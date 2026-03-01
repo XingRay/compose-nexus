@@ -43,7 +43,6 @@ android {
 dependencies {
     implementation(project(":sample"))
 
-    implementation(libs.compose.uiToolingPreview)
     implementation(libs.androidx.activity.compose)
 
     debugImplementation(libs.compose.uiTooling)
