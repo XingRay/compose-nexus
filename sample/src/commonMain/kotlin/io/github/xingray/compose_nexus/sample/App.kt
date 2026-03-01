@@ -1,48 +1,279 @@
 package io.github.xingray.compose_nexus.sample
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.xingray.compose_nexus.Greeting
-import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.dp
+import io.github.xingray.compose_nexus.controls.NexusDivider
+import io.github.xingray.compose_nexus.controls.NexusText
+import io.github.xingray.compose_nexus.sample.demos.*
+import io.github.xingray.compose_nexus.theme.NexusTheme
 
-import compose_nexus.sample.generated.resources.Res
-import compose_nexus.sample.generated.resources.compose_multiplatform
+enum class DemoRoute(val label: String, val group: String) {
+    Overview("Overview", ""),
+    // Basic
+    Button("Button", "Basic"),
+    Text("Text", "Basic"),
+    Link("Link", "Basic"),
+    Tag("Tag", "Basic"),
+    Divider("Divider", "Basic"),
+    Space("Space", "Basic"),
+    // Form
+    Input("Input", "Form"),
+    InputNumber("InputNumber", "Form"),
+    Textarea("Textarea", "Form"),
+    Checkbox("Checkbox", "Form"),
+    Radio("Radio", "Form"),
+    Switch("Switch", "Form"),
+    Select("Select", "Form"),
+    Slider("Slider", "Form"),
+    DatePicker("DatePicker", "Form"),
+    TimePicker("TimePicker", "Form"),
+    Form("Form", "Form"),
+    Autocomplete("Autocomplete", "Form"),
+    InputTag("InputTag", "Form"),
+    Cascader("Cascader", "Form"),
+    Transfer("Transfer", "Form"),
+    // Data
+    Table("Table", "Data Display"),
+    Tree("Tree", "Data Display"),
+    Pagination("Pagination", "Data Display"),
+    Progress("Progress", "Data Display"),
+    Avatar("Avatar", "Data Display"),
+    Skeleton("Skeleton", "Data Display"),
+    Empty("Empty", "Data Display"),
+    Calendar("Calendar", "Data Display"),
+    // Navigation
+    Menu("Menu", "Navigation"),
+    Steps("Steps", "Navigation"),
+    Breadcrumb("Breadcrumb", "Navigation"),
+    Tabs("Tabs", "Navigation"),
+    Dropdown("Dropdown", "Navigation"),
+    // Feedback
+    Alert("Alert", "Feedback"),
+    Message("Message", "Feedback"),
+    Notification("Notification", "Feedback"),
+    Loading("Loading", "Feedback"),
+    Tooltip("Tooltip", "Feedback"),
+    Tour("Tour", "Feedback"),
+    // Container
+    Card("Card", "Container"),
+    Collapse("Collapse", "Container"),
+    Dialog("Dialog", "Container"),
+    Drawer("Drawer", "Container"),
+    Carousel("Carousel", "Container"),
+}
 
 @Composable
-fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
+fun App(modifier: Modifier = Modifier) {
+    NexusTheme {
+        val colorScheme = NexusTheme.colorScheme
+        var currentRoute by remember { mutableStateOf(DemoRoute.Overview) }
+
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
+            modifier = modifier
+                .fillMaxSize()
                 .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .background(colorScheme.background.page),
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+            // Top header
+            AppHeader()
+
+            // Body: sidebar + content
+            Row(modifier = Modifier.weight(1f)) {
+                // Sidebar
+                AppSidebar(
+                    currentRoute = currentRoute,
+                    onRouteChange = { currentRoute = it },
+                )
+
+                // Content area
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(NexusTheme.shapes.base)
+                        .background(colorScheme.fill.blank)
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
                 ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+                    DemoContent(currentRoute)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun AppHeader() {
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(colorScheme.fill.blank)
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NexusText(
+            text = "Compose Nexus",
+            color = colorScheme.primary.base,
+            style = typography.large,
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        NexusText(
+            text = "Component Library",
+            color = colorScheme.text.secondary,
+            style = typography.small,
+        )
+    }
+    NexusDivider()
+}
+
+@Composable
+private fun AppSidebar(
+    currentRoute: DemoRoute,
+    onRouteChange: (DemoRoute) -> Unit,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+
+    Column(
+        modifier = Modifier
+            .width(220.dp)
+            .fillMaxHeight()
+            .background(colorScheme.fill.blank)
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp),
+    ) {
+        var lastGroup = ""
+        DemoRoute.entries.forEach { route ->
+            // Group header
+            if (route.group != lastGroup && route.group.isNotEmpty()) {
+                lastGroup = route.group
+                Spacer(modifier = Modifier.height(12.dp))
+                NexusText(
+                    text = route.group,
+                    color = colorScheme.text.placeholder,
+                    style = typography.extraSmall,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+                )
+            }
+
+            // Menu item
+            val isActive = currentRoute == route
+            val interactionSource = remember { MutableInteractionSource() }
+            val isHovered by interactionSource.collectIsHoveredAsState()
+
+            val bgColor = when {
+                isActive -> colorScheme.primary.light9
+                isHovered -> colorScheme.fill.light
+                else -> Color.Transparent
+            }
+            val textColor = when {
+                isActive -> colorScheme.primary.base
+                isHovered -> colorScheme.primary.base
+                else -> colorScheme.text.regular
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 36.dp)
+                    .hoverable(interactionSource)
+                    .background(bgColor)
+                    .clickable { onRouteChange(route) }
+                    .pointerHoverIcon(PointerIcon.Hand)
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                NexusText(
+                    text = route.label,
+                    color = textColor,
+                    style = typography.base,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DemoContent(route: DemoRoute) {
+    when (route) {
+        DemoRoute.Overview -> OverviewDemo()
+        DemoRoute.Button -> ButtonDemo()
+        DemoRoute.Text -> TextDemo()
+        DemoRoute.Link -> LinkDemo()
+        DemoRoute.Tag -> TagDemo()
+        DemoRoute.Divider -> DividerDemo()
+        DemoRoute.Space -> SpaceDemo()
+        DemoRoute.Input -> InputDemo()
+        DemoRoute.InputNumber -> InputNumberDemo()
+        DemoRoute.Textarea -> TextareaDemo()
+        DemoRoute.Checkbox -> CheckboxDemo()
+        DemoRoute.Radio -> RadioDemo()
+        DemoRoute.Switch -> SwitchDemo()
+        DemoRoute.Select -> SelectDemo()
+        DemoRoute.Slider -> SliderDemo()
+        DemoRoute.DatePicker -> DatePickerDemo()
+        DemoRoute.TimePicker -> TimePickerDemo()
+        DemoRoute.Form -> FormDemo()
+        DemoRoute.Autocomplete -> AutocompleteDemo()
+        DemoRoute.InputTag -> InputTagDemo()
+        DemoRoute.Cascader -> CascaderDemo()
+        DemoRoute.Transfer -> TransferDemo()
+        DemoRoute.Table -> TableDemo()
+        DemoRoute.Tree -> TreeDemo()
+        DemoRoute.Pagination -> PaginationDemo()
+        DemoRoute.Progress -> ProgressDemo()
+        DemoRoute.Avatar -> AvatarDemo()
+        DemoRoute.Skeleton -> SkeletonDemo()
+        DemoRoute.Empty -> EmptyDemo()
+        DemoRoute.Calendar -> CalendarDemo()
+        DemoRoute.Menu -> MenuDemo()
+        DemoRoute.Steps -> StepsDemo()
+        DemoRoute.Breadcrumb -> BreadcrumbDemo()
+        DemoRoute.Tabs -> TabsDemo()
+        DemoRoute.Dropdown -> DropdownDemo()
+        DemoRoute.Alert -> AlertDemo()
+        DemoRoute.Message -> MessageDemo()
+        DemoRoute.Notification -> NotificationDemo()
+        DemoRoute.Loading -> LoadingDemo()
+        DemoRoute.Tooltip -> TooltipDemo()
+        DemoRoute.Tour -> TourDemo()
+        DemoRoute.Card -> CardDemo()
+        DemoRoute.Collapse -> CollapseDemo()
+        DemoRoute.Dialog -> DialogDemo()
+        DemoRoute.Drawer -> DrawerDemo()
+        DemoRoute.Carousel -> CarouselDemo()
     }
 }
