@@ -6,7 +6,10 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.vanniktechMavenPublish)
 }
+
+val isMacOs = System.getProperty("os.name").startsWith("Mac", ignoreCase = true)
 
 kotlin {
     androidLibrary {
@@ -15,13 +18,15 @@ kotlin {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Nexus"
-            isStatic = true
+    if (isMacOs) {
+        listOf(
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "Nexus"
+                isStatic = true
+            }
         }
     }
 
@@ -48,6 +53,40 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+
+    coordinates("io.github.xingray", "compose-nexus-core", "0.0.1")
+
+    pom {
+        name.set("compose-nexus-core")
+        description.set("Compose Multiplatform UI component library inspired by Element Plus")
+        url.set("https://github.com/XingRay/compose-nexus")
+
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("XingRay")
+                name.set("XingRay")
+                email.set("leixing1012@gmail.com")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/XingRay/compose-nexus")
+            connection.set("scm:git:git://github.com/XingRay/compose-nexus.git")
+            developerConnection.set("scm:git:ssh://github.com/XingRay/compose-nexus.git")
         }
     }
 }
