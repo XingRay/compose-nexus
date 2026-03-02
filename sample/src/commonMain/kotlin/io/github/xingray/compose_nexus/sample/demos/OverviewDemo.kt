@@ -1,22 +1,29 @@
 package io.github.xingray.compose_nexus.sample.demos
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.controls.NexusText
+import io.github.xingray.compose_nexus.sample.DemoRoute
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
 private val componentGroups = listOf(
@@ -28,9 +35,12 @@ private val componentGroups = listOf(
     "Container" to listOf("Card", "Collapse", "Dialog", "Drawer", "Carousel"),
 )
 
+private val nameToRoute: Map<String, DemoRoute> =
+    DemoRoute.entries.associateBy { it.label }
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun OverviewDemo() {
+fun OverviewDemo(onNavigate: (DemoRoute) -> Unit = {}) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
 
@@ -51,17 +61,33 @@ fun OverviewDemo() {
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 components.forEach { name ->
+                    val route = nameToRoute[name]
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val isHovered by interactionSource.collectIsHoveredAsState()
+                    val bgColor = if (isHovered) colorScheme.primary.light9 else colorScheme.fill.lighter
+                    val textColor = if (isHovered) colorScheme.primary.base else colorScheme.text.regular
+
                     Box(
                         modifier = Modifier
                             .size(width = 140.dp, height = 60.dp)
                             .clip(NexusTheme.shapes.base)
-                            .background(colorScheme.fill.lighter)
+                            .hoverable(interactionSource)
+                            .background(bgColor)
+                            .then(
+                                if (route != null) {
+                                    Modifier
+                                        .clickable { onNavigate(route) }
+                                        .pointerHoverIcon(PointerIcon.Hand)
+                                } else {
+                                    Modifier
+                                }
+                            )
                             .padding(12.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         NexusText(
                             text = name,
-                            color = colorScheme.text.regular,
+                            color = textColor,
                             style = typography.base,
                         )
                     }

@@ -35,6 +35,8 @@ import io.github.xingray.compose_nexus.controls.NexusDivider
 import io.github.xingray.compose_nexus.controls.NexusText
 import io.github.xingray.compose_nexus.sample.demos.*
 import io.github.xingray.compose_nexus.theme.NexusTheme
+import io.github.xingray.compose_nexus.theme.darkColorScheme
+import io.github.xingray.compose_nexus.theme.lightColorScheme
 
 enum class DemoRoute(val label: String, val group: String) {
     Overview("Overview", ""),
@@ -93,18 +95,24 @@ enum class DemoRoute(val label: String, val group: String) {
 
 @Composable
 fun App(modifier: Modifier = Modifier) {
-    NexusTheme {
-        val colorScheme = NexusTheme.colorScheme
+    var isDarkMode by remember { mutableStateOf(false) }
+    val colorScheme = if (isDarkMode) darkColorScheme() else lightColorScheme()
+
+    NexusTheme(colorScheme = colorScheme) {
+        val colors = NexusTheme.colorScheme
         var currentRoute by remember { mutableStateOf(DemoRoute.Overview) }
 
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .safeContentPadding()
-                .background(colorScheme.background.page),
+                .background(colors.background.page),
         ) {
             // Top header
-            AppHeader()
+            AppHeader(
+                isDarkMode = isDarkMode,
+                onToggleDarkMode = { isDarkMode = !isDarkMode },
+            )
 
             // Body: sidebar + content
             Row(modifier = Modifier.weight(1f)) {
@@ -120,11 +128,11 @@ fun App(modifier: Modifier = Modifier) {
                         .weight(1f)
                         .fillMaxHeight()
                         .clip(NexusTheme.shapes.base)
-                        .background(colorScheme.fill.blank)
+                        .background(colors.fill.blank)
                         .padding(24.dp)
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    DemoContent(currentRoute)
+                    DemoContent(currentRoute, onNavigate = { currentRoute = it })
                 }
             }
         }
@@ -132,7 +140,10 @@ fun App(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AppHeader() {
+private fun AppHeader(
+    isDarkMode: Boolean,
+    onToggleDarkMode: () -> Unit,
+) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
 
@@ -155,6 +166,22 @@ private fun AppHeader() {
             color = colorScheme.text.secondary,
             style = typography.small,
         )
+        Spacer(modifier = Modifier.weight(1f))
+        // Dark mode toggle
+        Box(
+            modifier = Modifier
+                .clip(NexusTheme.shapes.base)
+                .background(colorScheme.fill.light)
+                .clickable { onToggleDarkMode() }
+                .pointerHoverIcon(PointerIcon.Hand)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            NexusText(
+                text = if (isDarkMode) "Light" else "Dark",
+                color = colorScheme.text.regular,
+                style = typography.small,
+            )
+        }
     }
     NexusDivider()
 }
@@ -227,9 +254,9 @@ private fun AppSidebar(
 }
 
 @Composable
-private fun DemoContent(route: DemoRoute) {
+private fun DemoContent(route: DemoRoute, onNavigate: (DemoRoute) -> Unit) {
     when (route) {
-        DemoRoute.Overview -> OverviewDemo()
+        DemoRoute.Overview -> OverviewDemo(onNavigate = onNavigate)
         DemoRoute.Button -> ButtonDemo()
         DemoRoute.Text -> TextDemo()
         DemoRoute.Link -> LinkDemo()
