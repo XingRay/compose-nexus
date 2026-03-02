@@ -43,6 +43,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.xingray.compose_nexus.foundation.NotAllowedPointerIcon
 import io.github.xingray.compose_nexus.foundation.ProvideContentColorTextStyle
 import io.github.xingray.compose_nexus.theme.ComponentSize
 import io.github.xingray.compose_nexus.theme.NexusTheme
@@ -205,8 +206,8 @@ private fun resolveButtonColors(
             return when {
                 isPressed -> ButtonColors(
                     background = cs.fill.blank,
-                    content = cs.primary.dark2,
-                    border = cs.primary.dark2,
+                    content = cs.primary.base,
+                    border = cs.primary.light5,
                 )
                 isHovered -> ButtonColors(
                     background = cs.fill.blank,
@@ -271,8 +272,8 @@ private fun resolveButtonColors(
             return when {
                 isPressed -> ButtonColors(
                     background = cs.fill.blank,
-                    content = cs.primary.dark2,
-                    border = cs.primary.dark2,
+                    content = cs.primary.base,
+                    border = cs.primary.light5,
                 )
                 isHovered -> ButtonColors(
                     background = cs.fill.blank,
@@ -288,9 +289,9 @@ private fun resolveButtonColors(
         }
         return when {
             isPressed -> ButtonColors(
-                background = cs.fill.blank,
-                content = cs.primary.dark2,
-                border = cs.primary.dark2,
+                background = cs.primary.light9,
+                content = cs.primary.base,
+                border = cs.primary.light5,
             )
             isHovered -> ButtonColors(
                 background = cs.primary.light9,
@@ -538,6 +539,7 @@ fun NexusButton(
                         .pointerHoverIcon(PointerIcon.Hand)
                 } else {
                     Modifier
+                        .pointerHoverIcon(NotAllowedPointerIcon)
                 }
             )
             .alpha(loadingAlpha),
