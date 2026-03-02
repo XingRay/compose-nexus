@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.composeHotReload)
 }
 
+val isMacOs = System.getProperty("os.name").startsWith("Mac", ignoreCase = true)
+
 kotlin {
     @Suppress("UnstableApiUsage")
     androidLibrary {
@@ -22,13 +24,15 @@ kotlin {
         }
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "Sample"
-            isStatic = true
+    if (isMacOs) {
+        listOf(
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "Sample"
+                isStatic = true
+            }
         }
     }
 
