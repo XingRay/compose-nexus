@@ -161,7 +161,11 @@ fun NexusRate(
 
         if (showText || showScore) {
             val text = if (showScore) {
-                val scoreValue = if (value % 1f == 0f) value.toInt().toString() else String.format("%.1f", value)
+                val scoreValue = if (value % 1f == 0f) {
+                    value.toInt().toString()
+                } else {
+                    oneDecimal(value)
+                }
                 scoreTemplate.replace("{value}", scoreValue)
             } else {
                 val index = ceil(value.coerceAtLeast(1f)).toInt().coerceIn(1, texts.size) - 1
@@ -177,4 +181,11 @@ fun NexusRate(
             )
         }
     }
+}
+
+private fun oneDecimal(value: Float): String {
+    val scaled = (value * 10f).toInt() / 10f
+    val integerPart = scaled.toInt()
+    val decimalPart = ((scaled - integerPart) * 10f).toInt()
+    return "$integerPart.$decimalPart"
 }

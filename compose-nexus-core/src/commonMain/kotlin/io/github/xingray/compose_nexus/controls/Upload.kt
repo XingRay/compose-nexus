@@ -408,10 +408,17 @@ fun NexusUpload(
 
 private fun formatBytes(size: Long): String {
     return when {
-        size >= 1024 * 1024 -> "${"%.1f".format(size / 1024f / 1024f)} MB"
-        size >= 1024 -> "${"%.1f".format(size / 1024f)} KB"
+        size >= 1024 * 1024 -> "${oneDecimal(size / 1024f / 1024f)} MB"
+        size >= 1024 -> "${oneDecimal(size / 1024f)} KB"
         else -> "$size B"
     }
+}
+
+private fun oneDecimal(value: Float): String {
+    val scaled = (value * 10f).toInt() / 10f
+    val integerPart = scaled.toInt()
+    val decimalPart = ((scaled - integerPart) * 10f).toInt()
+    return "$integerPart.$decimalPart"
 }
 
 private var uploadUidSeed = 0L
