@@ -1,16 +1,23 @@
 package io.github.xingray.compose_nexus.controls
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -18,25 +25,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.github.xingray.compose_nexus.theme.ComponentSize
 import io.github.xingray.compose_nexus.theme.NexusTheme
 import kotlin.math.roundToInt
 
-/**
- * Element Plus Slider — a draggable slider for selecting a value in a range.
- *
- * @param value Current value.
- * @param onValueChange Callback when value changes.
- * @param modifier Modifier.
- * @param min Minimum value.
- * @param max Maximum value.
- * @param step Discrete step (0 for continuous).
- * @param disabled Disabled state.
- * @param showTooltip Whether to show value tooltip above the thumb.
- */
+enum class NexusSliderPlacement {
+    Top,
+    Bottom,
+    Left,
+    Right,
+}
+
 @Composable
 fun NexusSlider(
     value: Float,
@@ -44,87 +48,517 @@ fun NexusSlider(
     modifier: Modifier = Modifier,
     min: Float = 0f,
     max: Float = 100f,
-    step: Float = 0f,
+    step: Float = 1f,
     disabled: Boolean = false,
+    showInput: Boolean = false,
+    showInputControls: Boolean = true,
+    size: ComponentSize = ComponentSize.Default,
+    inputSize: ComponentSize = size,
+    showStops: Boolean = false,
+    showTooltip: Boolean = true,
+    formatTooltip: ((Float) -> String)? = null,
+    vertical: Boolean = false,
+    height: Dp = 180.dp,
+    placement: NexusSliderPlacement = NexusSliderPlacement.Top,
+    marks: Map<Float, String> = emptyMap(),
+    onChange: ((Float) -> Unit)? = null,
+    onInput: ((Float) -> Unit)? = null,
+) {
+    val clamped = value.coerceIn(min, max)
+    if (!vertical && showInput) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SliderSingleTrack(
+                value = clamped,
+                onValueChange = onValueChange,
+                modifier = Modifier.weight(1f),
+                min = min,
+                max = max,
+                step = step,
+                disabled = disabled,
+                size = size,
+                showStops = showStops,
+                showTooltip = showTooltip,
+                formatTooltip = formatTooltip,
+                vertical = false,
+                height = height,
+                placement = placement,
+                marks = marks,
+                onChange = onChange,
+                onInput = onInput,
+            )
+            NexusInputNumber(
+                value = clamped.toDouble(),
+                onValueChange = {
+                    val normalized = snapValue(it.toFloat(), min, max, step)
+                    onValueChange(normalized)
+                    onInput?.invoke(normalized)
+                    onChange?.invoke(normalized)
+                },
+                min = min.toDouble(),
+                max = max.toDouble(),
+                step = step.toDouble().coerceAtLeast(0.000001),
+                size = inputSize,
+                disabled = disabled,
+                controls = showInputControls,
+                modifier = Modifier.width(120.dp),
+            )
+        }
+    } else {
+        SliderSingleTrack(
+            value = clamped,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            min = min,
+            max = max,
+            step = step,
+            disabled = disabled,
+            size = size,
+            showStops = showStops,
+            showTooltip = showTooltip,
+            formatTooltip = formatTooltip,
+            vertical = vertical,
+            height = height,
+            placement = placement,
+            marks = marks,
+            onChange = onChange,
+            onInput = onInput,
+        )
+    }
+}
+
+@Composable
+fun NexusRangeSlider(
+    values: ClosedFloatingPointRange<Float>,
+    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    modifier: Modifier = Modifier,
+    min: Float = 0f,
+    max: Float = 100f,
+    step: Float = 1f,
+    disabled: Boolean = false,
+    size: ComponentSize = ComponentSize.Default,
+    showStops: Boolean = false,
+    showTooltip: Boolean = true,
+    formatTooltip: ((Float) -> String)? = null,
+    placement: NexusSliderPlacement = NexusSliderPlacement.Top,
+    marks: Map<Float, String> = emptyMap(),
+    onChange: ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
+    onInput: ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
 ) {
     val colorScheme = NexusTheme.colorScheme
-    val density = LocalDensity.current
-
-    val trackHeight = 6.dp
-    val thumbSize = 20.dp
-    val activeColor = if (disabled) colorScheme.primary.light5 else colorScheme.primary.base
-    val inactiveColor = if (disabled) colorScheme.border.lighter else colorScheme.border.light
-    val thumbBorderColor = if (disabled) colorScheme.primary.light5 else colorScheme.primary.base
-
-    val range = max - min
-    val fraction = if (range > 0f) ((value - min) / range).coerceIn(0f, 1f) else 0f
-
-    fun snapToStep(raw: Float): Float {
-        if (step <= 0f) return raw.coerceIn(min, max)
-        val steps = ((raw - min) / step).roundToInt()
-        return (min + steps * step).coerceIn(min, max)
+    val trackHeight = when (size) {
+        ComponentSize.Large -> 8.dp
+        ComponentSize.Default -> 6.dp
+        ComponentSize.Small -> 4.dp
     }
+    val thumbSize = when (size) {
+        ComponentSize.Large -> 22.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
+    }
+    val topExtra = if (showTooltip && placement == NexusSliderPlacement.Top) 30.dp else 0.dp
+    val bottomExtra = (if (showTooltip && placement == NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
+        (if (marks.isNotEmpty()) 20.dp else 0.dp)
+    val normalized = normalizeRange(values, min, max, step)
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(thumbSize),
-        contentAlignment = Alignment.CenterStart,
+            .height(thumbSize + topExtra + bottomExtra),
     ) {
-        val trackWidthPx = with(density) { (maxWidth - thumbSize).toPx() }
-        val thumbOffsetPx = fraction * trackWidthPx
-        val halfThumbPx = with(density) { (thumbSize / 2).toPx() }
+        val trackWidthPx = (maxWidth - thumbSize).value
+        val trackTop = topExtra + (thumbSize - trackHeight) / 2
+        val halfThumbPx = thumbSize.value / 2f
+        val startFraction = fractionOf(normalized.start, min, max)
+        val endFraction = fractionOf(normalized.endInclusive, min, max)
+        val startOffsetPx = startFraction * trackWidthPx
+        val endOffsetPx = endFraction * trackWidthPx
 
-        // Inactive track (background)
+        var startDragOffset by remember(normalized) { mutableFloatStateOf(startOffsetPx) }
+        var endDragOffset by remember(normalized) { mutableFloatStateOf(endOffsetPx) }
+        var lastRange by remember(normalized) { mutableStateOf(normalized) }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(trackHeight)
+                .offset(y = trackTop)
                 .clip(CircleShape)
-                .background(inactiveColor)
-                .align(Alignment.Center),
+                .background(if (disabled) colorScheme.border.lighter else colorScheme.border.light),
         )
-
-        // Active track (filled portion)
         Box(
             modifier = Modifier
-                .fillMaxWidth(fraction)
+                .offset {
+                    IntOffset(
+                        x = (startOffsetPx + halfThumbPx).roundToInt(),
+                        y = trackTop.roundToPx(),
+                    )
+                }
+                .width((endOffsetPx - startOffsetPx).dp)
                 .height(trackHeight)
                 .clip(CircleShape)
-                .background(activeColor)
-                .align(Alignment.CenterStart),
+                .background(if (disabled) colorScheme.primary.light5 else colorScheme.primary.base),
         )
 
-        // Thumb
-        Box(
+        val stopCount = (((max - min) / step).roundToInt()).coerceAtMost(200)
+        if (showStops && step > 0f && stopCount > 1) {
+            (1 until stopCount).forEach { index ->
+                val xPx = index.toFloat() / stopCount.toFloat() * trackWidthPx + halfThumbPx
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .offset { IntOffset(xPx.roundToInt() - 2, (trackTop + trackHeight + 2.dp).roundToPx()) }
+                        .clip(CircleShape)
+                        .background(colorScheme.border.base),
+                )
+            }
+        }
+
+        marks.forEach { (markValue, label) ->
+            if (markValue in min..max) {
+                val markFraction = fractionOf(markValue, min, max)
+                val xPx = markFraction * trackWidthPx + halfThumbPx
+                NexusText(
+                    text = label,
+                    style = NexusTheme.typography.extraSmall,
+                    color = colorScheme.text.placeholder,
+                    modifier = Modifier.offset { IntOffset(xPx.roundToInt() - 10, (trackTop + thumbSize + 2.dp).roundToPx()) },
+                )
+            }
+        }
+
+        fun updateRange(isStartThumb: Boolean, offsetPx: Float) {
+            if (disabled) return
+            if (isStartThumb) {
+                val clampedPx = offsetPx.coerceIn(0f, endOffsetPx)
+                startDragOffset = clampedPx
+                val v = snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
+                lastRange = normalizeRange(v..lastRange.endInclusive, min, max, step)
+            } else {
+                val clampedPx = offsetPx.coerceIn(startOffsetPx, trackWidthPx)
+                endDragOffset = clampedPx
+                val v = snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
+                lastRange = normalizeRange(lastRange.start..v, min, max, step)
+            }
+            onValueChange(lastRange)
+            onInput?.invoke(lastRange)
+        }
+
+        SliderThumb(
             modifier = Modifier
-                .offset { IntOffset(thumbOffsetPx.roundToInt(), 0) }
-                .size(thumbSize)
-                .shadow(2.dp, CircleShape)
-                .clip(CircleShape)
-                .background(colorScheme.white)
-                .then(
-                    if (!disabled) {
-                        Modifier.pointerInput(min, max, step) {
-                            detectHorizontalDragGestures { change, dragAmount ->
-                                change.consume()
-                                val newPx = (thumbOffsetPx + dragAmount).coerceIn(0f, trackWidthPx)
-                                val newFraction = newPx / trackWidthPx
-                                val newValue = min + newFraction * range
-                                onValueChange(snapToStep(newValue))
-                            }
-                        }
-                    } else Modifier
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Inner dot to mimic Element Plus thumb with border
-            Box(
-                modifier = Modifier
-                    .size(thumbSize - 4.dp)
-                    .clip(CircleShape)
-                    .background(colorScheme.white),
+                .offset { IntOffset(startOffsetPx.roundToInt(), topExtra.roundToPx()) }
+                .pointerInput(disabled, startOffsetPx, endOffsetPx, min, max, step) {
+                    detectDragGestures(
+                        onDragStart = { startDragOffset = startOffsetPx },
+                        onDragEnd = { onChange?.invoke(lastRange) },
+                    ) { change, dragAmount ->
+                        change.consume()
+                        startDragOffset += dragAmount.x
+                        updateRange(isStartThumb = true, offsetPx = startDragOffset)
+                    }
+                },
+            size = thumbSize,
+            disabled = disabled,
+        )
+
+        SliderThumb(
+            modifier = Modifier
+                .offset { IntOffset(endOffsetPx.roundToInt(), topExtra.roundToPx()) }
+                .pointerInput(disabled, startOffsetPx, endOffsetPx, min, max, step) {
+                    detectDragGestures(
+                        onDragStart = { endDragOffset = endOffsetPx },
+                        onDragEnd = { onChange?.invoke(lastRange) },
+                    ) { change, dragAmount ->
+                        change.consume()
+                        endDragOffset += dragAmount.x
+                        updateRange(isStartThumb = false, offsetPx = endDragOffset)
+                    }
+                },
+            size = thumbSize,
+            disabled = disabled,
+        )
+
+        if (showTooltip) {
+            val formatter = formatTooltip ?: { it.roundToInt().toString() }
+            val y = if (placement == NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
+            SliderTooltip(
+                text = formatter(lastRange.start),
+                modifier = Modifier.offset { IntOffset(startOffsetPx.roundToInt() - 10, y.roundToPx()) },
+            )
+            SliderTooltip(
+                text = formatter(lastRange.endInclusive),
+                modifier = Modifier.offset { IntOffset(endOffsetPx.roundToInt() - 10, y.roundToPx()) },
             )
         }
     }
+}
+
+@Composable
+private fun SliderSingleTrack(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier,
+    min: Float,
+    max: Float,
+    step: Float,
+    disabled: Boolean,
+    size: ComponentSize,
+    showStops: Boolean,
+    showTooltip: Boolean,
+    formatTooltip: ((Float) -> String)?,
+    vertical: Boolean,
+    height: Dp,
+    placement: NexusSliderPlacement,
+    marks: Map<Float, String>,
+    onChange: ((Float) -> Unit)?,
+    onInput: ((Float) -> Unit)?,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    val trackThickness = when (size) {
+        ComponentSize.Large -> 8.dp
+        ComponentSize.Default -> 6.dp
+        ComponentSize.Small -> 4.dp
+    }
+    val thumbSize = when (size) {
+        ComponentSize.Large -> 22.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
+    }
+    val normalizedValue = snapValue(value, min, max, step)
+    var lastValue by remember(normalizedValue) { mutableFloatStateOf(normalizedValue) }
+
+    if (!vertical) {
+        val topExtra = if (showTooltip && placement == NexusSliderPlacement.Top) 30.dp else 0.dp
+        val bottomExtra = (if (showTooltip && placement == NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
+            (if (marks.isNotEmpty() || showStops) 20.dp else 0.dp)
+        BoxWithConstraints(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(thumbSize + topExtra + bottomExtra),
+        ) {
+            val trackWidthPx = (maxWidth - thumbSize).value
+            val fraction = fractionOf(normalizedValue, min, max)
+            val thumbOffsetPx = fraction * trackWidthPx
+            val halfThumbPx = thumbSize.value / 2f
+            val trackTop = topExtra + (thumbSize - trackThickness) / 2
+
+            fun emitFromOffset(offsetPx: Float) {
+                val raw = min + (offsetPx / trackWidthPx) * (max - min)
+                val next = snapValue(raw, min, max, step)
+                lastValue = next
+                onValueChange(next)
+                onInput?.invoke(next)
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(trackThickness)
+                    .offset(y = trackTop)
+                    .clip(CircleShape)
+                    .background(if (disabled) colorScheme.border.lighter else colorScheme.border.light),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .height(trackThickness)
+                    .offset(y = trackTop)
+                    .clip(CircleShape)
+                    .background(if (disabled) colorScheme.primary.light5 else colorScheme.primary.base),
+            )
+
+            val stopCount = (((max - min) / step).roundToInt()).coerceAtMost(200)
+            if (showStops && step > 0f && stopCount > 1) {
+                (1 until stopCount).forEach { index ->
+                    val xPx = index.toFloat() / stopCount.toFloat() * trackWidthPx + halfThumbPx
+                    Box(
+                        modifier = Modifier
+                            .size(4.dp)
+                            .offset { IntOffset(xPx.roundToInt() - 2, (trackTop + trackThickness + 2.dp).roundToPx()) }
+                            .clip(CircleShape)
+                            .background(colorScheme.border.base),
+                    )
+                }
+            }
+
+            marks.forEach { (markValue, label) ->
+                if (markValue in min..max) {
+                    val markFraction = fractionOf(markValue, min, max)
+                    val xPx = markFraction * trackWidthPx + halfThumbPx
+                    NexusText(
+                        text = label,
+                        style = NexusTheme.typography.extraSmall,
+                        color = colorScheme.text.placeholder,
+                        modifier = Modifier.offset { IntOffset(xPx.roundToInt() - 10, (trackTop + thumbSize + 2.dp).roundToPx()) },
+                    )
+                }
+            }
+
+            SliderThumb(
+                modifier = Modifier
+                    .offset { IntOffset(thumbOffsetPx.roundToInt(), topExtra.roundToPx()) }
+                    .pointerInput(disabled, value, min, max, step) {
+                        detectDragGestures(
+                            onDragEnd = { onChange?.invoke(lastValue) },
+                        ) { change, _ ->
+                            if (disabled) return@detectDragGestures
+                            val x = (change.position.x - halfThumbPx).coerceIn(0f, trackWidthPx)
+                            emitFromOffset(x)
+                            change.consume()
+                        }
+                    },
+                size = thumbSize,
+                disabled = disabled,
+            )
+
+            if (showTooltip) {
+                val formatter = formatTooltip ?: { it.roundToInt().toString() }
+                val y = if (placement == NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
+                SliderTooltip(
+                    text = formatter(normalizedValue),
+                    modifier = Modifier.offset { IntOffset(thumbOffsetPx.roundToInt() - 10, y.roundToPx()) },
+                )
+            }
+        }
+    } else {
+        val leftExtra = if (showTooltip && placement == NexusSliderPlacement.Left) 42.dp else 0.dp
+        val rightExtra = if (showTooltip && placement == NexusSliderPlacement.Right) 42.dp else 0.dp
+        BoxWithConstraints(
+            modifier = modifier
+                .width(thumbSize + leftExtra + rightExtra)
+                .height(height),
+        ) {
+            val trackHeightPx = (maxHeight - thumbSize).value
+            val fraction = fractionOf(normalizedValue, min, max)
+            val thumbOffsetYPx = (1f - fraction) * trackHeightPx
+            val trackLeft = leftExtra + (thumbSize - trackThickness) / 2
+
+            fun emitFromOffset(offsetYPx: Float) {
+                val raw = min + (1f - offsetYPx / trackHeightPx) * (max - min)
+                val next = snapValue(raw, min, max, step)
+                lastValue = next
+                onValueChange(next)
+                onInput?.invoke(next)
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(trackThickness)
+                    .fillMaxHeight()
+                    .offset(x = trackLeft)
+                    .clip(CircleShape)
+                    .background(if (disabled) colorScheme.border.lighter else colorScheme.border.light),
+            )
+            Box(
+                modifier = Modifier
+                    .width(trackThickness)
+                    .height((fraction * trackHeightPx).dp)
+                    .offset {
+                        IntOffset(
+                            x = trackLeft.roundToPx(),
+                            y = (thumbOffsetYPx + thumbSize.value / 2f).roundToInt(),
+                        )
+                    }
+                    .clip(CircleShape)
+                    .background(if (disabled) colorScheme.primary.light5 else colorScheme.primary.base),
+            )
+
+            SliderThumb(
+                modifier = Modifier
+                    .offset { IntOffset(leftExtra.roundToPx(), thumbOffsetYPx.roundToInt()) }
+                    .pointerInput(disabled, value, min, max, step) {
+                        detectDragGestures(
+                            onDragEnd = { onChange?.invoke(lastValue) },
+                        ) { change, _ ->
+                            if (disabled) return@detectDragGestures
+                            val y = (change.position.y - thumbSize.value / 2f).coerceIn(0f, trackHeightPx)
+                            emitFromOffset(y)
+                            change.consume()
+                        }
+                    },
+                size = thumbSize,
+                disabled = disabled,
+            )
+
+            if (showTooltip) {
+                val formatter = formatTooltip ?: { it.roundToInt().toString() }
+                val x = if (placement == NexusSliderPlacement.Left) 0.dp else leftExtra + thumbSize + 2.dp
+                SliderTooltip(
+                    text = formatter(normalizedValue),
+                    modifier = Modifier.offset { IntOffset(x.roundToPx(), thumbOffsetYPx.roundToInt()) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SliderThumb(
+    modifier: Modifier,
+    size: Dp,
+    disabled: Boolean,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    Box(
+        modifier = modifier
+            .size(size)
+            .shadow(2.dp, CircleShape)
+            .clip(CircleShape)
+            .background(colorScheme.white),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(size - 4.dp)
+                .clip(CircleShape)
+                .background(if (disabled) colorScheme.primary.light5 else colorScheme.white),
+        )
+    }
+}
+
+@Composable
+private fun SliderTooltip(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    Box(
+        modifier = modifier
+            .background(colorScheme.text.primary, NexusTheme.shapes.base)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+    ) {
+        NexusText(
+            text = text,
+            color = colorScheme.white,
+            style = NexusTheme.typography.extraSmall,
+        )
+    }
+}
+
+private fun snapValue(value: Float, min: Float, max: Float, step: Float): Float {
+    if (max <= min) return min
+    val clamped = value.coerceIn(min, max)
+    if (step <= 0f) return clamped
+    val stepCount = ((clamped - min) / step).roundToInt()
+    return (min + stepCount * step).coerceIn(min, max)
+}
+
+private fun fractionOf(value: Float, min: Float, max: Float): Float {
+    val range = max - min
+    if (range <= 0f) return 0f
+    return ((value - min) / range).coerceIn(0f, 1f)
+}
+
+private fun normalizeRange(
+    values: ClosedFloatingPointRange<Float>,
+    min: Float,
+    max: Float,
+    step: Float,
+): ClosedFloatingPointRange<Float> {
+    val start = snapValue(values.start, min, max, step)
+    val end = snapValue(values.endInclusive, min, max, step)
+    return if (start <= end) start..end else end..start
 }

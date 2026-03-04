@@ -9,6 +9,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.xingray.compose_nexus.foundation.LocalContentColor
 import io.github.xingray.compose_nexus.foundation.LocalTextStyle
+import io.github.xingray.compose_nexus.foundation.ProvideContentColorTextStyle
+import io.github.xingray.compose_nexus.theme.ComponentSize
 import io.github.xingray.compose_nexus.theme.NexusTheme
 import io.github.xingray.compose_nexus.theme.NexusType
 import io.github.xingray.compose_nexus.theme.typeColor
@@ -29,26 +31,48 @@ fun NexusText(
     text: String,
     modifier: Modifier = Modifier,
     type: NexusType = NexusType.Default,
-    style: TextStyle = LocalTextStyle.current,
+    size: ComponentSize = ComponentSize.Default,
+    style: TextStyle = TextStyle.Default,
     color: Color = Color.Unspecified,
+    truncated: Boolean = false,
+    lineClamp: Int? = null,
+    tag: String = "span",
     maxLines: Int = 0,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
+    @Suppress("UNUSED_VARIABLE")
+    val currentTag = tag
+
     val resolvedColor = when {
         color.isSpecified -> color
         type != NexusType.Default -> NexusTheme.colorScheme.typeColor(type)?.base
             ?: LocalContentColor.current
         else -> LocalContentColor.current
     }
-    val mergedStyle = style.merge(TextStyle(color = resolvedColor))
+    val sizeStyle = when (size) {
+        ComponentSize.Large -> NexusTheme.typography.large
+        ComponentSize.Default -> NexusTheme.typography.base
+        ComponentSize.Small -> NexusTheme.typography.small
+    }
+    val mergedStyle = sizeStyle.merge(style).merge(TextStyle(color = resolvedColor))
+    val effectiveMaxLines = when {
+        lineClamp != null && lineClamp > 0 -> lineClamp
+        truncated -> 1
+        maxLines > 0 -> maxLines
+        else -> 0
+    }
+    val effectiveOverflow = when {
+        (truncated || (lineClamp != null && lineClamp > 0)) && overflow == TextOverflow.Clip -> TextOverflow.Ellipsis
+        else -> overflow
+    }
 
-    if (maxLines > 0) {
+    if (effectiveMaxLines > 0) {
         BasicText(
             text = text,
             modifier = modifier,
             style = mergedStyle,
-            maxLines = maxLines,
-            overflow = overflow,
+            maxLines = effectiveMaxLines,
+            overflow = effectiveOverflow,
         )
     } else {
         BasicText(
@@ -56,5 +80,41 @@ fun NexusText(
             modifier = modifier,
             style = mergedStyle,
         )
+    }
+}
+
+@Composable
+fun NexusText(
+    modifier: Modifier = Modifier,
+    type: NexusType = NexusType.Default,
+    size: ComponentSize = ComponentSize.Default,
+    style: TextStyle = TextStyle.Default,
+    color: Color = Color.Unspecified,
+    tag: String = "span",
+    content: @Composable () -> Unit,
+) {
+    @Suppress("UNUSED_VARIABLE")
+    val currentTag = tag
+
+    val resolvedColor = when {
+        color.isSpecified -> color
+        type != NexusType.Default -> NexusTheme.colorScheme.typeColor(type)?.base
+            ?: LocalContentColor.current
+        else -> LocalContentColor.current
+    }
+    val sizeStyle = when (size) {
+        ComponentSize.Large -> NexusTheme.typography.large
+        ComponentSize.Default -> NexusTheme.typography.base
+        ComponentSize.Small -> NexusTheme.typography.small
+    }
+    val mergedStyle = sizeStyle.merge(style)
+
+    androidx.compose.foundation.layout.Box(modifier = modifier) {
+        ProvideContentColorTextStyle(
+            contentColor = resolvedColor,
+            textStyle = mergedStyle,
+        ) {
+            content()
+        }
     }
 }

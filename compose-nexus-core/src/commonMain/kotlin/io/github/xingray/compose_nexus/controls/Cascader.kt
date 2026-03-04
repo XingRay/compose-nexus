@@ -47,6 +47,11 @@ data class CascaderOption<T>(
     val disabled: Boolean = false,
 )
 
+enum class CascaderExpandTrigger {
+    Click,
+    Hover,
+}
+
 /**
  * Cascader state holder.
  */
@@ -70,7 +75,14 @@ class CascaderState<T>(
         isOpen = false
     }
 
-    fun displayText(): String {
+    fun clear() {
+        selectedPath.clear()
+    }
+
+    fun displayText(
+        showAllLevels: Boolean = true,
+        separator: String = " / ",
+    ): String {
         if (selectedPath.isEmpty()) return ""
         val labels = mutableListOf<String>()
         var currentOptions = options
@@ -81,7 +93,11 @@ class CascaderState<T>(
                 currentOptions = found.children
             }
         }
-        return labels.joinToString(" / ")
+        return if (showAllLevels) {
+            labels.joinToString(separator)
+        } else {
+            labels.lastOrNull().orEmpty()
+        }
     }
 
     internal fun expandAt(level: Int, value: T) {
@@ -130,6 +146,18 @@ fun <T> NexusCascader(
     state: CascaderState<T>,
     modifier: Modifier = Modifier,
     placeholder: String = "Select",
+    disabled: Boolean = false,
+    clearable: Boolean = false,
+    showAllLevels: Boolean = true,
+    separator: String = " / ",
+    expandTrigger: CascaderExpandTrigger = CascaderExpandTrigger.Click,
+    header: (@Composable () -> Unit)? = null,
+    footer: (@Composable () -> Unit)? = null,
+    onClear: (() -> Unit)? = null,
+    onVisibleChange: ((Boolean) -> Unit)? = null,
+    onFocus: (() -> Unit)? = null,
+    onBlur: (() -> Unit)? = null,
+    onExpandChange: ((List<T>) -> Unit)? = null,
     onSelect: ((List<T>) -> Unit)? = null,
 ) {
     val colorScheme = NexusTheme.colorScheme
@@ -140,12 +168,23 @@ fun <T> NexusCascader(
     Column(modifier = modifier) {
         // Trigger input
         NexusInput(
-            value = state.displayText(),
-            onValueChange = {},
+            value = state.displayText(showAllLevels = showAllLevels, separator = separator),
+            onValueChange = {
+                if (it.isEmpty()) {
+                    state.clear()
+                    onClear?.invoke()
+                }
+            },
             placeholder = placeholder,
+            disabled = disabled,
+            readonly = true,
+            clearable = clearable && state.selectedPath.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { state.isOpen = !state.isOpen },
+                .clickable(enabled = !disabled) {
+                    state.isOpen = !state.isOpen
+                    onVisibleChange?.invoke(state.isOpen)
+                },
             suffix = {
                 NexusText(
                     text = if (state.isOpen) "▴" else "▾",
@@ -153,44 +192,75 @@ fun <T> NexusCascader(
                     style = typography.extraSmall,
                 )
             },
+            onFocusChanged = { focused ->
+                if (focused) onFocus?.invoke() else onBlur?.invoke()
+            },
         )
 
         // Dropdown panels
-        if (state.isOpen) {
+        if (state.isOpen && !disabled) {
             Popup(
                 alignment = Alignment.TopStart,
                 properties = PopupProperties(focusable = true),
-                onDismissRequest = { state.close() },
+                onDismissRequest = {
+                    state.close()
+                    onVisibleChange?.invoke(false)
+                },
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .shadow(shadows.light.elevation, shapes.base)
                         .clip(shapes.base)
                         .background(colorScheme.fill.blank)
                         .border(1.dp, colorScheme.border.lighter, shapes.base),
                 ) {
-                    // Render each level as a column
-                    val levelCount = state.levelCount()
-                    for (level in 0 until levelCount) {
-                        val levelOptions = state.optionsAtLevel(level)
-                        if (levelOptions.isEmpty()) break
+                    if (header != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                        ) {
+                            header()
+                        }
+                    }
 
-                        CascaderColumn(
-                            options = levelOptions,
-                            expandedValue = state.expandedPath.getOrNull(level),
-                            selectedPath = state.selectedPath,
-                            level = level,
-                            onExpand = { value ->
-                                state.expandAt(level, value)
-                            },
-                            onSelect = { value ->
-                                // Build path up to this level + selected value
-                                val path = state.expandedPath.take(level).toMutableList()
-                                path.add(value)
-                                state.select(path)
-                                onSelect?.invoke(path)
-                            },
-                        )
+                    Row {
+                        // Render each level as a column
+                        val levelCount = state.levelCount()
+                        for (level in 0 until levelCount) {
+                            val levelOptions = state.optionsAtLevel(level)
+                            if (levelOptions.isEmpty()) break
+
+                            CascaderColumn(
+                                options = levelOptions,
+                                expandedValue = state.expandedPath.getOrNull(level),
+                                selectedPath = state.selectedPath,
+                                level = level,
+                                expandTrigger = expandTrigger,
+                                onExpand = { value ->
+                                    state.expandAt(level, value)
+                                    onExpandChange?.invoke(state.expandedPath.toList())
+                                },
+                                onSelect = { value ->
+                                    // Build path up to this level + selected value
+                                    val path = state.expandedPath.take(level).toMutableList()
+                                    path.add(value)
+                                    state.select(path)
+                                    onVisibleChange?.invoke(false)
+                                    onSelect?.invoke(path)
+                                },
+                            )
+                        }
+                    }
+
+                    if (footer != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                        ) {
+                            footer()
+                        }
                     }
                 }
             }
@@ -204,6 +274,7 @@ private fun <T> CascaderColumn(
     expandedValue: T?,
     selectedPath: List<T>,
     level: Int,
+    expandTrigger: CascaderExpandTrigger,
     onExpand: (T) -> Unit,
     onSelect: (T) -> Unit,
 ) {
@@ -240,7 +311,9 @@ private fun <T> CascaderColumn(
                         if (!option.disabled) {
                             Modifier
                                 .clickable {
-                                    if (hasChildren) {
+                                    if (hasChildren && expandTrigger == CascaderExpandTrigger.Click) {
+                                        onExpand(option.value)
+                                    } else if (hasChildren && expandTrigger == CascaderExpandTrigger.Hover) {
                                         onExpand(option.value)
                                     } else {
                                         onSelect(option.value)

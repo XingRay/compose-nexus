@@ -3,8 +3,10 @@ package io.github.xingray.compose_nexus.controls
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,22 +15,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.NexusTheme
+import io.github.xingray.compose_nexus.theme.NexusType
+import io.github.xingray.compose_nexus.theme.typeColor
 
 /**
- * A tree node data model.
- *
- * @param T The type of the node key.
- * @param key Unique identifier for this node.
- * @param label Display label.
- * @param children Child nodes.
- * @param disabled Whether this node is disabled.
+ * Tree node model.
  */
 data class TreeNode<T>(
     val key: T,
@@ -38,65 +38,168 @@ data class TreeNode<T>(
 )
 
 /**
- * Tree state holder managing expanded and selected nodes.
+ * Tree state holder.
  */
 @Stable
 class TreeState<T> {
-    internal val expandedKeys = mutableStateMapOf<T, Boolean>()
-    internal val selectedKey = mutableStateMapOf<String, T?>() // using "selected" as single key
+    internal val expandedKeyMap = mutableStateMapOf<T, Boolean>()
+    internal val checkedKeyMap = mutableStateMapOf<T, Boolean>()
+    internal val halfCheckedKeyMap = mutableStateMapOf<T, Boolean>()
 
-    fun isExpanded(key: T): Boolean = expandedKeys[key] == true
+    var currentKey by mutableStateOf<T?>(null)
+        private set
+    var filterKeyword by mutableStateOf("")
+        private set
+
+    fun isExpanded(key: T): Boolean = expandedKeyMap[key] == true
 
     fun toggleExpand(key: T) {
-        expandedKeys[key] = !(expandedKeys[key] ?: false)
+        expandedKeyMap[key] = !(expandedKeyMap[key] ?: false)
     }
 
     fun expand(key: T) {
-        expandedKeys[key] = true
+        expandedKeyMap[key] = true
     }
 
     fun collapse(key: T) {
-        expandedKeys[key] = false
+        expandedKeyMap[key] = false
     }
 
-    fun selectedKey(): T? = selectedKey["selected"]
-
-    fun select(key: T) {
-        selectedKey["selected"] = key
+    fun collapseAll() {
+        expandedKeyMap.clear()
     }
 
-    fun isSelected(key: T): Boolean = selectedKey["selected"] == key
+    fun selectedKey(): T? = currentKey
+
+    fun select(key: T?) {
+        currentKey = key
+    }
+
+    fun isSelected(key: T): Boolean = currentKey == key
+
+    fun filter(keyword: String) {
+        filterKeyword = keyword
+    }
+
+    fun isChecked(key: T): Boolean = checkedKeyMap[key] == true
+
+    fun isHalfChecked(key: T): Boolean = halfCheckedKeyMap[key] == true
+
+    fun checkedKeys(): List<T> = checkedKeyMap.filterValues { it }.keys.toList()
+
+    fun halfCheckedKeys(): List<T> = halfCheckedKeyMap.filterValues { it }.keys.toList()
+
+    fun setChecked(key: T, checked: Boolean) {
+        if (checked) checkedKeyMap[key] = true else checkedKeyMap.remove(key)
+    }
+
+    fun setHalfChecked(key: T, halfChecked: Boolean) {
+        if (halfChecked) halfCheckedKeyMap[key] = true else halfCheckedKeyMap.remove(key)
+    }
+
+    fun clearChecked() {
+        checkedKeyMap.clear()
+        halfCheckedKeyMap.clear()
+    }
+
+    fun setCheckedKeys(keys: Collection<T>) {
+        checkedKeyMap.clear()
+        keys.forEach { checkedKeyMap[it] = true }
+        halfCheckedKeyMap.clear()
+    }
 }
 
 @Composable
 fun <T> rememberTreeState(): TreeState<T> = remember { TreeState() }
 
+private data class TreeRelations<T>(
+    val nodeByKey: Map<T, TreeNode<T>>,
+    val parentByKey: Map<T, T?>,
+    val childrenByKey: Map<T, List<T>>,
+    val rootKeys: List<T>,
+)
+
 /**
- * Element Plus Tree — a hierarchical tree view.
- *
- * @param T Node key type.
- * @param nodes Root-level tree nodes.
- * @param modifier Modifier.
- * @param state Tree expand/select state.
- * @param defaultExpandAll Whether to expand all nodes by default.
- * @param onNodeClick Callback when a node is clicked.
- * @param nodeContent Custom content composable for each node. Defaults to label text.
+ * Element Plus Tree (core subset aligned to docs).
  */
 @Composable
 fun <T> NexusTree(
     nodes: List<TreeNode<T>>,
     modifier: Modifier = Modifier,
     state: TreeState<T> = rememberTreeState(),
+    emptyText: String = "No Data",
     defaultExpandAll: Boolean = false,
+    defaultExpandedKeys: List<T> = emptyList(),
+    highlightCurrent: Boolean = false,
+    expandOnClickNode: Boolean = true,
+    checkOnClickNode: Boolean = false,
+    checkOnClickLeaf: Boolean = true,
+    autoExpandParent: Boolean = true,
+    showCheckbox: Boolean = false,
+    checkStrictly: Boolean = false,
+    defaultCheckedKeys: List<T> = emptyList(),
+    currentNodeKey: T? = null,
+    filterNodeMethod: ((String, TreeNode<T>) -> Boolean)? = null,
+    accordion: Boolean = false,
+    indent: Int = 18,
+    icon: (@Composable (expanded: Boolean, hasChildren: Boolean) -> Unit)? = null,
     onNodeClick: ((TreeNode<T>) -> Unit)? = null,
+    onCheckChange: ((node: TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)? = null,
+    onCurrentChange: ((currentNode: TreeNode<T>?) -> Unit)? = null,
+    onNodeExpand: ((TreeNode<T>) -> Unit)? = null,
+    onNodeCollapse: ((TreeNode<T>) -> Unit)? = null,
+    nodeClassName: ((TreeNode<T>) -> NexusType?)? = null,
     nodeContent: (@Composable (TreeNode<T>) -> Unit)? = null,
+    empty: (@Composable () -> Unit)? = null,
 ) {
-    // Initialize expansion state for all nodes when defaultExpandAll
-    if (defaultExpandAll) {
-        remember(nodes) {
-            expandAllNodes(nodes, state)
-            true
+    val relations = remember(nodes) { buildTreeRelations(nodes) }
+
+    // Apply default state when input data/defaults change.
+    remember(nodes, defaultExpandAll, defaultExpandedKeys, defaultCheckedKeys, currentNodeKey, checkStrictly) {
+        if (defaultExpandAll) {
+            relations.nodeByKey.keys.forEach { state.expand(it) }
         }
+        defaultExpandedKeys.forEach { state.expand(it) }
+
+        if (defaultCheckedKeys.isNotEmpty()) {
+            state.clearChecked()
+            defaultCheckedKeys.forEach { key ->
+                if (relations.nodeByKey.containsKey(key)) {
+                    setCheckedWithCascade(
+                        key = key,
+                        checked = true,
+                        state = state,
+                        relations = relations,
+                        checkStrictly = checkStrictly,
+                    )
+                }
+            }
+        }
+
+        if (currentNodeKey != null) {
+            state.select(currentNodeKey)
+        }
+        true
+    }
+
+    if (nodes.isEmpty()) {
+        if (empty != null) {
+            empty()
+        } else {
+            NexusText(
+                text = emptyText,
+                color = NexusTheme.colorScheme.text.secondary,
+                style = NexusTheme.typography.small,
+                modifier = modifier.padding(8.dp),
+            )
+        }
+        return
+    }
+
+    val keyword = state.filterKeyword.trim()
+    val filtering = keyword.isNotEmpty()
+    val visibleMap = remember(nodes, keyword, filterNodeMethod) {
+        buildVisibleMap(nodes, keyword, filterNodeMethod)
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -104,78 +207,243 @@ fun <T> NexusTree(
             TreeNodeItem(
                 node = node,
                 state = state,
+                relations = relations,
+                visibleMap = visibleMap,
                 depth = 0,
+                filtering = filtering,
+                showCheckbox = showCheckbox,
+                checkStrictly = checkStrictly,
+                highlightCurrent = highlightCurrent,
+                expandOnClickNode = expandOnClickNode,
+                checkOnClickNode = checkOnClickNode,
+                checkOnClickLeaf = checkOnClickLeaf,
+                autoExpandParent = autoExpandParent,
+                accordion = accordion,
+                indent = indent,
+                icon = icon,
                 onNodeClick = onNodeClick,
+                onCheckChange = onCheckChange,
+                onCurrentChange = onCurrentChange,
+                onNodeExpand = onNodeExpand,
+                onNodeCollapse = onNodeCollapse,
+                nodeClassName = nodeClassName,
                 nodeContent = nodeContent,
             )
         }
     }
 }
 
-private fun <T> expandAllNodes(nodes: List<TreeNode<T>>, state: TreeState<T>) {
-    nodes.forEach { node ->
-        if (node.children.isNotEmpty()) {
-            state.expand(node.key)
-            expandAllNodes(node.children, state)
-        }
+private fun <T> buildTreeRelations(nodes: List<TreeNode<T>>): TreeRelations<T> {
+    val nodeByKey = LinkedHashMap<T, TreeNode<T>>()
+    val parentByKey = LinkedHashMap<T, T?>()
+    val childrenByKey = LinkedHashMap<T, List<T>>()
+    val rootKeys = nodes.map { it.key }
+
+    fun walk(node: TreeNode<T>, parent: T?) {
+        nodeByKey[node.key] = node
+        parentByKey[node.key] = parent
+        childrenByKey[node.key] = node.children.map { it.key }
+        node.children.forEach { child -> walk(child, node.key) }
     }
+    nodes.forEach { walk(it, null) }
+
+    return TreeRelations(
+        nodeByKey = nodeByKey,
+        parentByKey = parentByKey,
+        childrenByKey = childrenByKey,
+        rootKeys = rootKeys,
+    )
+}
+
+private fun <T> buildVisibleMap(
+    nodes: List<TreeNode<T>>,
+    keyword: String,
+    filterNodeMethod: ((String, TreeNode<T>) -> Boolean)?,
+): Map<T, Boolean> {
+    val visible = mutableMapOf<T, Boolean>()
+
+    if (keyword.isBlank()) {
+        fun markAll(list: List<TreeNode<T>>) {
+            list.forEach { node ->
+                visible[node.key] = true
+                markAll(node.children)
+            }
+        }
+        markAll(nodes)
+        return visible
+    }
+
+    fun matches(node: TreeNode<T>): Boolean {
+        return filterNodeMethod?.invoke(keyword, node) ?: node.label.contains(keyword, ignoreCase = true)
+    }
+
+    fun walk(node: TreeNode<T>): Boolean {
+        val selfMatch = matches(node)
+        val childMatch = node.children.any { walk(it) }
+        val isVisible = selfMatch || childMatch
+        visible[node.key] = isVisible
+        return isVisible
+    }
+    nodes.forEach { walk(it) }
+
+    return visible
 }
 
 @Composable
 private fun <T> TreeNodeItem(
     node: TreeNode<T>,
     state: TreeState<T>,
+    relations: TreeRelations<T>,
+    visibleMap: Map<T, Boolean>,
     depth: Int,
+    filtering: Boolean,
+    showCheckbox: Boolean,
+    checkStrictly: Boolean,
+    highlightCurrent: Boolean,
+    expandOnClickNode: Boolean,
+    checkOnClickNode: Boolean,
+    checkOnClickLeaf: Boolean,
+    autoExpandParent: Boolean,
+    accordion: Boolean,
+    indent: Int,
+    icon: (@Composable (expanded: Boolean, hasChildren: Boolean) -> Unit)?,
     onNodeClick: ((TreeNode<T>) -> Unit)?,
+    onCheckChange: ((node: TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)?,
+    onCurrentChange: ((currentNode: TreeNode<T>?) -> Unit)?,
+    onNodeExpand: ((TreeNode<T>) -> Unit)?,
+    onNodeCollapse: ((TreeNode<T>) -> Unit)?,
+    nodeClassName: ((TreeNode<T>) -> NexusType?)?,
     nodeContent: (@Composable (TreeNode<T>) -> Unit)?,
 ) {
+    if (visibleMap[node.key] != true) return
+
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
 
     val hasChildren = node.children.isNotEmpty()
     val isExpanded = state.isExpanded(node.key)
-    val isSelected = state.isSelected(node.key)
+    val isCurrent = state.isSelected(node.key)
+    val isChecked = state.isChecked(node.key)
+    val isHalfChecked = state.isHalfChecked(node.key)
 
+    val classType = nodeClassName?.invoke(node)
+    val classColor = classType?.let { colorScheme.typeColor(it)?.base }
+
+    val rowBackground = when {
+        highlightCurrent && isCurrent -> colorScheme.primary.light9
+        else -> colorScheme.fill.blank
+    }
     val textColor = when {
         node.disabled -> colorScheme.text.disabled
-        isSelected -> colorScheme.primary.base
+        isCurrent -> colorScheme.primary.base
+        classColor != null -> classColor
         else -> colorScheme.text.regular
     }
 
-    val expandIcon = when {
-        !hasChildren -> "  " // indentation spacer
-        isExpanded -> "▾"
-        else -> "▸"
+    fun toggleExpand() {
+        val nextExpanded = !state.isExpanded(node.key)
+        if (nextExpanded && accordion) {
+            val parentKey = relations.parentByKey[node.key]
+            val siblingKeys = if (parentKey == null) relations.rootKeys else relations.childrenByKey[parentKey].orEmpty()
+            siblingKeys.forEach { sibling ->
+                if (sibling != node.key) state.collapse(sibling)
+            }
+        }
+        if (nextExpanded) state.expand(node.key) else state.collapse(node.key)
+        if (nextExpanded) onNodeExpand?.invoke(node) else onNodeCollapse?.invoke(node)
+    }
+
+    fun toggleCheckedByInput(next: Boolean) {
+        setCheckedWithCascade(
+            key = node.key,
+            checked = next,
+            state = state,
+            relations = relations,
+            checkStrictly = checkStrictly,
+        )
+        onCheckChange?.invoke(node, state.isChecked(node.key), state.isHalfChecked(node.key))
+    }
+
+    fun onRowClick() {
+        if (node.disabled) return
+
+        if (hasChildren && expandOnClickNode) {
+            toggleExpand()
+        }
+
+        if (showCheckbox) {
+            val clickableForCheck = checkOnClickNode || (checkOnClickLeaf && !hasChildren)
+            if (clickableForCheck) {
+                toggleCheckedByInput(!isChecked)
+            }
+        }
+
+        state.select(node.key)
+        if (autoExpandParent && hasChildren && !state.isExpanded(node.key)) {
+            state.expand(node.key)
+        }
+        onCurrentChange?.invoke(node)
+        onNodeClick?.invoke(node)
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(rowBackground, NexusTheme.shapes.base)
             .then(
                 if (!node.disabled) {
                     Modifier
-                        .clickable {
-                            if (hasChildren) state.toggleExpand(node.key)
-                            state.select(node.key)
-                            onNodeClick?.invoke(node)
-                        }
+                        .clickable { onRowClick() }
                         .pointerHoverIcon(PointerIcon.Hand)
-                } else Modifier
+                } else {
+                    Modifier
+                }
             )
             .padding(
-                start = (depth * 18 + 8).dp,
+                start = (depth * indent + 8).dp,
                 top = 6.dp,
                 bottom = 6.dp,
                 end = 8.dp,
             ),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        NexusText(
-            text = expandIcon,
-            color = colorScheme.text.placeholder,
-            style = typography.extraSmall,
-        )
+        Box(
+            modifier = Modifier
+                .then(
+                    if (hasChildren && !node.disabled) {
+                        Modifier
+                            .clickable { toggleExpand() }
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    } else {
+                        Modifier
+                    }
+                ),
+        ) {
+            if (icon != null) {
+                icon(isExpanded, hasChildren)
+            } else {
+                NexusText(
+                    text = when {
+                        !hasChildren -> "  "
+                        isExpanded -> "▾"
+                        else -> "▸"
+                    },
+                    color = colorScheme.text.placeholder,
+                    style = typography.extraSmall,
+                )
+            }
+        }
+
+        if (showCheckbox) {
+            NexusCheckbox(
+                checked = isChecked,
+                onCheckedChange = { checked -> toggleCheckedByInput(checked) },
+                indeterminate = !checkStrictly && isHalfChecked,
+                disabled = node.disabled,
+                size = io.github.xingray.compose_nexus.theme.ComponentSize.Small,
+            )
+        }
 
         if (nodeContent != null) {
             nodeContent(node)
@@ -188,10 +456,10 @@ private fun <T> TreeNodeItem(
         }
     }
 
-    // Children (animated)
     if (hasChildren) {
+        val showChildren = if (filtering) true else isExpanded
         AnimatedVisibility(
-            visible = isExpanded,
+            visible = showChildren,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
@@ -200,8 +468,26 @@ private fun <T> TreeNodeItem(
                     TreeNodeItem(
                         node = child,
                         state = state,
+                        relations = relations,
+                        visibleMap = visibleMap,
                         depth = depth + 1,
+                        filtering = filtering,
+                        showCheckbox = showCheckbox,
+                        checkStrictly = checkStrictly,
+                        highlightCurrent = highlightCurrent,
+                        expandOnClickNode = expandOnClickNode,
+                        checkOnClickNode = checkOnClickNode,
+                        checkOnClickLeaf = checkOnClickLeaf,
+                        autoExpandParent = autoExpandParent,
+                        accordion = accordion,
+                        indent = indent,
+                        icon = icon,
                         onNodeClick = onNodeClick,
+                        onCheckChange = onCheckChange,
+                        onCurrentChange = onCurrentChange,
+                        onNodeExpand = onNodeExpand,
+                        onNodeCollapse = onNodeCollapse,
+                        nodeClassName = nodeClassName,
                         nodeContent = nodeContent,
                     )
                 }
@@ -209,3 +495,58 @@ private fun <T> TreeNodeItem(
         }
     }
 }
+
+private fun <T> setCheckedWithCascade(
+    key: T,
+    checked: Boolean,
+    state: TreeState<T>,
+    relations: TreeRelations<T>,
+    checkStrictly: Boolean,
+) {
+    if (checkStrictly) {
+        state.setChecked(key, checked)
+        state.setHalfChecked(key, false)
+        return
+    }
+
+    fun setDescendants(nodeKey: T, value: Boolean) {
+        state.setChecked(nodeKey, value)
+        state.setHalfChecked(nodeKey, false)
+        relations.childrenByKey[nodeKey].orEmpty().forEach { child ->
+            setDescendants(child, value)
+        }
+    }
+
+    setDescendants(key, checked)
+    updateAncestors(key, state, relations)
+}
+
+private fun <T> updateAncestors(
+    key: T,
+    state: TreeState<T>,
+    relations: TreeRelations<T>,
+) {
+    var parent = relations.parentByKey[key]
+    while (parent != null) {
+        val children = relations.childrenByKey[parent].orEmpty()
+        val allChecked = children.isNotEmpty() && children.all { child -> state.isChecked(child) }
+        val anyChecked = children.any { child -> state.isChecked(child) || state.isHalfChecked(child) }
+
+        when {
+            allChecked -> {
+                state.setChecked(parent, true)
+                state.setHalfChecked(parent, false)
+            }
+            anyChecked -> {
+                state.setChecked(parent, false)
+                state.setHalfChecked(parent, true)
+            }
+            else -> {
+                state.setChecked(parent, false)
+                state.setHalfChecked(parent, false)
+            }
+        }
+        parent = relations.parentByKey[parent]
+    }
+}
+

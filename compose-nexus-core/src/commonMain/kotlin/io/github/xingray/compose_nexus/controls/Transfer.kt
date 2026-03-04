@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -28,72 +26,122 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
+import io.github.xingray.compose_nexus.theme.ComponentSize
 import io.github.xingray.compose_nexus.theme.NexusTheme
 import io.github.xingray.compose_nexus.theme.NexusType
 
-/**
- * Transfer data item.
- */
 data class TransferItem<T>(
     val key: T,
     val label: String,
     val disabled: Boolean = false,
+    val payload: Map<String, Any?> = emptyMap(),
 )
 
-/**
- * Transfer state holder.
- */
+data class TransferPropsAlias(
+    val key: String = "key",
+    val label: String = "label",
+    val disabled: String = "disabled",
+)
+
+data class TransferFormat(
+    val noChecked: String = "{checked}/{total}",
+    val hasChecked: String = "{checked}/{total}",
+)
+
+enum class TransferDirection { Left, Right }
+
+enum class TransferTargetOrder { Original, Push, Unshift }
+
 @Stable
 class TransferState<T>(
     sourceItems: List<TransferItem<T>>,
     targetItems: List<TransferItem<T>> = emptyList(),
+    leftDefaultChecked: List<T> = emptyList(),
+    rightDefaultChecked: List<T> = emptyList(),
 ) {
     val sourceList = mutableStateListOf<TransferItem<T>>().apply { addAll(sourceItems) }
     val targetList = mutableStateListOf<TransferItem<T>>().apply { addAll(targetItems) }
-    val sourceChecked = mutableStateListOf<T>()
-    val targetChecked = mutableStateListOf<T>()
+    val sourceChecked = mutableStateListOf<T>().apply { addAll(leftDefaultChecked) }
+    val targetChecked = mutableStateListOf<T>().apply { addAll(rightDefaultChecked) }
 
-    fun moveToTarget() {
+    private val originalOrder: Map<T, Int> = (sourceItems + targetItems).mapIndexed { index, item ->
+        item.key to index
+    }.toMap()
+
+    fun moveToTarget(order: TransferTargetOrder): List<T> {
         val toMove = sourceList.filter { it.key in sourceChecked && !it.disabled }
-        sourceList.removeAll(toMove)
-        targetList.addAll(toMove)
+        if (toMove.isEmpty()) {
+            sourceChecked.clear()
+            return emptyList()
+        }
+        sourceList.removeAll(toMove.toSet())
+        when (order) {
+            TransferTargetOrder.Push -> targetList.addAll(toMove)
+            TransferTargetOrder.Unshift -> targetList.addAll(0, toMove)
+            TransferTargetOrder.Original -> {
+                targetList.addAll(toMove)
+                val sorted = targetList.sortedBy { originalOrder[it.key] ?: Int.MAX_VALUE }
+                targetList.clear()
+                targetList.addAll(sorted)
+            }
+        }
+        val moved = toMove.map { it.key }
         sourceChecked.clear()
+        return moved
     }
 
-    fun moveToSource() {
+    fun moveToSource(order: TransferTargetOrder): List<T> {
         val toMove = targetList.filter { it.key in targetChecked && !it.disabled }
-        targetList.removeAll(toMove)
-        sourceList.addAll(toMove)
+        if (toMove.isEmpty()) {
+            targetChecked.clear()
+            return emptyList()
+        }
+        targetList.removeAll(toMove.toSet())
+        when (order) {
+            TransferTargetOrder.Push -> sourceList.addAll(toMove)
+            TransferTargetOrder.Unshift -> sourceList.addAll(0, toMove)
+            TransferTargetOrder.Original -> {
+                sourceList.addAll(toMove)
+                val sorted = sourceList.sortedBy { originalOrder[it.key] ?: Int.MAX_VALUE }
+                sourceList.clear()
+                sourceList.addAll(sorted)
+            }
+        }
+        val moved = toMove.map { it.key }
         targetChecked.clear()
+        return moved
     }
 
-    fun toggleSourceCheck(key: T) {
-        if (key in sourceChecked) sourceChecked.remove(key)
-        else sourceChecked.add(key)
+    fun toggleSourceCheck(key: T, disabled: Boolean = false): List<T> {
+        if (disabled) return sourceChecked.toList()
+        if (key in sourceChecked) sourceChecked.remove(key) else sourceChecked.add(key)
+        return sourceChecked.toList()
     }
 
-    fun toggleTargetCheck(key: T) {
-        if (key in targetChecked) targetChecked.remove(key)
-        else targetChecked.add(key)
+    fun toggleTargetCheck(key: T, disabled: Boolean = false): List<T> {
+        if (disabled) return targetChecked.toList()
+        if (key in targetChecked) targetChecked.remove(key) else targetChecked.add(key)
+        return targetChecked.toList()
     }
+
+    fun targetKeys(): List<T> = targetList.map { it.key }
 }
 
 @Composable
 fun <T> rememberTransferState(
     sourceItems: List<TransferItem<T>>,
     targetItems: List<TransferItem<T>> = emptyList(),
-): TransferState<T> = remember { TransferState(sourceItems, targetItems) }
+    leftDefaultChecked: List<T> = emptyList(),
+    rightDefaultChecked: List<T> = emptyList(),
+): TransferState<T> = remember {
+    TransferState(
+        sourceItems = sourceItems,
+        targetItems = targetItems,
+        leftDefaultChecked = leftDefaultChecked,
+        rightDefaultChecked = rightDefaultChecked,
+    )
+}
 
-/**
- * Element Plus Transfer — a dual-list shuttle component for moving items between two panels.
- *
- * @param T Item key type.
- * @param state Transfer state.
- * @param modifier Modifier.
- * @param sourceTitle Title for the source (left) panel.
- * @param targetTitle Title for the target (right) panel.
- * @param filterable Whether to show a filter input in each panel.
- */
 @Composable
 fun <T> NexusTransfer(
     state: TransferState<T>,
@@ -101,55 +149,98 @@ fun <T> NexusTransfer(
     sourceTitle: String = "Source",
     targetTitle: String = "Target",
     filterable: Boolean = false,
+    filterPlaceholder: String = "Filter keyword",
+    filterMethod: ((String, TransferItem<T>) -> Boolean)? = null,
+    targetOrder: TransferTargetOrder = TransferTargetOrder.Original,
+    titles: Pair<String, String>? = null,
+    buttonTexts: Pair<String, String>? = null,
+    format: TransferFormat = TransferFormat(),
+    props: TransferPropsAlias = TransferPropsAlias(),
+    renderContent: (@Composable (TransferItem<T>) -> Unit)? = null,
+    leftFooter: (@Composable () -> Unit)? = null,
+    rightFooter: (@Composable () -> Unit)? = null,
+    leftEmpty: (@Composable () -> Unit)? = null,
+    rightEmpty: (@Composable () -> Unit)? = null,
+    onChange: ((value: List<T>, direction: TransferDirection, movedKeys: List<T>) -> Unit)? = null,
+    onLeftCheckChange: ((value: List<T>, movedKeys: List<T>) -> Unit)? = null,
+    onRightCheckChange: ((value: List<T>, movedKeys: List<T>) -> Unit)? = null,
 ) {
-    val colorScheme = NexusTheme.colorScheme
-    val typography = NexusTheme.typography
-    val shapes = NexusTheme.shapes
+    val finalTitles = titles ?: (sourceTitle to targetTitle)
+    val finalButtonTexts = buttonTexts ?: ("→" to "←")
 
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        // Source panel
         TransferPanel(
-            title = sourceTitle,
+            title = finalTitles.first,
             items = state.sourceList,
             checkedKeys = state.sourceChecked,
-            onToggle = { state.toggleSourceCheck(it) },
             filterable = filterable,
+            filterPlaceholder = filterPlaceholder,
+            filterMethod = filterMethod,
+            format = format,
+            props = props,
+            renderContent = renderContent,
+            footer = leftFooter,
+            empty = leftEmpty,
+            onToggle = { item ->
+                val checked = state.toggleSourceCheck(item.key, resolveDisabled(item, props))
+                onLeftCheckChange?.invoke(checked, listOf(item.key))
+            },
             modifier = Modifier.weight(1f),
         )
 
-        // Action buttons
         Column(
             modifier = Modifier.padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             NexusButton(
-                onClick = { state.moveToTarget() },
+                onClick = {
+                    val moved = state.moveToTarget(targetOrder)
+                    if (moved.isNotEmpty()) {
+                        onChange?.invoke(state.targetKeys(), TransferDirection.Right, moved)
+                    }
+                },
                 type = NexusType.Primary,
                 disabled = state.sourceChecked.isEmpty(),
+                size = ComponentSize.Small,
             ) {
-                NexusText(text = "→")
+                NexusText(text = finalButtonTexts.first)
             }
             NexusButton(
-                onClick = { state.moveToSource() },
+                onClick = {
+                    val moved = state.moveToSource(targetOrder)
+                    if (moved.isNotEmpty()) {
+                        onChange?.invoke(state.targetKeys(), TransferDirection.Left, moved)
+                    }
+                },
                 type = NexusType.Primary,
                 disabled = state.targetChecked.isEmpty(),
+                size = ComponentSize.Small,
             ) {
-                NexusText(text = "←")
+                NexusText(text = finalButtonTexts.second)
             }
         }
 
-        // Target panel
         TransferPanel(
-            title = targetTitle,
+            title = finalTitles.second,
             items = state.targetList,
             checkedKeys = state.targetChecked,
-            onToggle = { state.toggleTargetCheck(it) },
             filterable = filterable,
+            filterPlaceholder = filterPlaceholder,
+            filterMethod = filterMethod,
+            format = format,
+            props = props,
+            renderContent = renderContent,
+            footer = rightFooter,
+            empty = rightEmpty,
+            onToggle = { item ->
+                val checked = state.toggleTargetCheck(item.key, resolveDisabled(item, props))
+                onRightCheckChange?.invoke(checked, listOf(item.key))
+            },
             modifier = Modifier.weight(1f),
         )
     }
@@ -160,8 +251,15 @@ private fun <T> TransferPanel(
     title: String,
     items: List<TransferItem<T>>,
     checkedKeys: List<T>,
-    onToggle: (T) -> Unit,
     filterable: Boolean,
+    filterPlaceholder: String,
+    filterMethod: ((String, TransferItem<T>) -> Boolean)?,
+    format: TransferFormat,
+    props: TransferPropsAlias,
+    renderContent: (@Composable (TransferItem<T>) -> Unit)?,
+    footer: (@Composable () -> Unit)?,
+    empty: (@Composable () -> Unit)?,
+    onToggle: (TransferItem<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colorScheme = NexusTheme.colorScheme
@@ -170,10 +268,18 @@ private fun <T> TransferPanel(
 
     var filterText by remember { mutableStateOf("") }
     val filteredItems = if (filterText.isNotEmpty()) {
-        items.filter { it.label.contains(filterText, ignoreCase = true) }
+        items.filter { item ->
+            filterMethod?.invoke(filterText, item)
+                ?: resolveLabel(item, props).contains(filterText, ignoreCase = true)
+        }
     } else {
         items
     }
+
+    val statusTemplate = if (checkedKeys.isEmpty()) format.noChecked else format.hasChecked
+    val statusText = statusTemplate
+        .replace("{checked}", checkedKeys.size.toString())
+        .replace("{total}", items.size.toString())
 
     Column(
         modifier = modifier
@@ -181,7 +287,6 @@ private fun <T> TransferPanel(
             .border(1.dp, colorScheme.border.lighter, shapes.base)
             .background(colorScheme.fill.blank),
     ) {
-        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -196,28 +301,26 @@ private fun <T> TransferPanel(
                     modifier = Modifier.weight(1f),
                 )
                 NexusText(
-                    text = "${checkedKeys.size}/${items.size}",
+                    text = statusText,
                     color = colorScheme.text.secondary,
                     style = typography.extraSmall,
                 )
             }
         }
 
-        // Filter input
         if (filterable) {
             NexusInput(
                 value = filterText,
                 onValueChange = { filterText = it },
-                placeholder = "Filter",
+                placeholder = filterPlaceholder,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
                 clearable = true,
-                size = io.github.xingray.compose_nexus.theme.ComponentSize.Small,
+                size = ComponentSize.Small,
             )
         }
 
-        // Items
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -231,24 +334,31 @@ private fun <T> TransferPanel(
                         .padding(vertical = 20.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    NexusText(
-                        text = "No Data",
-                        color = colorScheme.text.placeholder,
-                        style = typography.small,
-                    )
+                    if (empty != null) {
+                        empty()
+                    } else {
+                        NexusText(
+                            text = "No Data",
+                            color = colorScheme.text.placeholder,
+                            style = typography.small,
+                        )
+                    }
                 }
             } else {
                 filteredItems.forEach { item ->
+                    val disabled = resolveDisabled(item, props)
                     val isChecked = item.key in checkedKeys
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .then(
-                                if (!item.disabled) {
+                                if (!disabled) {
                                     Modifier
-                                        .clickable { onToggle(item.key) }
+                                        .clickable { onToggle(item) }
                                         .pointerHoverIcon(PointerIcon.Hand)
-                                } else Modifier
+                                } else {
+                                    Modifier
+                                }
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -256,18 +366,45 @@ private fun <T> TransferPanel(
                     ) {
                         NexusCheckbox(
                             checked = isChecked,
-                            onCheckedChange = { if (!item.disabled) onToggle(item.key) },
-                            disabled = item.disabled,
+                            onCheckedChange = { if (!disabled) onToggle(item) },
+                            disabled = disabled,
                         )
-                        NexusText(
-                            text = item.label,
-                            color = if (item.disabled) colorScheme.text.disabled
-                            else colorScheme.text.regular,
-                            style = typography.base,
-                        )
+                        Box(modifier = Modifier.weight(1f)) {
+                            if (renderContent != null) {
+                                renderContent(item)
+                            } else {
+                                NexusText(
+                                    text = resolveLabel(item, props),
+                                    color = if (disabled) colorScheme.text.disabled else colorScheme.text.regular,
+                                    style = typography.base,
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+
+        if (footer != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+            ) {
+                footer()
+            }
+        }
+    }
+}
+
+private fun <T> resolveLabel(item: TransferItem<T>, props: TransferPropsAlias): String {
+    return item.payload[props.label]?.toString() ?: item.label
+}
+
+private fun <T> resolveDisabled(item: TransferItem<T>, props: TransferPropsAlias): Boolean {
+    return when (val value = item.payload[props.disabled]) {
+        is Boolean -> value
+        is String -> value.equals("true", ignoreCase = true)
+        else -> item.disabled
     }
 }

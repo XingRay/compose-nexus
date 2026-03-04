@@ -1,6 +1,8 @@
 package io.github.xingray.compose_nexus.controls
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,12 +26,16 @@ import io.github.xingray.compose_nexus.theme.NexusTheme
 @Composable
 fun NexusEmpty(
     modifier: Modifier = Modifier,
+    imageUrl: String = "",
+    imageSize: Int? = null,
     description: String = "No Data",
     image: (@Composable () -> Unit)? = null,
+    descriptionSlot: (@Composable () -> Unit)? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
+    val resolvedImageSize = (imageSize ?: 96).dp
 
     Column(
         modifier = modifier
@@ -38,26 +44,45 @@ fun NexusEmpty(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        // Image / icon
+        // Image slot has highest priority, then imageUrl, then fallback illustration.
         if (image != null) {
-            image()
+            Box(modifier = Modifier.size(resolvedImageSize)) {
+                image()
+            }
+        } else if (imageUrl.isNotBlank()) {
+            Box(
+                modifier = Modifier
+                    .size(resolvedImageSize)
+                    .background(colorScheme.fill.light, NexusTheme.shapes.base)
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                NexusText(
+                    text = imageUrl,
+                    color = colorScheme.text.placeholder,
+                    style = typography.extraSmall,
+                )
+            }
         } else {
             NexusText(
                 text = "□",
                 color = colorScheme.text.placeholder,
                 style = typography.extraLarge,
-                modifier = Modifier.size(64.dp),
+                modifier = Modifier.size(resolvedImageSize),
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Description
-        NexusText(
-            text = description,
-            color = colorScheme.text.secondary,
-            style = typography.base,
-        )
+        if (descriptionSlot != null) {
+            descriptionSlot()
+        } else {
+            NexusText(
+                text = description,
+                color = colorScheme.text.secondary,
+                style = typography.base,
+            )
+        }
 
         // Actions
         if (actions != null) {

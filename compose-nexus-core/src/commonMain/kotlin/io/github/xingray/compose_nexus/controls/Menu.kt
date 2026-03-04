@@ -5,19 +5,17 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.hoverable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -33,27 +31,24 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
-/**
- * Menu mode.
- */
 enum class MenuMode {
     Horizontal,
     Vertical,
 }
 
-/**
- * A menu item definition.
- */
+enum class MenuTrigger {
+    Hover,
+    Click,
+}
+
 data class MenuItem(
     val key: String,
     val label: String,
     val disabled: Boolean = false,
+    val route: Any? = null,
     val children: List<MenuItem> = emptyList(),
 )
 
-/**
- * Menu state holder.
- */
 @Stable
 class MenuState(
     initialActiveKey: String = "",
@@ -71,31 +66,62 @@ class MenuState(
     fun toggleOpen(key: String) {
         openKeys[key] = !(openKeys[key] ?: false)
     }
+
+    fun open(index: String) {
+        openKeys[index] = true
+    }
+
+    fun close(index: String) {
+        openKeys[index] = false
+    }
+
+    fun updateActiveIndex(index: String) {
+        activeKey = index
+    }
+
+    fun handleResize() {
+        // API parity placeholder.
+    }
 }
 
 @Composable
 fun rememberMenuState(
     initialActiveKey: String = "",
-): MenuState = remember { MenuState(initialActiveKey) }
+    defaultOpeneds: List<String> = emptyList(),
+): MenuState {
+    val state = remember { MenuState(initialActiveKey) }
+    remember(defaultOpeneds) {
+        defaultOpeneds.forEach { state.open(it) }
+        true
+    }
+    return state
+}
 
-/**
- * Element Plus Menu — a navigation menu (horizontal or vertical).
- *
- * @param items Menu items, supporting nested sub-menus.
- * @param state Menu state for active/open tracking.
- * @param modifier Modifier.
- * @param mode Horizontal or Vertical layout.
- * @param onSelect Callback when a leaf menu item is selected.
- */
 @Composable
 fun NexusMenu(
     items: List<MenuItem>,
     state: MenuState = rememberMenuState(),
     modifier: Modifier = Modifier,
     mode: MenuMode = MenuMode.Vertical,
-    onSelect: ((String) -> Unit)? = null,
+    collapse: Boolean = false,
+    defaultOpeneds: List<String> = emptyList(),
+    uniqueOpened: Boolean = false,
+    menuTrigger: MenuTrigger = MenuTrigger.Hover,
+    backgroundColor: Color? = null,
+    textColor: Color? = null,
+    activeTextColor: Color? = null,
+    onSelect: ((index: String, indexPath: List<String>) -> Unit)? = null,
+    onOpen: ((index: String, indexPath: List<String>) -> Unit)? = null,
+    onClose: ((index: String, indexPath: List<String>) -> Unit)? = null,
 ) {
     val colorScheme = NexusTheme.colorScheme
+    val menuBg = backgroundColor ?: colorScheme.fill.blank
+    val siblings = items.map { it.key }
+
+    remember(defaultOpeneds, items) {
+        defaultOpeneds.forEach { state.open(it) }
+        true
+    }
 
     when (mode) {
         MenuMode.Horizontal -> {
@@ -103,13 +129,17 @@ fun NexusMenu(
                 modifier = modifier
                     .fillMaxWidth()
                     .defaultMinSize(minHeight = 56.dp)
-                    .background(colorScheme.fill.blank),
+                    .background(menuBg),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 items.forEach { item ->
                     HorizontalMenuItemComposable(
                         item = item,
                         state = state,
+                        path = listOf(item.key),
+                        menuTrigger = menuTrigger,
+                        textColor = textColor,
+                        activeTextColor = activeTextColor,
                         onSelect = onSelect,
                     )
                 }
@@ -118,15 +148,23 @@ fun NexusMenu(
         MenuMode.Vertical -> {
             Column(
                 modifier = modifier
-                    .defaultMinSize(minWidth = 200.dp)
-                    .background(colorScheme.fill.blank),
+                    .defaultMinSize(minWidth = if (collapse) 64.dp else 200.dp)
+                    .background(menuBg),
             ) {
                 items.forEach { item ->
                     VerticalMenuItemComposable(
                         item = item,
                         state = state,
                         depth = 0,
+                        path = listOf(item.key),
+                        siblingsAtLevel = siblings,
+                        collapse = collapse,
+                        uniqueOpened = uniqueOpened,
+                        textColor = textColor,
+                        activeTextColor = activeTextColor,
                         onSelect = onSelect,
+                        onOpen = onOpen,
+                        onClose = onClose,
                     )
                 }
             }
@@ -138,55 +176,92 @@ fun NexusMenu(
 private fun HorizontalMenuItemComposable(
     item: MenuItem,
     state: MenuState,
-    onSelect: ((String) -> Unit)?,
+    path: List<String>,
+    menuTrigger: MenuTrigger,
+    textColor: Color?,
+    activeTextColor: Color?,
+    onSelect: ((String, List<String>) -> Unit)?,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isActive = state.activeKey == item.key
+    val hasChildren = item.children.isNotEmpty()
 
-    val textColor = when {
+    val normalColor = textColor ?: colorScheme.text.primary
+    val activeColor = activeTextColor ?: colorScheme.primary.base
+    val resolvedTextColor = when {
         item.disabled -> colorScheme.text.disabled
-        isActive -> colorScheme.primary.base
-        isHovered -> colorScheme.primary.base
-        else -> colorScheme.text.primary
+        isActive -> activeColor
+        isHovered -> activeColor
+        else -> normalColor
     }
-    val borderColor = if (isActive) colorScheme.primary.base else Color.Transparent
+    val borderColor = if (isActive) activeColor else Color.Transparent
 
-    Column(
-        modifier = Modifier
-            .hoverable(interactionSource)
-            .then(
-                if (!item.disabled && item.children.isEmpty()) {
-                    Modifier
-                        .clickable {
-                            state.select(item.key)
-                            onSelect?.invoke(item.key)
-                        }
-                        .pointerHoverIcon(PointerIcon.Hand)
-                } else Modifier
-            )
-            .padding(horizontal = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
-            modifier = Modifier.defaultMinSize(minHeight = 56.dp),
-            contentAlignment = Alignment.Center,
+    @Composable
+    fun TriggerContent() {
+        Column(
+            modifier = Modifier
+                .hoverable(interactionSource)
+                .then(
+                    if (!item.disabled && !hasChildren) {
+                        Modifier
+                            .clickable {
+                                state.select(item.key)
+                                onSelect?.invoke(item.key, path)
+                            }
+                            .pointerHoverIcon(PointerIcon.Hand)
+                    } else {
+                        Modifier
+                    }
+                )
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            NexusText(
-                text = item.label,
-                color = textColor,
-                style = typography.base,
+            Box(
+                modifier = Modifier.defaultMinSize(minHeight = 56.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                NexusText(
+                    text = item.label,
+                    color = resolvedTextColor,
+                    style = typography.base,
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .height(2.dp)
+                    .fillMaxWidth()
+                    .background(borderColor),
             )
         }
-        // Active indicator line
-        Box(
-            modifier = Modifier
-                .height(2.dp)
-                .fillMaxWidth()
-                .background(borderColor),
-        )
+    }
+
+    if (hasChildren && !item.disabled) {
+        val dropdownState = rememberDropdownState()
+        NexusDropdown(
+            state = dropdownState,
+            triggerMode = if (menuTrigger == MenuTrigger.Hover) DropdownTrigger.Hover else DropdownTrigger.Click,
+            placement = DropdownPlacement.BottomStart,
+            trigger = { TriggerContent() },
+            onCommand = { command ->
+                val key = command?.toString() ?: return@NexusDropdown
+                state.select(key)
+                val childPath = path + key
+                onSelect?.invoke(key, childPath)
+            },
+        ) {
+            item.children.forEach { child ->
+                NexusDropdownItem(
+                    text = child.label,
+                    command = child.key,
+                    disabled = child.disabled,
+                )
+            }
+        }
+    } else {
+        TriggerContent()
     }
 }
 
@@ -195,8 +270,18 @@ private fun VerticalMenuItemComposable(
     item: MenuItem,
     state: MenuState,
     depth: Int,
-    onSelect: ((String) -> Unit)?,
+    path: List<String>,
+    siblingsAtLevel: List<String>,
+    collapse: Boolean,
+    uniqueOpened: Boolean,
+    textColor: Color?,
+    activeTextColor: Color?,
+    onSelect: ((String, List<String>) -> Unit)?,
+    onOpen: ((String, List<String>) -> Unit)?,
+    onClose: ((String, List<String>) -> Unit)?,
 ) {
+    if (collapse && depth > 0) return
+
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
     val hasChildren = item.children.isNotEmpty()
@@ -206,19 +291,20 @@ private fun VerticalMenuItemComposable(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
+    val normalColor = textColor ?: colorScheme.text.primary
+    val activeColor = activeTextColor ?: colorScheme.primary.base
     val bgColor = when {
         isActive && !hasChildren -> colorScheme.primary.light9
         isHovered -> colorScheme.fill.light
         else -> Color.Transparent
     }
-    val textColor = when {
+    val resolvedTextColor = when {
         item.disabled -> colorScheme.text.disabled
-        isActive && !hasChildren -> colorScheme.primary.base
-        isHovered -> colorScheme.primary.base
-        else -> colorScheme.text.primary
+        isActive && !hasChildren -> activeColor
+        isHovered -> activeColor
+        else -> normalColor
     }
 
-    // Menu item row
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,14 +316,28 @@ private fun VerticalMenuItemComposable(
                     Modifier
                         .clickable {
                             if (hasChildren) {
-                                state.toggleOpen(item.key)
+                                val willOpen = !isOpen
+                                if (willOpen) {
+                                    if (uniqueOpened) {
+                                        siblingsAtLevel.forEach { sibling ->
+                                            if (sibling != item.key) state.close(sibling)
+                                        }
+                                    }
+                                    state.open(item.key)
+                                    onOpen?.invoke(item.key, path)
+                                } else {
+                                    state.close(item.key)
+                                    onClose?.invoke(item.key, path)
+                                }
                             } else {
                                 state.select(item.key)
-                                onSelect?.invoke(item.key)
+                                onSelect?.invoke(item.key, path)
                             }
                         }
                         .pointerHoverIcon(PointerIcon.Hand)
-                } else Modifier
+                } else {
+                    Modifier
+                }
             )
             .padding(
                 start = (depth * 20 + 20).dp,
@@ -248,12 +348,12 @@ private fun VerticalMenuItemComposable(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         NexusText(
-            text = item.label,
-            color = textColor,
+            text = if (collapse) item.label.take(1) else item.label,
+            color = resolvedTextColor,
             style = typography.base,
             modifier = Modifier.weight(1f),
         )
-        if (hasChildren) {
+        if (hasChildren && !collapse) {
             NexusText(
                 text = if (isOpen) "▾" else "▸",
                 color = colorScheme.text.placeholder,
@@ -262,23 +362,32 @@ private fun VerticalMenuItemComposable(
         }
     }
 
-    // Sub-menu items (animated)
-    if (hasChildren) {
+    if (!collapse && hasChildren) {
         AnimatedVisibility(
             visible = isOpen,
             enter = expandVertically(),
             exit = shrinkVertically(),
         ) {
             Column {
+                val childSiblings = item.children.map { it.key }
                 item.children.forEach { child ->
                     VerticalMenuItemComposable(
                         item = child,
                         state = state,
                         depth = depth + 1,
+                        path = path + child.key,
+                        siblingsAtLevel = childSiblings,
+                        collapse = collapse,
+                        uniqueOpened = uniqueOpened,
+                        textColor = textColor,
+                        activeTextColor = activeTextColor,
                         onSelect = onSelect,
+                        onOpen = onOpen,
+                        onClose = onClose,
                     )
                 }
             }
         }
     }
 }
+

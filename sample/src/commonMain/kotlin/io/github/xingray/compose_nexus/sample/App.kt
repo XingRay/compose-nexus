@@ -42,38 +42,71 @@ enum class DemoRoute(val label: String, val group: String) {
     Overview("Overview", ""),
     // Basic
     Button("Button", "Basic"),
+    Border("Border", "Basic"),
+    Color("Color", "Basic"),
+    LayoutContainer("Layout Container", "Basic"),
+    Icon("Icon", "Basic"),
+    Layout("Layout", "Basic"),
     Text("Text", "Basic"),
+    Typography("Typography", "Basic"),
     Link("Link", "Basic"),
+    Scrollbar("Scrollbar", "Basic"),
     Tag("Tag", "Basic"),
-    Divider("Divider", "Basic"),
+    Divider("Divider", "Others"),
     Space("Space", "Basic"),
+    Splitter("Splitter", "Basic"),
+    ConfigProvider("Config Provider", "Configuration"),
     // Form
     Input("Input", "Form"),
     InputNumber("InputNumber", "Form"),
     Textarea("Textarea", "Form"),
     Checkbox("Checkbox", "Form"),
     Radio("Radio", "Form"),
+    Rate("Rate", "Form"),
     Switch("Switch", "Form"),
     Select("Select", "Form"),
+    VirtualizedSelect("Virtualized Select", "Form"),
     Slider("Slider", "Form"),
+    DatePickerPanel("DatePickerPanel", "Form"),
     DatePicker("DatePicker", "Form"),
+    DateTimePicker("DateTimePicker", "Form"),
     TimePicker("TimePicker", "Form"),
+    TimeSelect("TimeSelect", "Form"),
     Form("Form", "Form"),
     Autocomplete("Autocomplete", "Form"),
+    ColorPickerPanel("ColorPickerPanel", "Form"),
+    ColorPicker("ColorPicker", "Form"),
     InputTag("InputTag", "Form"),
+    Mention("Mention", "Form"),
     Cascader("Cascader", "Form"),
     Transfer("Transfer", "Form"),
+    TreeSelect("TreeSelect", "Form"),
+    Upload("Upload", "Form"),
     // Data
     Table("Table", "Data Display"),
+    VirtualizedTable("Virtualized Table", "Data Display"),
     Tree("Tree", "Data Display"),
+    VirtualizedTree("Virtualized Tree", "Data Display"),
+    Statistic("Statistic", "Data Display"),
+    Segmented("Segmented", "Data Display"),
     Pagination("Pagination", "Data Display"),
     Progress("Progress", "Data Display"),
+    Result("Result", "Data Display"),
     Avatar("Avatar", "Data Display"),
+    Badge("Badge", "Data Display"),
     Skeleton("Skeleton", "Data Display"),
     Empty("Empty", "Data Display"),
+    Image("Image", "Data Display"),
+    InfiniteScroll("Infinite Scroll", "Data Display"),
+    Timeline("Timeline", "Data Display"),
     Calendar("Calendar", "Data Display"),
+    Descriptions("Descriptions", "Data Display"),
     // Navigation
+    Affix("Affix", "Navigation"),
+    Anchor("Anchor", "Navigation"),
+    Backtop("Backtop", "Navigation"),
     Menu("Menu", "Navigation"),
+    PageHeader("Page Header", "Navigation"),
     Steps("Steps", "Navigation"),
     Breadcrumb("Breadcrumb", "Navigation"),
     Tabs("Tabs", "Navigation"),
@@ -81,8 +114,11 @@ enum class DemoRoute(val label: String, val group: String) {
     // Feedback
     Alert("Alert", "Feedback"),
     Message("Message", "Feedback"),
+    MessageBox("Message Box", "Feedback"),
     Notification("Notification", "Feedback"),
     Loading("Loading", "Feedback"),
+    Popconfirm("Popconfirm", "Feedback"),
+    Popover("Popover", "Feedback"),
     Tooltip("Tooltip", "Feedback"),
     Tour("Tour", "Feedback"),
     // Container
@@ -91,6 +127,7 @@ enum class DemoRoute(val label: String, val group: String) {
     Dialog("Dialog", "Container"),
     Drawer("Drawer", "Container"),
     Carousel("Carousel", "Container"),
+    Watermark("Watermark", "Others"),
 }
 
 @Composable
@@ -258,43 +295,79 @@ private fun DemoContent(route: DemoRoute, onNavigate: (DemoRoute) -> Unit) {
     when (route) {
         DemoRoute.Overview -> OverviewDemo(onNavigate = onNavigate)
         DemoRoute.Button -> ButtonDemo()
+        DemoRoute.Border -> BorderDemo()
+        DemoRoute.Color -> ColorDemo()
+        DemoRoute.LayoutContainer -> LayoutContainerDemo()
+        DemoRoute.Icon -> IconDemo()
+        DemoRoute.Layout -> LayoutDemo()
         DemoRoute.Text -> TextDemo()
+        DemoRoute.Typography -> TypographyDemo()
         DemoRoute.Link -> LinkDemo()
+        DemoRoute.Scrollbar -> ScrollbarDemo()
         DemoRoute.Tag -> TagDemo()
         DemoRoute.Divider -> DividerDemo()
         DemoRoute.Space -> SpaceDemo()
+        DemoRoute.Splitter -> SplitterDemo()
+        DemoRoute.ConfigProvider -> ConfigProviderDemo()
         DemoRoute.Input -> InputDemo()
         DemoRoute.InputNumber -> InputNumberDemo()
         DemoRoute.Textarea -> TextareaDemo()
         DemoRoute.Checkbox -> CheckboxDemo()
         DemoRoute.Radio -> RadioDemo()
+        DemoRoute.Rate -> RateDemo()
         DemoRoute.Switch -> SwitchDemo()
         DemoRoute.Select -> SelectDemo()
+        DemoRoute.VirtualizedSelect -> VirtualizedSelectDemo()
         DemoRoute.Slider -> SliderDemo()
+        DemoRoute.DatePickerPanel -> DatePickerPanelDemo()
         DemoRoute.DatePicker -> DatePickerDemo()
+        DemoRoute.DateTimePicker -> DateTimePickerDemo()
         DemoRoute.TimePicker -> TimePickerDemo()
+        DemoRoute.TimeSelect -> TimeSelectDemo()
         DemoRoute.Form -> FormDemo()
         DemoRoute.Autocomplete -> AutocompleteDemo()
+        DemoRoute.ColorPickerPanel -> ColorPickerPanelDemo()
+        DemoRoute.ColorPicker -> ColorPickerDemo()
         DemoRoute.InputTag -> InputTagDemo()
+        DemoRoute.Mention -> MentionDemo()
         DemoRoute.Cascader -> CascaderDemo()
         DemoRoute.Transfer -> TransferDemo()
+        DemoRoute.TreeSelect -> TreeSelectDemo()
+        DemoRoute.Upload -> UploadDemo()
         DemoRoute.Table -> TableDemo()
+        DemoRoute.VirtualizedTable -> VirtualizedTableDemo()
         DemoRoute.Tree -> TreeDemo()
+        DemoRoute.VirtualizedTree -> VirtualizedTreeDemo()
+        DemoRoute.Statistic -> StatisticDemo()
+        DemoRoute.Segmented -> SegmentedDemo()
         DemoRoute.Pagination -> PaginationDemo()
         DemoRoute.Progress -> ProgressDemo()
+        DemoRoute.Result -> ResultDemo()
         DemoRoute.Avatar -> AvatarDemo()
+        DemoRoute.Badge -> BadgeDemo()
         DemoRoute.Skeleton -> SkeletonDemo()
         DemoRoute.Empty -> EmptyDemo()
+        DemoRoute.Image -> ImageDemo()
+        DemoRoute.InfiniteScroll -> InfiniteScrollDemo()
+        DemoRoute.Timeline -> TimelineDemo()
         DemoRoute.Calendar -> CalendarDemo()
+        DemoRoute.Descriptions -> DescriptionsDemo()
+        DemoRoute.Affix -> AffixDemo()
+        DemoRoute.Anchor -> AnchorDemo()
+        DemoRoute.Backtop -> BacktopDemo()
         DemoRoute.Menu -> MenuDemo()
+        DemoRoute.PageHeader -> PageHeaderDemo()
         DemoRoute.Steps -> StepsDemo()
         DemoRoute.Breadcrumb -> BreadcrumbDemo()
         DemoRoute.Tabs -> TabsDemo()
         DemoRoute.Dropdown -> DropdownDemo()
         DemoRoute.Alert -> AlertDemo()
         DemoRoute.Message -> MessageDemo()
+        DemoRoute.MessageBox -> MessageBoxDemo()
         DemoRoute.Notification -> NotificationDemo()
         DemoRoute.Loading -> LoadingDemo()
+        DemoRoute.Popconfirm -> PopconfirmDemo()
+        DemoRoute.Popover -> PopoverDemo()
         DemoRoute.Tooltip -> TooltipDemo()
         DemoRoute.Tour -> TourDemo()
         DemoRoute.Card -> CardDemo()
@@ -302,5 +375,6 @@ private fun DemoContent(route: DemoRoute, onNavigate: (DemoRoute) -> Unit) {
         DemoRoute.Dialog -> DialogDemo()
         DemoRoute.Drawer -> DrawerDemo()
         DemoRoute.Carousel -> CarouselDemo()
+        DemoRoute.Watermark -> WatermarkDemo()
     }
 }

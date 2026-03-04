@@ -1,10 +1,13 @@
 package io.github.xingray.compose_nexus.controls
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
@@ -19,9 +22,10 @@ import io.github.xingray.compose_nexus.theme.NexusTheme
 fun NexusBreadcrumb(
     modifier: Modifier = Modifier,
     separator: String = "/",
+    separatorIcon: (@Composable () -> Unit)? = null,
     content: NexusBreadcrumbScope.() -> Unit,
 ) {
-    val scope = NexusBreadcrumbScopeImpl(separator).apply(content)
+    val scope = NexusBreadcrumbScopeImpl().apply(content)
 
     Row(
         modifier = modifier,
@@ -31,11 +35,21 @@ fun NexusBreadcrumb(
         scope.items.forEachIndexed { index, item ->
             item.content()
             if (index < scope.items.lastIndex) {
-                NexusText(
-                    text = " $separator ",
-                    color = NexusTheme.colorScheme.text.placeholder,
-                    style = NexusTheme.typography.small,
-                )
+                if (separatorIcon != null) {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(0.dp),
+                    ) {
+                        separatorIcon()
+                    }
+                } else {
+                    NexusText(
+                        text = " $separator ",
+                        color = NexusTheme.colorScheme.text.placeholder,
+                        style = NexusTheme.typography.small,
+                    )
+                }
             }
         }
     }
@@ -45,7 +59,7 @@ interface NexusBreadcrumbScope {
     fun item(content: @Composable () -> Unit)
 }
 
-private class NexusBreadcrumbScopeImpl(val separator: String) : NexusBreadcrumbScope {
+private class NexusBreadcrumbScopeImpl : NexusBreadcrumbScope {
     val items = mutableListOf<BreadcrumbEntry>()
 
     override fun item(content: @Composable () -> Unit) {
@@ -67,8 +81,12 @@ private class BreadcrumbEntry(val content: @Composable () -> Unit)
 fun NexusBreadcrumbItem(
     text: String,
     modifier: Modifier = Modifier,
+    to: Any? = null,
+    replace: Boolean = false,
     isCurrent: Boolean = false,
     onClick: (() -> Unit)? = null,
+    onNavigate: ((to: Any, replace: Boolean) -> Unit)? = null,
+    content: (@Composable () -> Unit)? = null,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
@@ -81,10 +99,27 @@ fun NexusBreadcrumbItem(
             modifier = modifier,
         )
     } else {
-        NexusLink(
-            text = text,
-            onClick = onClick ?: {},
-            modifier = modifier,
-        )
+        Row(
+            modifier = modifier
+                .clickable {
+                    onClick?.invoke()
+                    if (to != null) {
+                        onNavigate?.invoke(to, replace)
+                    }
+                }
+                .pointerHoverIcon(PointerIcon.Hand),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            if (content != null) {
+                content()
+            } else {
+                NexusText(
+                    text = text,
+                    color = colorScheme.primary.base,
+                    style = typography.small,
+                )
+            }
+        }
     }
 }

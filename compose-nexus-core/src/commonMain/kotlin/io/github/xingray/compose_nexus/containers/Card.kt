@@ -15,8 +15,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.xingray.compose_nexus.controls.LocalNexusConfig
+import io.github.xingray.compose_nexus.controls.NexusCardShadowMode
 import io.github.xingray.compose_nexus.controls.NexusDivider
+import io.github.xingray.compose_nexus.controls.NexusText
 import io.github.xingray.compose_nexus.foundation.ProvideContentColorTextStyle
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
@@ -32,16 +36,40 @@ import io.github.xingray.compose_nexus.theme.NexusTheme
 fun NexusCard(
     modifier: Modifier = Modifier,
     shadow: CardShadow = CardShadow.Always,
+    headerText: String? = null,
+    footerText: String? = null,
+    bodyModifier: Modifier = Modifier,
+    bodyPadding: Dp = 20.dp,
+    headerClass: String? = null,
+    bodyClass: String? = null,
+    footerClass: String? = null,
     header: (@Composable () -> Unit)? = null,
+    footer: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val shapes = NexusTheme.shapes
     val shadows = NexusTheme.shadows
+    val configShadow = LocalNexusConfig.current.card.shadow
+    val resolvedShadow = when (configShadow) {
+        NexusCardShadowMode.Always -> CardShadow.Always
+        NexusCardShadowMode.Hover -> CardShadow.Hover
+        NexusCardShadowMode.Never -> CardShadow.Never
+        null -> shadow
+    }
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val headerContent = header ?: headerText?.let {
+        @Composable { NexusText(text = it) }
+    }
+    val footerContent = footer ?: footerText?.let {
+        @Composable { NexusText(text = it) }
+    }
 
-    val elevation = when (shadow) {
+    @Suppress("UNUSED_VARIABLE")
+    val _unusedClasses = Triple(headerClass, bodyClass, footerClass)
+
+    val elevation = when (resolvedShadow) {
         CardShadow.Always -> shadows.light.elevation
         CardShadow.Hover -> if (isHovered) shadows.light.elevation else 0.dp
         CardShadow.Never -> 0.dp
@@ -56,7 +84,7 @@ fun NexusCard(
             .border(1.dp, colorScheme.border.lighter, shapes.base),
     ) {
         // Header
-        if (header != null) {
+        if (headerContent != null) {
             ProvideContentColorTextStyle(
                 contentColor = colorScheme.text.primary,
                 textStyle = NexusTheme.typography.base,
@@ -66,7 +94,7 @@ fun NexusCard(
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp, vertical = 18.dp),
                 ) {
-                    header()
+                    headerContent()
                 }
             }
             NexusDivider(color = colorScheme.border.lighter)
@@ -80,9 +108,27 @@ fun NexusCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(bodyPadding)
+                    .then(bodyModifier),
             ) {
                 content()
+            }
+        }
+
+        // Footer
+        if (footerContent != null) {
+            NexusDivider(color = colorScheme.border.lighter)
+            ProvideContentColorTextStyle(
+                contentColor = colorScheme.text.secondary,
+                textStyle = NexusTheme.typography.small,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                ) {
+                    footerContent()
+                }
             }
         }
     }

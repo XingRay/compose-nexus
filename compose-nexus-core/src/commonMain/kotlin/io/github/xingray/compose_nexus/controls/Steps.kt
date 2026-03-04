@@ -23,12 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
-/**
- * Step status.
- */
 enum class StepStatus {
     Wait,
     Process,
@@ -37,26 +35,18 @@ enum class StepStatus {
     Success,
 }
 
-/**
- * Step direction.
- */
 enum class StepsDirection {
     Horizontal,
     Vertical,
 }
 
-/**
- * A single step definition.
- */
 data class StepItem(
     val title: String,
     val description: String = "",
-    val status: StepStatus? = null, // null = auto-resolved from active
+    val icon: (@Composable () -> Unit)? = null,
+    val status: StepStatus? = null,
 )
 
-/**
- * Steps state holder.
- */
 @Stable
 class StepsState(
     initialActive: Int = 0,
@@ -72,12 +62,16 @@ class StepsState(
     fun next() = goTo(active + 1)
     fun prev() = goTo(active - 1)
 
-    fun resolveStatus(index: Int): StepStatus {
+    fun resolveStatus(
+        index: Int,
+        processStatus: StepStatus,
+        finishStatus: StepStatus,
+    ): StepStatus {
         val step = steps.getOrNull(index) ?: return StepStatus.Wait
         if (step.status != null) return step.status
         return when {
-            index < active -> StepStatus.Finish
-            index == active -> StepStatus.Process
+            index < active -> finishStatus
+            index == active -> processStatus
             else -> StepStatus.Wait
         }
     }
@@ -91,22 +85,85 @@ fun rememberStepsState(
     StepsState(initialActive, steps)
 }
 
-/**
- * Element Plus Steps — a step progress indicator.
- *
- * @param state Steps state.
- * @param modifier Modifier.
- * @param direction Horizontal or vertical layout.
- */
 @Composable
 fun NexusSteps(
     state: StepsState,
     modifier: Modifier = Modifier,
     direction: StepsDirection = StepsDirection.Horizontal,
+    space: Dp? = null,
+    processStatus: StepStatus = StepStatus.Process,
+    finishStatus: StepStatus = StepStatus.Finish,
+    alignCenter: Boolean = false,
+    simple: Boolean = false,
 ) {
+    if (simple) {
+        SimpleSteps(
+            state = state,
+            modifier = modifier,
+            processStatus = processStatus,
+            finishStatus = finishStatus,
+        )
+        return
+    }
+
     when (direction) {
-        StepsDirection.Horizontal -> HorizontalSteps(state, modifier)
-        StepsDirection.Vertical -> VerticalSteps(state, modifier)
+        StepsDirection.Horizontal -> HorizontalSteps(
+            state = state,
+            modifier = modifier,
+            space = space,
+            processStatus = processStatus,
+            finishStatus = finishStatus,
+            alignCenter = alignCenter,
+        )
+        StepsDirection.Vertical -> VerticalSteps(
+            state = state,
+            modifier = modifier,
+            processStatus = processStatus,
+            finishStatus = finishStatus,
+            alignCenter = alignCenter,
+        )
+    }
+}
+
+@Composable
+private fun SimpleSteps(
+    state: StepsState,
+    modifier: Modifier,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(colorScheme.fill.light, NexusTheme.shapes.base)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        state.steps.forEachIndexed { index, step ->
+            val status = state.resolveStatus(index, processStatus, finishStatus)
+            val color = when (status) {
+                StepStatus.Process -> colorScheme.primary.base
+                StepStatus.Error -> colorScheme.danger.base
+                StepStatus.Finish, StepStatus.Success -> colorScheme.text.primary
+                StepStatus.Wait -> colorScheme.text.placeholder
+            }
+
+            NexusText(
+                text = step.title,
+                color = color,
+                style = typography.small,
+            )
+            if (index < state.steps.lastIndex) {
+                NexusText(
+                    text = "  >  ",
+                    color = colorScheme.text.placeholder,
+                    style = typography.small,
+                )
+            }
+        }
     }
 }
 
@@ -114,6 +171,10 @@ fun NexusSteps(
 private fun HorizontalSteps(
     state: StepsState,
     modifier: Modifier,
+    space: Dp?,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
+    alignCenter: Boolean,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -123,8 +184,9 @@ private fun HorizontalSteps(
             StepHead(
                 index = index,
                 step = step,
-                status = state.resolveStatus(index),
-                modifier = Modifier.weight(1f),
+                status = state.resolveStatus(index, processStatus, finishStatus),
+                alignCenter = alignCenter,
+                modifier = if (space != null) Modifier.width(space) else Modifier.weight(1f),
             )
         }
     }
@@ -134,19 +196,22 @@ private fun HorizontalSteps(
 private fun VerticalSteps(
     state: StepsState,
     modifier: Modifier,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
+    alignCenter: Boolean,
 ) {
     Column(
         modifier = modifier,
     ) {
         state.steps.forEachIndexed { index, step ->
-            val status = state.resolveStatus(index)
+            val status = state.resolveStatus(index, processStatus, finishStatus)
             Row(
                 modifier = Modifier.padding(bottom = if (index < state.steps.lastIndex) 24.dp else 0.dp),
             ) {
-                StepCircle(index = index, status = status)
+                StepCircle(index = index, status = status, step = step)
                 Spacer(modifier = Modifier.width(12.dp))
-                Column {
-                    StepTextContent(step = step, status = status)
+                Column(horizontalAlignment = if (alignCenter) Alignment.CenterHorizontally else Alignment.Start) {
+                    StepTextContent(step = step, status = status, alignCenter = alignCenter)
                 }
             }
         }
@@ -158,37 +223,34 @@ private fun StepHead(
     index: Int,
     step: StepItem,
     status: StepStatus,
+    alignCenter: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = if (alignCenter) Alignment.CenterHorizontally else Alignment.Start,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Left line
             if (index > 0) {
-                val lineColor = stepLineColor(status)
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(2.dp)
-                        .background(lineColor),
+                        .background(stepLineColor(status)),
                 )
             } else {
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            StepCircle(index = index, status = status)
-
-            // Right line placeholder (weight balance)
+            StepCircle(index = index, status = status, step = step)
             Spacer(modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        StepTextContent(step = step, status = status)
+        StepTextContent(step = step, status = status, alignCenter = alignCenter)
     }
 }
 
@@ -196,6 +258,7 @@ private fun StepHead(
 private fun StepCircle(
     index: Int,
     status: StepStatus,
+    step: StepItem,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
@@ -240,11 +303,15 @@ private fun StepCircle(
             .border(2.dp, borderColor, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
-        NexusText(
-            text = displayText,
-            color = contentColor,
-            style = typography.extraSmall,
-        )
+        if (step.icon != null) {
+            step.icon()
+        } else {
+            NexusText(
+                text = displayText,
+                color = contentColor,
+                style = typography.extraSmall,
+            )
+        }
     }
 }
 
@@ -252,6 +319,7 @@ private fun StepCircle(
 private fun StepTextContent(
     step: StepItem,
     status: StepStatus,
+    alignCenter: Boolean,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
@@ -273,6 +341,7 @@ private fun StepTextContent(
             text = step.description,
             color = colorScheme.text.secondary,
             style = typography.extraSmall,
+            modifier = if (alignCenter) Modifier else Modifier,
         )
     }
 }
@@ -285,3 +354,4 @@ private fun stepLineColor(currentStatus: StepStatus): Color {
         else -> colorScheme.primary.base
     }
 }
+

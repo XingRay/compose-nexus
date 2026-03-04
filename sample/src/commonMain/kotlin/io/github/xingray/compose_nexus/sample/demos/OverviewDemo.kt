@@ -27,12 +27,14 @@ import io.github.xingray.compose_nexus.sample.DemoRoute
 import io.github.xingray.compose_nexus.theme.NexusTheme
 
 private val componentGroups = listOf(
-    "Basic" to listOf("Button", "Text", "Link", "Tag", "Divider", "Space"),
-    "Form" to listOf("Input", "InputNumber", "Textarea", "Checkbox", "Radio", "Switch", "Select", "Slider", "DatePicker", "TimePicker", "Form", "Autocomplete", "InputTag", "Cascader", "Transfer"),
-    "Data Display" to listOf("Table", "Tree", "Pagination", "Progress", "Avatar", "Skeleton", "Empty", "Calendar"),
-    "Navigation" to listOf("Menu", "Steps", "Breadcrumb", "Tabs", "Dropdown"),
-    "Feedback" to listOf("Alert", "Message", "Notification", "Loading", "Tooltip", "Tour"),
+    "Basic" to listOf("Button", "Border", "Color", "Layout Container", "Icon", "Layout", "Text", "Typography", "Link", "Scrollbar", "Tag", "Space", "Splitter"),
+    "Configuration" to listOf("Config Provider"),
+    "Form" to listOf("Input", "InputNumber", "Textarea", "Checkbox", "Radio", "Rate", "Switch", "Select", "Virtualized Select", "Slider", "DatePickerPanel", "DatePicker", "DateTimePicker", "TimePicker", "TimeSelect", "Form", "Autocomplete", "ColorPickerPanel", "ColorPicker", "InputTag", "Mention", "Cascader", "Transfer", "TreeSelect", "Upload"),
+    "Data Display" to listOf("Table", "Virtualized Table", "Tree", "Virtualized Tree", "Statistic", "Segmented", "Pagination", "Progress", "Result", "Avatar", "Badge", "Skeleton", "Empty", "Image", "Infinite Scroll", "Timeline", "Calendar", "Descriptions"),
+    "Navigation" to listOf("Affix", "Anchor", "Backtop", "Menu", "Page Header", "Steps", "Breadcrumb", "Tabs", "Dropdown"),
+    "Feedback" to listOf("Alert", "Message", "Message Box", "Notification", "Loading", "Popconfirm", "Popover", "Tooltip", "Tour"),
     "Container" to listOf("Card", "Collapse", "Dialog", "Drawer", "Carousel"),
+    "Others" to listOf("Divider", "Watermark"),
 )
 
 private val nameToRoute: Map<String, DemoRoute> =

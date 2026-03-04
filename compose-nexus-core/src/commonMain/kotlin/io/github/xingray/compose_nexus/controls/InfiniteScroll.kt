@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.NexusTheme
+import kotlinx.coroutines.delay
 
 /**
  * InfiniteScroll state holder.
@@ -29,6 +30,7 @@ class InfiniteScrollState(
     var isLoading by mutableStateOf(false)
     var hasMore by mutableStateOf(true)
     var error by mutableStateOf(false)
+    var disabled by mutableStateOf(false)
 }
 
 @Composable
@@ -56,6 +58,10 @@ fun <T> NexusInfiniteScroll(
     state: InfiniteScrollState = rememberInfiniteScrollState(),
     modifier: Modifier = Modifier,
     threshold: Int = 3,
+    infiniteScrollDisabled: Boolean = false,
+    infiniteScrollDelay: Long = 200L,
+    infiniteScrollDistance: Int = 0,
+    infiniteScrollImmediate: Boolean = true,
     onLoadMore: suspend () -> Unit = {},
     loadingContent: (@Composable () -> Unit)? = null,
     noMoreContent: (@Composable () -> Unit)? = null,
@@ -64,19 +70,55 @@ fun <T> NexusInfiniteScroll(
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
 
-    // Detect when scrolled near the bottom
+    state.disabled = infiniteScrollDisabled
+
+    // Detect when scrolled near the bottom.
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = state.listState.layoutInfo
-            val totalItems = layoutInfo.totalItemsCount
-            val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            state.hasMore && !state.isLoading && lastVisibleIndex >= totalItems - threshold - 1
+            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()
+            val lastVisibleIndex = lastVisible?.index ?: -1
+            val nearEndByIndex = lastVisibleIndex >= items.lastIndex - threshold
+            val distanceToBottom = if (lastVisible == null) Int.MAX_VALUE else {
+                layoutInfo.viewportEndOffset - (lastVisible.offset + lastVisible.size)
+            }
+            val nearEndByDistance = distanceToBottom <= infiniteScrollDistance
+            state.hasMore &&
+                !state.isLoading &&
+                !state.disabled &&
+                (nearEndByIndex || nearEndByDistance)
         }
     }
 
-    // Trigger loading
-    LaunchedEffect(shouldLoadMore) {
-        if (shouldLoadMore && state.hasMore && !state.isLoading) {
+    val shouldImmediateLoad by remember {
+        derivedStateOf {
+            if (!infiniteScrollImmediate) return@derivedStateOf false
+            val layoutInfo = state.listState.layoutInfo
+            val contentNotFilled = layoutInfo.visibleItemsInfo.size >= items.size
+            state.hasMore &&
+                !state.isLoading &&
+                !state.disabled &&
+                contentNotFilled
+        }
+    }
+
+    // Trigger loading with throttle delay.
+    val triggerKey = remember(
+        shouldLoadMore,
+        shouldImmediateLoad,
+        items.size,
+        state.disabled,
+        state.hasMore,
+        state.isLoading,
+        infiniteScrollDelay,
+    ) {
+        Triple(shouldLoadMore, shouldImmediateLoad, items.size)
+    }
+    LaunchedEffect(triggerKey) {
+        val shouldTrigger = shouldLoadMore || shouldImmediateLoad
+        if (shouldTrigger && state.hasMore && !state.isLoading && !state.disabled) {
+            if (infiniteScrollDelay > 0) delay(infiniteScrollDelay)
+            if (!state.hasMore || state.isLoading || state.disabled) return@LaunchedEffect
             state.isLoading = true
             try {
                 onLoadMore()

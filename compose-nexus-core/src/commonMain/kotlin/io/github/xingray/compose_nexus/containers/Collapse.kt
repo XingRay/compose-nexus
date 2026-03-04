@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,23 +31,25 @@ import io.github.xingray.compose_nexus.controls.NexusDivider
 import io.github.xingray.compose_nexus.controls.NexusText
 import io.github.xingray.compose_nexus.foundation.ProvideContentColorTextStyle
 import io.github.xingray.compose_nexus.theme.NexusTheme
+import kotlinx.coroutines.launch
 
-// ============================================================================
-// Collapse state
-// ============================================================================
+enum class CollapseExpandIconPosition {
+    Left,
+    Right,
+}
 
-/**
- * State for [NexusCollapse]. Tracks which items are expanded.
- *
- * @param initialExpanded Initial set of expanded item names.
- * @param accordion If true, only one item can be expanded at a time.
- */
 @Stable
 class CollapseState(
     initialExpanded: Set<String> = emptySet(),
     val accordion: Boolean = false,
 ) {
-    var expanded: Set<String> by mutableStateOf(initialExpanded)
+    var expanded: Set<String> by mutableStateOf(
+        if (accordion) initialExpanded.take(1).toSet() else initialExpanded,
+    )
+        private set
+
+    val activeNames: List<String>
+        get() = expanded.toList()
 
     fun isExpanded(name: String): Boolean = name in expanded
 
@@ -56,42 +60,108 @@ class CollapseState(
             if (accordion) setOf(name) else expanded + name
         }
     }
+
+    fun setActiveNames(names: Collection<String>) {
+        expanded = if (accordion) names.firstOrNull()?.let { setOf(it) } ?: emptySet() else names.toSet()
+    }
+
+    fun setActiveName(name: String?) {
+        expanded = if (name.isNullOrEmpty()) emptySet() else setOf(name)
+    }
 }
 
 @Composable
 fun rememberCollapseState(
     initialExpanded: Set<String> = emptySet(),
     accordion: Boolean = false,
-): CollapseState = remember { CollapseState(initialExpanded, accordion) }
-
-// ============================================================================
-// Collapse scope
-// ============================================================================
+): CollapseState = remember(accordion) { CollapseState(initialExpanded, accordion) }
 
 @Stable
 class CollapseScope internal constructor(
     internal val state: CollapseState,
-)
+    private val expandIconPosition: CollapseExpandIconPosition,
+    private val beforeCollapse: (suspend () -> Boolean)?,
+    private val onChange: ((Any) -> Unit)?,
+) {
+    private var toggling by mutableStateOf(false)
 
-// ============================================================================
-// NexusCollapse
-// ============================================================================
+    internal fun itemIconPosition(override: CollapseExpandIconPosition?): CollapseExpandIconPosition {
+        return override ?: expandIconPosition
+    }
 
-/**
- * Element Plus Collapse — a set of expandable/collapsible panels.
- *
- * @param state Collapse state controlling which panels are expanded.
- * @param modifier Modifier.
- * @param content Content using [CollapseScope] receiver for [NexusCollapseItem].
- */
+    fun setActiveNames(activeNames: Collection<String>) {
+        state.setActiveNames(activeNames)
+        emitChange()
+    }
+
+    fun requestToggle(name: String) {
+        if (toggling) return
+    }
+
+    internal fun emitChange() {
+        val value: Any = if (state.accordion) {
+            state.activeNames.firstOrNull().orEmpty()
+        } else {
+            state.activeNames
+        }
+        onChange?.invoke(value)
+    }
+
+    internal fun tryToggle(
+        name: String,
+        scope: kotlinx.coroutines.CoroutineScope,
+    ) {
+        if (toggling) return
+        scope.launch {
+            toggling = true
+            val allowed = beforeCollapse?.invoke() ?: true
+            if (allowed) {
+                state.toggle(name)
+                emitChange()
+            }
+            toggling = false
+        }
+    }
+}
+
 @Composable
 fun NexusCollapse(
     state: CollapseState = rememberCollapseState(),
     modifier: Modifier = Modifier,
+    modelValue: Any? = null,
+    expandIconPosition: CollapseExpandIconPosition = CollapseExpandIconPosition.Right,
+    beforeCollapse: (suspend () -> Boolean)? = null,
+    onChange: ((Any) -> Unit)? = null,
     content: @Composable CollapseScope.() -> Unit,
 ) {
     val colorScheme = NexusTheme.colorScheme
-    val scope = remember(state) { CollapseScope(state) }
+
+    LaunchedEffect(modelValue) {
+        when (modelValue) {
+            is String -> state.setActiveName(modelValue)
+            is Number -> state.setActiveName(modelValue.toString())
+            is Collection<*> -> {
+                state.setActiveNames(
+                    modelValue.mapNotNull {
+                        when (it) {
+                            is String -> it
+                            is Number -> it.toString()
+                            else -> null
+                        }
+                    },
+                )
+            }
+        }
+    }
+
+    val scope = remember(state, expandIconPosition, beforeCollapse, onChange) {
+        CollapseScope(
+            state = state,
+            expandIconPosition = expandIconPosition,
+            beforeCollapse = beforeCollapse,
+            onChange = onChange,
+        )
+    }
 
     Column(
         modifier = modifier
@@ -102,31 +172,52 @@ fun NexusCollapse(
     }
 }
 
-/**
- * Element Plus CollapseItem — a single expandable panel within [NexusCollapse].
- *
- * @param name Unique identifier for this item.
- * @param title Title composable shown in the header.
- * @param disabled Whether this item can be toggled.
- * @param content Content shown when expanded.
- */
 @Composable
 fun CollapseScope.NexusCollapseItem(
     name: String,
     modifier: Modifier = Modifier,
+    titleText: String = "",
     disabled: Boolean = false,
-    title: @Composable () -> Unit,
+    expandIconPosition: CollapseExpandIconPosition? = null,
+    titleSlot: (@Composable (isActive: Boolean) -> Unit)? = null,
+    iconSlot: (@Composable (isActive: Boolean) -> Unit)? = null,
+    title: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val colorScheme = NexusTheme.colorScheme
     val motion = NexusTheme.motion
     val isExpanded = state.isExpanded(name)
+    val position = itemIconPosition(expandIconPosition)
+    val coroutineScope = rememberCoroutineScope()
+
+    @Composable
+    fun RenderIcon() {
+        if (iconSlot != null) {
+            iconSlot(isExpanded)
+        } else {
+            NexusText(
+                text = "▶",
+                modifier = Modifier.rotate(if (isExpanded) 90f else 0f),
+                color = if (disabled) colorScheme.disabled.text else colorScheme.text.secondary,
+                style = NexusTheme.typography.extraSmall,
+            )
+        }
+    }
+
+    @Composable
+    fun RenderTitle() {
+        if (titleSlot != null) {
+            titleSlot(isExpanded)
+        } else if (titleText.isNotEmpty()) {
+            NexusText(text = titleText)
+        } else {
+            title()
+        }
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Divider between items
         NexusDivider(color = colorScheme.border.lighter)
 
-        // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,34 +228,37 @@ fun CollapseScope.NexusCollapseItem(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
-                            ) { state.toggle(name) }
+                            ) { tryToggle(name, coroutineScope) }
                             .pointerHoverIcon(PointerIcon.Hand)
-                    } else Modifier
+                    } else {
+                        Modifier
+                    }
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Arrow indicator
-            NexusText(
-                text = "▶",
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .rotate(if (isExpanded) 90f else 0f),
-                color = colorScheme.text.secondary,
-                style = NexusTheme.typography.extraSmall,
-            )
+            if (position == CollapseExpandIconPosition.Left) {
+                Box(modifier = Modifier.padding(end = 8.dp)) {
+                    RenderIcon()
+                }
+            }
 
             ProvideContentColorTextStyle(
                 contentColor = if (disabled) colorScheme.disabled.text else colorScheme.text.primary,
                 textStyle = NexusTheme.typography.base,
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    title()
+                    RenderTitle()
+                }
+            }
+
+            if (position == CollapseExpandIconPosition.Right) {
+                Box(modifier = Modifier.padding(start = 8.dp)) {
+                    RenderIcon()
                 }
             }
         }
 
-        // Content panel
         AnimatedVisibility(
             visible = isExpanded,
             enter = expandVertically(animationSpec = motion.tweenFast()),

@@ -10,7 +10,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +26,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -61,6 +66,72 @@ private data class ButtonColors(
     val content: Color,
     val border: Color,
 )
+
+private data class ButtonGroupConfig(
+    val size: ComponentSize?,
+    val type: NexusType?,
+)
+
+private val LocalButtonGroupConfig = compositionLocalOf {
+    ButtonGroupConfig(
+        size = null,
+        type = null,
+    )
+}
+
+private fun String.withAutoInsertedSpace(enabled: Boolean): String {
+    if (!enabled || this.length != 2) return this
+    if (this.all { it in '\u4E00'..'\u9FFF' }) {
+        return "${this[0]} ${this[1]}"
+    }
+    return this
+}
+
+private fun Modifier.drawShapeStroke(
+    shape: Shape,
+    color: Color,
+    width: Dp,
+    dashPattern: List<Dp>? = null,
+): Modifier = drawBehind {
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val path = androidx.compose.ui.graphics.Path()
+    when (outline) {
+        is androidx.compose.ui.graphics.Outline.Rectangle -> path.addRect(outline.rect)
+        is androidx.compose.ui.graphics.Outline.Rounded -> path.addRoundRect(outline.roundRect)
+        is androidx.compose.ui.graphics.Outline.Generic -> path.addPath(outline.path)
+    }
+    val pathEffect = dashPattern?.let { pattern ->
+        PathEffect.dashPathEffect(pattern.map { it.toPx() }.toFloatArray())
+    }
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(
+            width = width.toPx(),
+            pathEffect = pathEffect,
+        ),
+    )
+}
+
+private fun Modifier.drawShapeOverlayStroke(
+    shape: Shape,
+    color: Color,
+    width: Dp,
+): Modifier = drawWithContent {
+    drawContent()
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val path = androidx.compose.ui.graphics.Path()
+    when (outline) {
+        is androidx.compose.ui.graphics.Outline.Rectangle -> path.addRect(outline.rect)
+        is androidx.compose.ui.graphics.Outline.Rounded -> path.addRoundRect(outline.roundRect)
+        is androidx.compose.ui.graphics.Outline.Generic -> path.addPath(outline.path)
+    }
+    drawPath(
+        path = path,
+        color = color,
+        style = Stroke(width = width.toPx()),
+    )
+}
 
 @Composable
 private fun resolveButtonColors(
@@ -411,8 +482,8 @@ private fun LoadingSpinner(color: Color, size: Dp = 14.dp) {
 fun NexusButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    type: NexusType = NexusType.Default,
-    size: ComponentSize = ComponentSize.Default,
+    type: NexusType? = null,
+    size: ComponentSize? = null,
     plain: Boolean = false,
     text: Boolean = false,
     bg: Boolean = false,
@@ -423,22 +494,42 @@ fun NexusButton(
     loading: Boolean = false,
     disabled: Boolean = false,
     color: Color? = null,
+    tag: String = "button",
+    autoInsertSpace: Boolean = false,
+    icon: (@Composable () -> Unit)? = null,
+    loadingContent: (@Composable () -> Unit)? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     val shapes = NexusTheme.shapes
     val sizes = NexusTheme.sizes
     val typography = NexusTheme.typography
+    val cs = NexusTheme.colorScheme
+    val config = LocalNexusConfig.current
+    val buttonConfig = config.button
+    val groupConfig = LocalButtonGroupConfig.current
+    val resolvedType = type ?: groupConfig.type ?: buttonConfig.type ?: NexusType.Default
+    val resolvedSize = size ?: groupConfig.size ?: config.size ?: ComponentSize.Default
+    val resolvedPlain = plain || (buttonConfig.plain == true)
+    val resolvedText = text || (buttonConfig.text == true)
+    val resolvedRound = round || (buttonConfig.round == true)
+    val resolvedDashed = dashed || (buttonConfig.dashed == true)
+
+    // keep API parity with Element Plus tag prop even though Compose does not render HTML tags directly.
+    @Suppress("UNUSED_VARIABLE")
+    val currentTag = tag
+    val shouldAutoInsertSpace = autoInsertSpace || (buttonConfig.autoInsertSpace == true)
 
     val isDisabled = disabled || loading
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
+    val isFocused by interactionSource.collectIsFocusedAsState()
 
     val colors = resolveButtonColors(
-        type = type,
-        plain = plain,
-        dashed = dashed,
-        text = text,
+        type = resolvedType,
+        plain = resolvedPlain,
+        dashed = resolvedDashed,
+        text = resolvedText,
         bg = bg,
         link = link,
         customColor = color,
@@ -450,22 +541,22 @@ fun NexusButton(
     // Shape
     val shape: Shape = when {
         circle -> shapes.circle
-        round -> shapes.round
+        resolvedRound -> shapes.round
         else -> shapes.base
     }
 
     // Sizing
-    val buttonHeight: Dp = when (size) {
+    val buttonHeight: Dp = when (resolvedSize) {
         ComponentSize.Large -> sizes.componentLarge
         ComponentSize.Default -> sizes.componentDefault
         ComponentSize.Small -> sizes.componentSmall
     }
-    val horizontalPad: Dp = when (size) {
+    val horizontalPad: Dp = when (resolvedSize) {
         ComponentSize.Large -> 20.dp
         ComponentSize.Default -> 16.dp
         ComponentSize.Small -> 12.dp
     }
-    val textStyle = when (size) {
+    val textStyle = when (resolvedSize) {
         ComponentSize.Large -> typography.base
         ComponentSize.Default -> typography.base
         ComponentSize.Small -> typography.extraSmall
@@ -476,7 +567,7 @@ fun NexusButton(
     val effectivePadding = if (circle) PaddingValues(0.dp) else PaddingValues(horizontal = horizontalPad)
 
     // Text/link buttons have no border
-    val showBorder = !text && !link
+    val showBorder = !resolvedText && !link
     val borderColor = if (showBorder) colors.border else Color.Transparent
 
     val loadingAlpha by animateFloatAsState(
@@ -498,33 +589,24 @@ fun NexusButton(
             .then(
                 when {
                     !showBorder -> Modifier
-                    dashed -> Modifier.drawBehind {
-                        val strokeWidth = 1.dp.toPx()
-                        val outline = shape.createOutline(this.size, layoutDirection, this)
-                        val borderPath = androidx.compose.ui.graphics.Path()
-                        when (outline) {
-                            is androidx.compose.ui.graphics.Outline.Rectangle -> {
-                                borderPath.addRect(outline.rect)
-                            }
-                            is androidx.compose.ui.graphics.Outline.Rounded -> {
-                                borderPath.addRoundRect(outline.roundRect)
-                            }
-                            is androidx.compose.ui.graphics.Outline.Generic -> {
-                                borderPath.addPath(outline.path)
-                            }
-                        }
-                        drawPath(
-                            path = borderPath,
-                            color = borderColor,
-                            style = Stroke(
-                                width = strokeWidth,
-                                pathEffect = PathEffect.dashPathEffect(
-                                    floatArrayOf(4.dp.toPx(), 3.dp.toPx())
-                                )
-                            )
-                        )
-                    }
+                    resolvedDashed -> Modifier.drawShapeStroke(
+                        shape = shape,
+                        color = borderColor,
+                        width = 1.dp,
+                        dashPattern = listOf(4.dp, 3.dp),
+                    )
                     else -> Modifier.border(1.dp, borderColor, shape)
+                }
+            )
+            .then(
+                if (isFocused && !isDisabled) {
+                    Modifier.drawShapeOverlayStroke(
+                        shape = shape,
+                        color = cs.primary.light7,
+                        width = 2.dp,
+                    )
+                } else {
+                    Modifier
                 }
             )
             .then(
@@ -535,6 +617,9 @@ fun NexusButton(
                             indication = null,
                             onClick = onClick,
                             role = Role.Button,
+                        )
+                        .focusable(
+                            interactionSource = interactionSource,
                         )
                         .pointerHoverIcon(PointerIcon.Hand)
                 } else {
@@ -555,16 +640,70 @@ fun NexusButton(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (loading) {
-                    val spinnerSize = when (size) {
+                    val spinnerSize = when (resolvedSize) {
                         ComponentSize.Large -> 16.dp
                         ComponentSize.Default -> 14.dp
                         ComponentSize.Small -> 12.dp
                     }
-                    LoadingSpinner(color = colors.content, size = spinnerSize)
+                    if (loadingContent != null) {
+                        loadingContent()
+                    } else {
+                        LoadingSpinner(color = colors.content, size = spinnerSize)
+                    }
+                } else if (icon != null) {
+                    icon()
                 }
                 content()
             }
         }
+    }
+}
+
+@Composable
+fun NexusButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    type: NexusType? = null,
+    size: ComponentSize? = null,
+    plain: Boolean = false,
+    textButton: Boolean = false,
+    bg: Boolean = false,
+    link: Boolean = false,
+    round: Boolean = false,
+    circle: Boolean = false,
+    dashed: Boolean = false,
+    loading: Boolean = false,
+    disabled: Boolean = false,
+    color: Color? = null,
+    tag: String = "button",
+    autoInsertSpace: Boolean = false,
+    icon: (@Composable () -> Unit)? = null,
+    loadingContent: (@Composable () -> Unit)? = null,
+) {
+    val configAutoInsertSpace = LocalNexusConfig.current.button.autoInsertSpace == true
+    val shouldAutoInsertSpace = autoInsertSpace || configAutoInsertSpace
+    NexusButton(
+        onClick = onClick,
+        modifier = modifier,
+        type = type,
+        size = size,
+        plain = plain,
+        text = textButton,
+        bg = bg,
+        link = link,
+        round = round,
+        circle = circle,
+        dashed = dashed,
+        loading = loading,
+        disabled = disabled,
+        color = color,
+        tag = tag,
+        autoInsertSpace = shouldAutoInsertSpace,
+        icon = icon,
+        loadingContent = loadingContent,
+    ) {
+        NexusText(text = text.withAutoInsertedSpace(shouldAutoInsertSpace))
     }
 }
 
@@ -588,17 +727,26 @@ enum class ButtonGroupDirection {
 fun NexusButtonGroup(
     modifier: Modifier = Modifier,
     direction: ButtonGroupDirection = ButtonGroupDirection.Horizontal,
+    size: ComponentSize? = null,
+    type: NexusType? = null,
     content: @Composable () -> Unit,
 ) {
-    when (direction) {
-        ButtonGroupDirection.Horizontal -> {
-            Row(modifier = modifier) {
-                content()
+    CompositionLocalProvider(
+        LocalButtonGroupConfig provides ButtonGroupConfig(
+            size = size,
+            type = type,
+        ),
+    ) {
+        when (direction) {
+            ButtonGroupDirection.Horizontal -> {
+                Row(modifier = modifier) {
+                    content()
+                }
             }
-        }
-        ButtonGroupDirection.Vertical -> {
-            Column(modifier = modifier) {
-                content()
+            ButtonGroupDirection.Vertical -> {
+                Column(modifier = modifier) {
+                    content()
+                }
             }
         }
     }

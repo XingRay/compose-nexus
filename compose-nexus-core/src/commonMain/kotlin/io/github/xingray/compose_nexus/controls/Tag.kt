@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import io.github.xingray.compose_nexus.theme.ComponentSize
 import io.github.xingray.compose_nexus.theme.NexusTheme
@@ -47,9 +48,15 @@ fun NexusTag(
     size: ComponentSize = ComponentSize.Default,
     effect: TagEffect = TagEffect.Light,
     closable: Boolean = false,
+    disableTransitions: Boolean = false,
+    hit: Boolean = false,
+    color: Color? = null,
     round: Boolean = false,
+    onClick: (() -> Unit)? = null,
     onClose: (() -> Unit)? = null,
 ) {
+    @Suppress("UNUSED_VARIABLE")
+    val _disableTransitions = disableTransitions
     val colorScheme = NexusTheme.colorScheme
     val typography = NexusTheme.typography
     val shapes = NexusTheme.shapes
@@ -59,24 +66,47 @@ fun NexusTag(
 
     val bgColor: Color
     val textColor: Color
-    val borderColor: Color
+    var borderColor: Color
 
-    when (effect) {
-        TagEffect.Dark -> {
-            bgColor = tc?.base ?: colorScheme.info.base
-            textColor = colorScheme.white
-            borderColor = tc?.base ?: colorScheme.info.base
+    if (color != null) {
+        when (effect) {
+            TagEffect.Plain -> {
+                bgColor = Color.Transparent
+                textColor = color
+                borderColor = color
+            }
+            TagEffect.Dark -> {
+                bgColor = color
+                textColor = if (color.luminance() > 0.55f) colorScheme.text.primary else colorScheme.white
+                borderColor = color
+            }
+            TagEffect.Light -> {
+                bgColor = color
+                textColor = if (color.luminance() > 0.55f) colorScheme.text.primary else colorScheme.white
+                borderColor = color
+            }
         }
-        TagEffect.Plain -> {
-            bgColor = Color.Transparent
-            textColor = tc?.base ?: colorScheme.text.regular
-            borderColor = tc?.light5 ?: colorScheme.border.base
+    } else {
+        when (effect) {
+            TagEffect.Dark -> {
+                bgColor = tc?.base ?: colorScheme.info.base
+                textColor = colorScheme.white
+                borderColor = tc?.base ?: colorScheme.info.base
+            }
+            TagEffect.Plain -> {
+                bgColor = Color.Transparent
+                textColor = tc?.base ?: colorScheme.text.regular
+                borderColor = tc?.light5 ?: colorScheme.border.base
+            }
+            TagEffect.Light -> {
+                bgColor = tc?.light9 ?: colorScheme.fill.base
+                textColor = tc?.base ?: colorScheme.text.regular
+                borderColor = tc?.light8 ?: colorScheme.border.lighter
+            }
         }
-        TagEffect.Light -> {
-            bgColor = tc?.light9 ?: colorScheme.fill.base
-            textColor = tc?.base ?: colorScheme.text.regular
-            borderColor = tc?.light8 ?: colorScheme.border.lighter
-        }
+    }
+    if (hit) {
+        borderColor = tc?.base ?: textColor
     }
 
     val tagHeight = when (size) {
@@ -96,6 +126,13 @@ fun NexusTag(
             .clip(shape)
             .background(bgColor)
             .border(1.dp, borderColor, shape)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable { onClick() }
+                } else {
+                    Modifier
+                }
+            )
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -114,4 +151,34 @@ fun NexusTag(
             )
         }
     }
+}
+
+@Composable
+fun NexusCheckTag(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    disabled: Boolean = false,
+    type: NexusType = NexusType.Primary,
+) {
+    val colorScheme = NexusTheme.colorScheme
+    val tc = colorScheme.typeColor(type)
+    val bg = if (checked) (tc?.base ?: colorScheme.primary.base) else colorScheme.fill.light
+
+    NexusTag(
+        text = text,
+        modifier = modifier.then(
+            if (!disabled) {
+                Modifier.clickable { onCheckedChange(!checked) }
+            } else {
+                Modifier
+            }
+        ),
+        type = type,
+        effect = if (checked) TagEffect.Dark else TagEffect.Light,
+        color = bg,
+        hit = true,
+        onClick = null,
+    )
 }
