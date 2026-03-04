@@ -61,7 +61,7 @@ mavenPublishing {
     publishToMavenCentral()
     signAllPublications()
 
-    coordinates("io.github.xingray", "compose-nexus-core", "0.0.1")
+    coordinates("io.github.xingray", "compose-nexus-core", "0.0.2")
 
     pom {
         name.set("compose-nexus-core")

@@ -8,6 +8,12 @@
 
 Compose Multiplatform UI component library inspired by [Element Plus](https://element-plus.org/), targeting Android, iOS, Desktop (JVM), Web (JS/WasmJS).
 
+### Maven Central
+
+```kotlin
+implementation("io.github.xingray:compose-nexus-core:0.0.2")
+```
+
 ### Screenshot
 
 ![Sample Screenshot](doc/image/image.png)
@@ -97,6 +103,12 @@ Open the `iosApp` directory in Xcode, or use the run configuration in your IDE.
 ## 中文
 
 基于 [Element Plus](https://element-plus.org/) 设计风格的 Compose Multiplatform UI 组件库，支持 Android、iOS、桌面端 (JVM)、Web (JS/WasmJS) 多平台。
+
+### Maven Central
+
+```kotlin
+implementation("io.github.xingray:compose-nexus-core:0.0.2")
+```
 
 ### 截图
 
