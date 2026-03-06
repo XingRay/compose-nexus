@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		135ACA5664F94686B3A58548 /* compose_nexus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = compose_nexus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		135ACA5664F94686B3A58548 /* compose.nexus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = compose_nexus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -87,7 +87,7 @@
 			packageProductDependencies = (
 			);
 			productName = iosApp;
-			productReference = 135ACA5664F94686B3A58548 /* compose_nexus.app */;
+			productReference = 135ACA5664F94686B3A58548 /* compose.nexus.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */

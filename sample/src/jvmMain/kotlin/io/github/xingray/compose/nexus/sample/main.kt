@@ -7,7 +7,7 @@ import io.github.xingray.compose.nexus.sample.App
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "compose_nexus sample",
+        title = "compose.nexus sample",
     ) {
         App()
     }

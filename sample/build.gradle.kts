@@ -15,7 +15,7 @@ val isMacOs = System.getProperty("os.name").startsWith("Mac", ignoreCase = true)
 kotlin {
     @Suppress("UnstableApiUsage")
     androidLibrary {
-        namespace = "io.github.xingray.compose_nexus.sample"
+        namespace = "io.github.xingray.compose.nexus.sample"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -68,11 +68,11 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "io.github.xingray.compose_nexus.sample.MainKt"
+        mainClass = "io.github.xingray.compose.nexus.sample.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "io.github.xingray.compose_nexus.sample"
+            packageName = "io.github.xingray.compose.nexus.sample"
             packageVersion = "1.0.0"
         }
     }

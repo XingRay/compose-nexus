@@ -265,7 +265,7 @@ dark-2:  #73767A
 
 ```
 compose-nexus-core/
-├── src/commonMain/kotlin/io/github/xingray/compose_nexus/
+├── src/commonMain/kotlin/io/github/xingray/compose/nexus/
 │   ├── foundation/           ← 基础工具
 │   │   ├── BuildModifier.kt
 │   │   ├── LocalContentColor.kt

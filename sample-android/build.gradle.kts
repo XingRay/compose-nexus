@@ -11,11 +11,11 @@ kotlin {
 }
 
 android {
-    namespace = "io.github.xingray.compose_nexus.sample.android"
+    namespace = "io.github.xingray.compose.nexus.sample.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "io.github.xingray.compose_nexus.sample.android"
+        applicationId = "io.github.xingray.compose.nexus.sample.android"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

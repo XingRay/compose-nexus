@@ -13,7 +13,7 @@ val isMacOs = System.getProperty("os.name").startsWith("Mac", ignoreCase = true)
 
 kotlin {
     androidLibrary {
-        namespace = "io.github.xingray.compose_nexus"
+        namespace = "io.github.xingray.compose.nexus"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
