@@ -66,6 +66,9 @@ fun <T> rememberCrudTablePageState(
  * @param state Page state.
  * @param modifier Modifier.
  * @param title Page title.
+ * @param searchPlaceholder Placeholder text for search input.
+ * @param headerActions Additional actions in the header (e.g., refresh, batch delete buttons).
+ * @param filterActions Additional filter controls (e.g., checkboxes, dropdowns).
  * @param onSearch Callback for search/filter.
  * @param onPageChange Callback for page navigation.
  * @param onCreate Callback for creating a new item.
@@ -82,6 +85,9 @@ fun <T> NexusCrudTablePage(
     state: io.github.xingray.compose.nexus.templates.CrudTablePageState<T> = _root_ide_package_.io.github.xingray.compose.nexus.templates.rememberCrudTablePageState(),
     modifier: Modifier = Modifier,
     title: String = "Data Management",
+    searchPlaceholder: String = "Search...",
+    headerActions: (@Composable () -> Unit)? = null,
+    filterActions: (@Composable () -> Unit)? = null,
     onSearch: ((String) -> Unit)? = null,
     onPageChange: ((Int) -> Unit)? = null,
     onCreate: (() -> Unit)? = null,
@@ -113,15 +119,25 @@ fun <T> NexusCrudTablePage(
                 color = colorScheme.text.primary,
                 style = typography.extraLarge,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
-                onClick = {
-                    state.isCreateDialogOpen = true
-                    createDialogState.open()
-                    onCreate?.invoke()
-                },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "+ New")
+                // Custom header actions
+                if (headerActions != null) {
+                    headerActions()
+                }
+                // Default create button
+                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    onClick = {
+                        state.isCreateDialogOpen = true
+                        createDialogState.open()
+                        onCreate?.invoke()
+                    },
+                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                ) {
+                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "+ New")
+                }
             }
         }
 
@@ -133,10 +149,14 @@ fun <T> NexusCrudTablePage(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Custom filter actions (e.g., checkboxes, dropdowns)
+            if (filterActions != null) {
+                filterActions()
+            }
             _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
                 value = state.searchQuery,
                 onValueChange = { state.searchQuery = it },
-                placeholder = "Search...",
+                placeholder = searchPlaceholder,
                 clearable = true,
                 modifier = Modifier.weight(1f),
             )
