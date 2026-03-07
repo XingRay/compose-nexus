@@ -79,8 +79,8 @@ class DialogState(initialVisible: Boolean = false) {
 }
 
 @Composable
-fun rememberDialogState(initialVisible: Boolean = false): io.github.xingray.compose.nexus.containers.DialogState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.containers.DialogState(initialVisible) }
+fun rememberDialogState(initialVisible: Boolean = false): DialogState =
+    remember { DialogState(initialVisible) }
 
 enum class DialogTransition {
     FadeScale,
@@ -90,7 +90,7 @@ enum class DialogTransition {
 
 @Composable
 fun NexusDialog(
-    state: io.github.xingray.compose.nexus.containers.DialogState,
+    state: DialogState,
     modifier: Modifier = Modifier,
     title: String? = null,
     width: Dp = 500.dp,
@@ -109,7 +109,7 @@ fun NexusDialog(
     alignCenter: Boolean = false,
     destroyOnClose: Boolean = false,
     zIndex: Float = 2000f,
-    transition: io.github.xingray.compose.nexus.containers.DialogTransition = _root_ide_package_.io.github.xingray.compose.nexus.containers.DialogTransition.FadeScale,
+    transition: DialogTransition = DialogTransition.FadeScale,
     beforeClose: ((done: () -> Unit) -> Unit)? = null,
     onOpen: (() -> Unit)? = null,
     onOpened: (() -> Unit)? = null,
@@ -122,7 +122,7 @@ fun NexusDialog(
     closeIcon: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val openCloseDuration = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion.durationFast.toLong()
+    val openCloseDuration = NexusTheme.motion.durationFast.toLong()
     var lastVisible by remember { mutableStateOf(state.visible) }
     LaunchedEffect(state.visible) {
         if (state.visible && !lastVisible) {
@@ -141,10 +141,10 @@ fun NexusDialog(
 
     if (!state.visible) return
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
-    val motion = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
+    val motion = NexusTheme.motion
     val density = LocalDensity.current
 
     var offsetX by remember { mutableFloatStateOf(0f) }
@@ -163,17 +163,17 @@ fun NexusDialog(
     val enterTransition: EnterTransition
     val exitTransition: ExitTransition
     when (transition) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DialogTransition.FadeScale -> {
+        DialogTransition.FadeScale -> {
             enterTransition = fadeIn(motion.tweenFade()) + scaleIn(initialScale = 0.94f, animationSpec = motion.tweenFast())
             exitTransition = fadeOut(motion.tweenFadeLinear()) + scaleOut(targetScale = 0.94f, animationSpec = motion.tweenFast())
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DialogTransition.Fade -> {
+        DialogTransition.Fade -> {
             enterTransition = fadeIn(motion.tweenFade())
             exitTransition = fadeOut(motion.tweenFadeLinear())
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DialogTransition.SlideUp -> {
+        DialogTransition.SlideUp -> {
             enterTransition = fadeIn(motion.tweenFade()) + slideInVertically(
                 initialOffsetY = { it / 6 },
                 animationSpec = motion.tweenFast(),
@@ -300,17 +300,17 @@ fun NexusDialog(
                             contentAlignment = if (center) Alignment.Center else Alignment.CenterStart,
                         ) {
                             if (header != null) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                                ProvideContentColorTextStyle(
                                     contentColor = colorScheme.text.primary,
-                                    textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large,
+                                    textStyle = NexusTheme.typography.large,
                                 ) {
                                     header()
                                 }
                             } else if (title != null) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = title,
                                     color = colorScheme.text.primary,
-                                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large,
+                                    style = NexusTheme.typography.large,
                                 )
                             }
                         }
@@ -326,10 +326,10 @@ fun NexusDialog(
                                 if (closeIcon != null) {
                                     closeIcon()
                                 } else {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = "✕",
                                         color = colorScheme.text.placeholder,
-                                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.medium,
+                                        style = NexusTheme.typography.medium,
                                     )
                                 }
                             }
@@ -338,9 +338,9 @@ fun NexusDialog(
                         }
                     }
 
-                    _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                    ProvideContentColorTextStyle(
                         contentColor = colorScheme.text.regular,
-                        textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        textStyle = NexusTheme.typography.base,
                     ) {
                         Box(
                             modifier = Modifier

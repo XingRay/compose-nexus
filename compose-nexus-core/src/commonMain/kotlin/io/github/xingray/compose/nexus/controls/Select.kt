@@ -72,12 +72,12 @@ private data class ResolvedSelectOption<T>(
     val label: String,
     val disabled: Boolean,
     val group: String? = null,
-    val raw: io.github.xingray.compose.nexus.controls.SelectOption<T>,
+    val raw: SelectOption<T>,
 )
 
 private sealed interface SelectDropdownRow<out T> {
     data class Group(val label: String) : SelectDropdownRow<Nothing>
-    data class Option<T>(val option: io.github.xingray.compose.nexus.controls.ResolvedSelectOption<T>) : SelectDropdownRow<T>
+    data class Option<T>(val option: ResolvedSelectOption<T>) : SelectDropdownRow<T>
     data class Create(val query: String) : SelectDropdownRow<Nothing>
 }
 
@@ -96,16 +96,16 @@ class SelectState<T>(
 fun <T> rememberSelectState(
     initialSelected: T? = null,
     initialSelectedValues: List<T> = emptyList(),
-): io.github.xingray.compose.nexus.controls.SelectState<T> = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectState(initialSelected, initialSelectedValues) }
+): SelectState<T> = remember { SelectState(initialSelected, initialSelectedValues) }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun <T> NexusSelect(
-    state: io.github.xingray.compose.nexus.controls.SelectState<T>,
-    options: List<io.github.xingray.compose.nexus.controls.SelectOption<T>>,
+    state: SelectState<T>,
+    options: List<SelectOption<T>>,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     placeholder: String = "Select",
     disabled: Boolean = false,
     clearable: Boolean = false,
@@ -116,9 +116,9 @@ fun <T> NexusSelect(
     collapseTagsTooltip: Boolean = false,
     maxCollapseTags: Int = 1,
     filterable: Boolean = false,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.SelectOption<T>) -> Boolean)? = null,
+    filterMethod: ((String, SelectOption<T>) -> Boolean)? = null,
     remote: Boolean = false,
-    remoteMethod: ((String) -> List<io.github.xingray.compose.nexus.controls.SelectOption<T>>)? = null,
+    remoteMethod: ((String) -> List<SelectOption<T>>)? = null,
     allowCreate: Boolean = false,
     defaultFirstOption: Boolean = false,
     reserveKeyword: Boolean = true,
@@ -126,7 +126,7 @@ fun <T> NexusSelect(
     loadingText: String = "Loading",
     noMatchText: String = "No matching data",
     noDataText: String = "No data",
-    props: io.github.xingray.compose.nexus.controls.SelectOptionProps = _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOptionProps(),
+    props: SelectOptionProps = SelectOptionProps(),
     valueKey: ((T) -> Any?)? = null,
     height: Int = 274,
     itemHeight: Int = 34,
@@ -140,10 +140,10 @@ fun <T> NexusSelect(
     prefix: (@Composable () -> Unit)? = null,
     empty: (@Composable () -> Unit)? = null,
     loadingContent: (@Composable () -> Unit)? = null,
-    optionContent: (@Composable (io.github.xingray.compose.nexus.controls.SelectOption<T>, Boolean) -> Unit)? = null,
-    tagContent: (@Composable (io.github.xingray.compose.nexus.controls.SelectOption<T>, Boolean, () -> Unit) -> Unit)? = null,
+    optionContent: (@Composable (SelectOption<T>, Boolean) -> Unit)? = null,
+    tagContent: (@Composable (SelectOption<T>, Boolean, () -> Unit) -> Unit)? = null,
     labelContent: (@Composable (index: Int, label: String, value: T) -> Unit)? = null,
-    createOption: ((String) -> io.github.xingray.compose.nexus.controls.SelectOption<T>)? = null,
+    createOption: ((String) -> SelectOption<T>)? = null,
     onChange: ((Any?) -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
     onRemoveTag: ((T) -> Unit)? = null,
@@ -151,39 +151,39 @@ fun <T> NexusSelect(
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val sizes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.sizes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val sizes = NexusTheme.sizes
+    val typography = NexusTheme.typography
+    val shadows = NexusTheme.shadows
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     var focused by remember { mutableStateOf(false) }
     var inputWidth by remember { mutableStateOf(280.dp) }
-    val createdOptions = remember { mutableStateListOf<io.github.xingray.compose.nexus.controls.SelectOption<T>>() }
+    val createdOptions = remember { mutableStateListOf<SelectOption<T>>() }
 
     val controlHeight: Dp = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.componentLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.componentDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.componentSmall
+        ComponentSize.Large -> sizes.componentLarge
+        ComponentSize.Default -> sizes.componentDefault
+        ComponentSize.Small -> sizes.componentSmall
     }
     val horizontalPadding: Dp = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.inputPaddingLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.inputPaddingDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.inputPaddingSmall
+        ComponentSize.Large -> sizes.inputPaddingLarge
+        ComponentSize.Default -> sizes.inputPaddingDefault
+        ComponentSize.Small -> sizes.inputPaddingSmall
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
 
     fun valueEquals(left: T, right: T): Boolean {
         return if (valueKey != null) valueKey(left) == valueKey(right) else left == right
     }
 
-    fun resolveOption(option: io.github.xingray.compose.nexus.controls.SelectOption<T>, group: String? = null): List<io.github.xingray.compose.nexus.controls.ResolvedSelectOption<T>> {
+    fun resolveOption(option: SelectOption<T>, group: String? = null): List<ResolvedSelectOption<T>> {
         val payload = option.payload
         @Suppress("UNCHECKED_CAST")
         val mappedValue = payload[props.value] as? T ?: option.value
@@ -194,7 +194,7 @@ fun <T> NexusSelect(
             else -> option.disabled
         }
         @Suppress("UNCHECKED_CAST")
-        val mappedChildren = (payload[props.options] as? List<io.github.xingray.compose.nexus.controls.SelectOption<T>>) ?: option.options
+        val mappedChildren = (payload[props.options] as? List<SelectOption<T>>) ?: option.options
 
         return if (mappedChildren.isNotEmpty()) {
             mappedChildren.flatMap { child ->
@@ -202,7 +202,7 @@ fun <T> NexusSelect(
             }
         } else {
             listOf(
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ResolvedSelectOption(
+                ResolvedSelectOption(
                     value = mappedValue,
                     label = mappedLabel,
                     disabled = mappedDisabled,
@@ -283,7 +283,7 @@ fun <T> NexusSelect(
         onClear?.invoke()
     }
 
-    fun selectOption(option: io.github.xingray.compose.nexus.controls.ResolvedSelectOption<T>) {
+    fun selectOption(option: ResolvedSelectOption<T>) {
         if (option.disabled) return
         if (multiple) {
             val exists = state.selectedValues.any { valueEquals(it, option.value) }
@@ -314,7 +314,7 @@ fun <T> NexusSelect(
             createdOptions.add(newOption)
         }
         selectOption(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.ResolvedSelectOption(
+            ResolvedSelectOption(
                 value = newOption.value,
                 label = newOption.label,
                 disabled = newOption.disabled,
@@ -325,17 +325,17 @@ fun <T> NexusSelect(
 
     val showCreateOption = allowCreate && filterable && state.query.isNotBlank() &&
         filteredOptions.none { it.label.equals(state.query.trim(), ignoreCase = true) }
-    val dropdownRows = buildList<io.github.xingray.compose.nexus.controls.SelectDropdownRow<T>> {
+    val dropdownRows = buildList<SelectDropdownRow<T>> {
         var currentGroup: String? = null
         filteredOptions.forEach { option ->
             if (option.group != null && option.group != currentGroup) {
                 currentGroup = option.group
-                add(_root_ide_package_.io.github.xingray.compose.nexus.controls.SelectDropdownRow.Group(currentGroup))
+                add(SelectDropdownRow.Group(currentGroup))
             }
-            add(_root_ide_package_.io.github.xingray.compose.nexus.controls.SelectDropdownRow.Option(option))
+            add(SelectDropdownRow.Option(option))
         }
         if (showCreateOption) {
-            add(_root_ide_package_.io.github.xingray.compose.nexus.controls.SelectDropdownRow.Create(state.query.trim()))
+            add(SelectDropdownRow.Create(state.query.trim()))
         }
     }
 
@@ -393,10 +393,10 @@ fun <T> NexusSelect(
                             if (tagContent != null) {
                                 tagContent(option.raw, disabled, removeAction)
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+                                NexusTag(
                                     text = option.label,
-                                    size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
-                                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+                                    size = ComponentSize.Small,
+                                    type = io.github.xingray.compose.nexus.theme.NexusType.Info,
                                     closable = !disabled,
                                     onClose = { removeAction() },
                                 )
@@ -411,11 +411,11 @@ fun <T> NexusSelect(
                             } else {
                                 "+$hiddenTagCount"
                             }
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+                            NexusTag(
                                 text = text,
-                                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
-                                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
-                                effect = _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Plain,
+                                size = ComponentSize.Small,
+                                type = io.github.xingray.compose.nexus.theme.NexusType.Info,
+                                effect = TagEffect.Plain,
                             )
                         }
                         if (filterable && !disabled) {
@@ -459,7 +459,7 @@ fun <T> NexusSelect(
                                 cursorBrush = SolidColor(colorScheme.primary.base),
                                 decorationBox = { inner ->
                                     if (state.selectedValues.isEmpty() && state.query.isEmpty()) {
-                                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                        NexusText(
                                             text = placeholder,
                                             color = colorScheme.text.placeholder,
                                             style = textStyle,
@@ -469,7 +469,7 @@ fun <T> NexusSelect(
                                 },
                             )
                         } else if (state.selectedValues.isEmpty()) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = placeholder,
                                 color = colorScheme.text.placeholder,
                                 style = textStyle,
@@ -518,7 +518,7 @@ fun <T> NexusSelect(
                             cursorBrush = SolidColor(colorScheme.primary.base),
                             decorationBox = { inner ->
                                 if ((selectedLabel == null && state.query.isEmpty()) || (!state.expanded && selectedLabel == null)) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = placeholder,
                                         color = colorScheme.text.placeholder,
                                         style = textStyle,
@@ -530,7 +530,7 @@ fun <T> NexusSelect(
                     } else if (selectedOption != null && labelContent != null) {
                         labelContent(0, selectedOption.label, selectedOption.value)
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = selectedLabel ?: placeholder,
                             color = if (selectedLabel != null) colorScheme.text.regular else colorScheme.text.placeholder,
                             style = textStyle,
@@ -552,7 +552,7 @@ fun <T> NexusSelect(
                     if (clearIcon != null) {
                         clearIcon()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "✕",
                             color = colorScheme.text.placeholder,
                             style = typography.extraSmall,
@@ -560,7 +560,7 @@ fun <T> NexusSelect(
                     }
                 }
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = if (state.expanded) "▲" else "▼",
                     color = colorScheme.text.placeholder,
                     style = typography.extraSmall,
@@ -593,17 +593,17 @@ fun <T> NexusSelect(
                     }
 
                     @Composable
-                    fun renderRow(row: io.github.xingray.compose.nexus.controls.SelectDropdownRow<T>) {
+                    fun renderRow(row: SelectDropdownRow<T>) {
                         when (row) {
-                            is io.github.xingray.compose.nexus.controls.SelectDropdownRow.Group -> {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            is SelectDropdownRow.Group -> {
+                                NexusText(
                                     text = row.label,
                                     color = colorScheme.text.placeholder,
                                     style = typography.extraSmall,
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                 )
                             }
-                            is io.github.xingray.compose.nexus.controls.SelectDropdownRow.Option -> {
+                            is SelectDropdownRow.Option -> {
                                 val option = row.option
                                 val optionInteraction = remember { MutableInteractionSource() }
                                 val optionHovered by optionInteraction.collectIsHoveredAsState()
@@ -646,7 +646,7 @@ fun <T> NexusSelect(
                                     if (optionContent != null) {
                                         optionContent(option.raw, isSelected)
                                     } else {
-                                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                        NexusText(
                                             text = option.label,
                                             color = optionTextColor,
                                             style = textStyle,
@@ -654,7 +654,7 @@ fun <T> NexusSelect(
                                     }
                                 }
                             }
-                            is io.github.xingray.compose.nexus.controls.SelectDropdownRow.Create -> {
+                            is SelectDropdownRow.Create -> {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -663,7 +663,7 @@ fun <T> NexusSelect(
                                         .padding(horizontal = horizontalPadding, vertical = 8.dp),
                                     contentAlignment = Alignment.CenterStart,
                                 ) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = "Create \"${row.query}\"",
                                         color = colorScheme.primary.base,
                                         style = textStyle,
@@ -679,7 +679,7 @@ fun <T> NexusSelect(
                                 if (loadingContent != null) {
                                     loadingContent()
                                 } else {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = loadingText,
                                         color = colorScheme.text.secondary,
                                         style = textStyle,
@@ -692,7 +692,7 @@ fun <T> NexusSelect(
                                 if (empty != null) {
                                     empty()
                                 } else {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = if (state.query.isNotEmpty()) noMatchText else noDataText,
                                         color = colorScheme.text.placeholder,
                                         style = textStyle,

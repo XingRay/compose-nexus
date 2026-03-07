@@ -44,10 +44,10 @@ internal data class TimelineItemData(
     val timestamp: String,
     val hideTimestamp: Boolean,
     val center: Boolean,
-    val placement: io.github.xingray.compose.nexus.controls.TimelinePlacement,
-    val type: io.github.xingray.compose.nexus.theme.NexusType,
+    val placement: TimelinePlacement,
+    val type: NexusType,
     val color: androidx.compose.ui.graphics.Color?,
-    val size: io.github.xingray.compose.nexus.controls.TimelineItemSize,
+    val size: TimelineItemSize,
     val icon: (@Composable () -> Unit)?,
     val hollow: Boolean,
     val dot: (@Composable () -> Unit)?,
@@ -56,22 +56,22 @@ internal data class TimelineItemData(
 
 @Stable
 class TimelineScope internal constructor() {
-    internal val items = mutableListOf<io.github.xingray.compose.nexus.controls.TimelineItemData>()
+    internal val items = mutableListOf<TimelineItemData>()
 
     fun item(
         timestamp: String = "",
         hideTimestamp: Boolean = false,
         center: Boolean = false,
-        placement: io.github.xingray.compose.nexus.controls.TimelinePlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelinePlacement.Bottom,
-        type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+        placement: TimelinePlacement = TimelinePlacement.Bottom,
+        type: NexusType = NexusType.Info,
         color: androidx.compose.ui.graphics.Color? = null,
-        size: io.github.xingray.compose.nexus.controls.TimelineItemSize = _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineItemSize.Normal,
+        size: TimelineItemSize = TimelineItemSize.Normal,
         icon: (@Composable () -> Unit)? = null,
         hollow: Boolean = false,
         dot: (@Composable () -> Unit)? = null,
         content: @Composable () -> Unit,
     ) {
-        items += _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineItemData(
+        items += TimelineItemData(
             timestamp = timestamp,
             hideTimestamp = hideTimestamp,
             center = center,
@@ -91,10 +91,10 @@ class TimelineScope internal constructor() {
 fun NexusTimeline(
     modifier: Modifier = Modifier,
     reverse: Boolean = false,
-    mode: io.github.xingray.compose.nexus.controls.TimelineMode = _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineMode.Start,
-    content: io.github.xingray.compose.nexus.controls.TimelineScope.() -> Unit,
+    mode: TimelineMode = TimelineMode.Start,
+    content: TimelineScope.() -> Unit,
 ) {
-    val scope = _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineScope().also(content)
+    val scope = TimelineScope().also(content)
     val data = if (reverse) scope.items.reversed() else scope.items
 
     Column(
@@ -105,12 +105,12 @@ fun NexusTimeline(
     ) {
         data.forEachIndexed { index, item ->
             val alignStart = when (mode) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineMode.Start -> true
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineMode.End -> false
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineMode.Alternate -> index % 2 == 0
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineMode.AlternateReverse -> index % 2 == 1
+                TimelineMode.Start -> true
+                TimelineMode.End -> false
+                TimelineMode.Alternate -> index % 2 == 0
+                TimelineMode.AlternateReverse -> index % 2 == 1
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineRow(
+            TimelineRow(
                 item = item,
                 alignStart = alignStart,
                 isLast = index == data.lastIndex,
@@ -121,17 +121,17 @@ fun NexusTimeline(
 
 @Composable
 private fun TimelineRow(
-    item: io.github.xingray.compose.nexus.controls.TimelineItemData,
+    item: TimelineItemData,
     alignStart: Boolean,
     isLast: Boolean,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val lineColor = colorScheme.border.light
     val dotColor = item.color ?: (colorScheme.typeColor(item.type)?.base ?: colorScheme.info.base)
     val dotSize = when (item.size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineItemSize.Normal -> 12.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelineItemSize.Large -> 16.dp
+        TimelineItemSize.Normal -> 12.dp
+        TimelineItemSize.Large -> 16.dp
     }
 
     @Composable
@@ -184,8 +184,8 @@ private fun TimelineRow(
                 .padding(bottom = if (isLast) 0.dp else 6.dp),
             verticalArrangement = if (item.center) Arrangement.Center else Arrangement.Top,
         ) {
-            if (!item.hideTimestamp && item.placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelinePlacement.Top && item.timestamp.isNotBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            if (!item.hideTimestamp && item.placement == TimelinePlacement.Top && item.timestamp.isNotBlank()) {
+                NexusText(
                     text = item.timestamp,
                     color = colorScheme.text.secondary,
                     style = typography.extraSmall,
@@ -195,9 +195,9 @@ private fun TimelineRow(
 
             item.content()
 
-            if (!item.hideTimestamp && item.placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TimelinePlacement.Bottom && item.timestamp.isNotBlank()) {
+            if (!item.hideTimestamp && item.placement == TimelinePlacement.Bottom && item.timestamp.isNotBlank()) {
                 Spacer(modifier = Modifier.height(4.dp))
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = item.timestamp,
                     color = colorScheme.text.secondary,
                     style = typography.extraSmall,

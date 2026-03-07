@@ -57,48 +57,48 @@ data class NexusUploadRawFile(
     val type: String = "",
     val url: String? = null,
     val isDirectory: Boolean = false,
-    val uid: Long = _root_ide_package_.io.github.xingray.compose.nexus.controls.nextUploadUid(),
+    val uid: Long = nextUploadUid(),
 )
 
 data class NexusUploadFile(
     val uid: Long,
     val name: String,
     val size: Long = 0L,
-    val status: io.github.xingray.compose.nexus.controls.NexusUploadStatus = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Ready,
+    val status: NexusUploadStatus = NexusUploadStatus.Ready,
     val percentage: Float = 0f,
     val response: Any? = null,
     val url: String? = null,
-    val raw: io.github.xingray.compose.nexus.controls.NexusUploadRawFile? = null,
+    val raw: NexusUploadRawFile? = null,
 )
 
 @Stable
 class UploadState(
-    initialFiles: List<io.github.xingray.compose.nexus.controls.NexusUploadFile> = emptyList(),
+    initialFiles: List<NexusUploadFile> = emptyList(),
 ) {
-    val fileList = mutableStateListOf<io.github.xingray.compose.nexus.controls.NexusUploadFile>().apply { addAll(initialFiles) }
+    val fileList = mutableStateListOf<NexusUploadFile>().apply { addAll(initialFiles) }
 
     internal var submitImpl: (() -> Unit)? = null
-    internal var abortImpl: ((io.github.xingray.compose.nexus.controls.NexusUploadFile?) -> Unit)? = null
-    internal var handleStartImpl: ((io.github.xingray.compose.nexus.controls.NexusUploadRawFile) -> Unit)? = null
-    internal var handleRemoveImpl: ((io.github.xingray.compose.nexus.controls.NexusUploadFile) -> Unit)? = null
+    internal var abortImpl: ((NexusUploadFile?) -> Unit)? = null
+    internal var handleStartImpl: ((NexusUploadRawFile) -> Unit)? = null
+    internal var handleRemoveImpl: ((NexusUploadFile) -> Unit)? = null
 
     fun submit() {
         submitImpl?.invoke()
     }
 
-    fun abort(file: io.github.xingray.compose.nexus.controls.NexusUploadFile? = null) {
+    fun abort(file: NexusUploadFile? = null) {
         abortImpl?.invoke(file)
     }
 
-    fun handleStart(rawFile: io.github.xingray.compose.nexus.controls.NexusUploadRawFile) {
+    fun handleStart(rawFile: NexusUploadRawFile) {
         handleStartImpl?.invoke(rawFile)
     }
 
-    fun handleRemove(file: io.github.xingray.compose.nexus.controls.NexusUploadFile) {
+    fun handleRemove(file: NexusUploadFile) {
         handleRemoveImpl?.invoke(file)
     }
 
-    fun clearFiles(status: Set<io.github.xingray.compose.nexus.controls.NexusUploadStatus>? = null) {
+    fun clearFiles(status: Set<NexusUploadStatus>? = null) {
         if (status == null) {
             fileList.clear()
         } else {
@@ -106,18 +106,18 @@ class UploadState(
         }
     }
 
-    internal fun addFile(file: io.github.xingray.compose.nexus.controls.NexusUploadFile) {
+    internal fun addFile(file: NexusUploadFile) {
         fileList.add(file)
     }
 
-    internal fun updateFile(uid: Long, transform: (io.github.xingray.compose.nexus.controls.NexusUploadFile) -> io.github.xingray.compose.nexus.controls.NexusUploadFile) {
+    internal fun updateFile(uid: Long, transform: (NexusUploadFile) -> NexusUploadFile) {
         val index = fileList.indexOfFirst { it.uid == uid }
         if (index >= 0) {
             fileList[index] = transform(fileList[index])
         }
     }
 
-    internal fun removeByUid(uid: Long): io.github.xingray.compose.nexus.controls.NexusUploadFile? {
+    internal fun removeByUid(uid: Long): NexusUploadFile? {
         val index = fileList.indexOfFirst { it.uid == uid }
         return if (index >= 0) {
             fileList.removeAt(index)
@@ -129,12 +129,12 @@ class UploadState(
 
 @Composable
 fun rememberUploadState(
-    initialFiles: List<io.github.xingray.compose.nexus.controls.NexusUploadFile> = emptyList(),
-): io.github.xingray.compose.nexus.controls.UploadState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.UploadState(initialFiles) }
+    initialFiles: List<NexusUploadFile> = emptyList(),
+): UploadState = remember { UploadState(initialFiles) }
 
 @Composable
 fun NexusUpload(
-    state: io.github.xingray.compose.nexus.controls.UploadState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberUploadState(),
+    state: UploadState = rememberUploadState(),
     modifier: Modifier = Modifier,
     action: String = "#",
     method: String = "post",
@@ -142,25 +142,25 @@ fun NexusUpload(
     showFileList: Boolean = true,
     drag: Boolean = false,
     accept: String = "",
-    listType: io.github.xingray.compose.nexus.controls.NexusUploadListType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadListType.Text,
+    listType: NexusUploadListType = NexusUploadListType.Text,
     autoUpload: Boolean = true,
     disabled: Boolean = false,
     limit: Int? = null,
     directory: Boolean = false,
     trigger: (@Composable () -> Unit)? = null,
     tip: (@Composable () -> Unit)? = null,
-    fileContent: (@Composable (file: io.github.xingray.compose.nexus.controls.NexusUploadFile, index: Int) -> Unit)? = null,
-    onSelectFiles: (() -> List<io.github.xingray.compose.nexus.controls.NexusUploadRawFile>)? = null,
-    onPreview: ((io.github.xingray.compose.nexus.controls.NexusUploadFile) -> Unit)? = null,
-    onRemove: ((io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    onSuccess: ((Any?, io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    onError: ((Throwable, io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    onProgress: ((Float, io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    onChange: ((io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    onExceed: ((List<io.github.xingray.compose.nexus.controls.NexusUploadRawFile>, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Unit)? = null,
-    beforeUpload: (suspend (io.github.xingray.compose.nexus.controls.NexusUploadRawFile) -> Boolean)? = null,
-    beforeRemove: (suspend (io.github.xingray.compose.nexus.controls.NexusUploadFile, List<io.github.xingray.compose.nexus.controls.NexusUploadFile>) -> Boolean)? = null,
-    httpRequest: (suspend (io.github.xingray.compose.nexus.controls.NexusUploadRawFile) -> Result<Any?>)? = null,
+    fileContent: (@Composable (file: NexusUploadFile, index: Int) -> Unit)? = null,
+    onSelectFiles: (() -> List<NexusUploadRawFile>)? = null,
+    onPreview: ((NexusUploadFile) -> Unit)? = null,
+    onRemove: ((NexusUploadFile, List<NexusUploadFile>) -> Unit)? = null,
+    onSuccess: ((Any?, NexusUploadFile, List<NexusUploadFile>) -> Unit)? = null,
+    onError: ((Throwable, NexusUploadFile, List<NexusUploadFile>) -> Unit)? = null,
+    onProgress: ((Float, NexusUploadFile, List<NexusUploadFile>) -> Unit)? = null,
+    onChange: ((NexusUploadFile, List<NexusUploadFile>) -> Unit)? = null,
+    onExceed: ((List<NexusUploadRawFile>, List<NexusUploadFile>) -> Unit)? = null,
+    beforeUpload: (suspend (NexusUploadRawFile) -> Boolean)? = null,
+    beforeRemove: (suspend (NexusUploadFile, List<NexusUploadFile>) -> Boolean)? = null,
+    httpRequest: (suspend (NexusUploadRawFile) -> Result<Any?>)? = null,
 ) {
     @Suppress("UNUSED_VARIABLE")
     val _action = action
@@ -168,25 +168,25 @@ fun NexusUpload(
     val _method = method
     @Suppress("UNUSED_VARIABLE")
     val _accept = accept
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val typography = NexusTheme.typography
     val scope = rememberCoroutineScope()
     val runningJobs = remember { mutableMapOf<Long, Job>() }
-    var uploadQueue: ((io.github.xingray.compose.nexus.controls.NexusUploadFile) -> Unit)? = null
+    var uploadQueue: ((NexusUploadFile) -> Unit)? = null
 
-    fun addRawFile(rawFile: io.github.xingray.compose.nexus.controls.NexusUploadRawFile) {
+    fun addRawFile(rawFile: NexusUploadRawFile) {
         scope.launch {
             val allowedByDirectory = if (directory) rawFile.isDirectory || rawFile.name.contains("/") else !rawFile.isDirectory
             if (!allowedByDirectory) return@launch
             val allowed = beforeUpload?.invoke(rawFile) ?: true
             if (!allowed) return@launch
 
-            val file = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadFile(
+            val file = NexusUploadFile(
                 uid = rawFile.uid,
                 name = rawFile.name,
                 size = rawFile.size,
-                status = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Ready,
+                status = NexusUploadStatus.Ready,
                 percentage = 0f,
                 url = rawFile.url,
                 raw = rawFile,
@@ -199,7 +199,7 @@ fun NexusUpload(
         }
     }
 
-    fun removeFile(file: io.github.xingray.compose.nexus.controls.NexusUploadFile) {
+    fun removeFile(file: NexusUploadFile) {
         scope.launch {
             val allow = beforeRemove?.invoke(file, state.fileList.toList()) ?: true
             if (!allow) return@launch
@@ -209,12 +209,12 @@ fun NexusUpload(
         }
     }
 
-    fun upload(file: io.github.xingray.compose.nexus.controls.NexusUploadFile) {
-        if (file.status == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Uploading) return
-        val raw = file.raw ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadRawFile(name = file.name, size = file.size, url = file.url, uid = file.uid)
+    fun upload(file: NexusUploadFile) {
+        if (file.status == NexusUploadStatus.Uploading) return
+        val raw = file.raw ?: NexusUploadRawFile(name = file.name, size = file.size, url = file.url, uid = file.uid)
         val job = scope.launch {
             state.updateFile(file.uid) {
-                it.copy(status = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Uploading, percentage = 0f)
+                it.copy(status = NexusUploadStatus.Uploading, percentage = 0f)
             }
             listOf(20f, 55f, 80f).forEach { p ->
                 delay(90)
@@ -236,7 +236,7 @@ fun NexusUpload(
                 onSuccess = { result ->
                     state.updateFile(file.uid) { current ->
                         current.copy(
-                            status = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Success,
+                            status = NexusUploadStatus.Success,
                             percentage = 100f,
                             response = result,
                         )
@@ -248,7 +248,7 @@ fun NexusUpload(
                 },
                 onFailure = { err ->
                     state.updateFile(file.uid) { current ->
-                        current.copy(status = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Fail)
+                        current.copy(status = NexusUploadStatus.Fail)
                     }
                     state.fileList.firstOrNull { it.uid == file.uid }?.let { current ->
                         onError?.invoke(err, current, state.fileList.toList())
@@ -264,7 +264,7 @@ fun NexusUpload(
         if (disabled) return
         val files = onSelectFiles?.invoke()
             ?: listOf(
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadRawFile(
+                NexusUploadRawFile(
                     name = "mock-${Random.nextInt(1000)}.txt",
                     size = Random.nextLong(1024, 200 * 1024),
                     type = "text/plain",
@@ -282,7 +282,7 @@ fun NexusUpload(
 
     state.submitImpl = {
         state.fileList
-            .filter { it.status == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Ready }
+            .filter { it.status == NexusUploadStatus.Ready }
             .forEach { upload(it) }
     }
     state.abortImpl = { target ->
@@ -318,20 +318,20 @@ fun NexusUpload(
             } else {
                 if (drag) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Drop file here or click to upload", style = typography.small)
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(text = "Drop file here or click to upload", style = typography.small)
+                        NexusText(
                             text = if (directory) "Directory mode enabled" else "Mock file selector",
                             style = typography.extraSmall,
                             color = colorScheme.text.secondary,
                         )
                     }
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         onClick = { selectFiles() },
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                        type = NexusType.Primary,
                         disabled = disabled,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Select File")
+                        NexusText(text = "Select File")
                     }
                 }
             }
@@ -351,10 +351,10 @@ fun NexusUpload(
             ) {
                 state.fileList.forEachIndexed { index, file ->
                     val statusColor = when (file.status) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Ready -> colorScheme.text.secondary
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Uploading -> colorScheme.primary.base
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Success -> colorScheme.success.base
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadStatus.Fail -> colorScheme.danger.base
+                        NexusUploadStatus.Ready -> colorScheme.text.secondary
+                        NexusUploadStatus.Uploading -> colorScheme.primary.base
+                        NexusUploadStatus.Success -> colorScheme.success.base
+                        NexusUploadStatus.Fail -> colorScheme.danger.base
                     }
                     Row(
                         modifier = Modifier
@@ -366,15 +366,15 @@ fun NexusUpload(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        if (listType != _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadListType.Text) {
+                        if (listType != NexusUploadListType.Text) {
                             Box(
                                 modifier = Modifier
-                                    .size(if (listType == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusUploadListType.PictureCard) 46.dp else 34.dp)
+                                    .size(if (listType == NexusUploadListType.PictureCard) 46.dp else 34.dp)
                                     .clip(shapes.base)
                                     .background(colorScheme.fill.light),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "IMG", style = typography.extraSmall, color = colorScheme.text.placeholder)
+                                NexusText(text = "IMG", style = typography.extraSmall, color = colorScheme.text.placeholder)
                             }
                         }
                         Box(modifier = Modifier.weight(1f)) {
@@ -382,16 +382,16 @@ fun NexusUpload(
                                 fileContent(file, index)
                             } else {
                                 Column {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = file.name, style = typography.small)
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                                        text = "${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatBytes(file.size)} • ${file.status.name.lowercase()} ${file.percentage.toInt()}%",
+                                    NexusText(text = file.name, style = typography.small)
+                                    NexusText(
+                                        text = "${formatBytes(file.size)} • ${file.status.name.lowercase()} ${file.percentage.toInt()}%",
                                         style = typography.extraSmall,
                                         color = statusColor,
                                     )
                                 }
                             }
                         }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "Remove",
                             style = typography.extraSmall,
                             color = colorScheme.danger.base,
@@ -408,8 +408,8 @@ fun NexusUpload(
 
 private fun formatBytes(size: Long): String {
     return when {
-        size >= 1024 * 1024 -> "${_root_ide_package_.io.github.xingray.compose.nexus.controls.oneDecimal(size / 1024f / 1024f)} MB"
-        size >= 1024 -> "${_root_ide_package_.io.github.xingray.compose.nexus.controls.oneDecimal(size / 1024f)} KB"
+        size >= 1024 * 1024 -> "${oneDecimal(size / 1024f / 1024f)} MB"
+        size >= 1024 -> "${oneDecimal(size / 1024f)} KB"
         else -> "$size B"
     }
 }
@@ -424,6 +424,6 @@ private fun oneDecimal(value: Float): String {
 private var uploadUidSeed = 0L
 
 private fun nextUploadUid(): Long {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.uploadUidSeed += 1
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.uploadUidSeed
+    uploadUidSeed += 1
+    return uploadUidSeed
 }

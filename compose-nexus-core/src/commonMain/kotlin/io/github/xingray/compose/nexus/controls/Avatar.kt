@@ -50,13 +50,13 @@ data class AvatarGroupItem(
 fun NexusAvatar(
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
-    shape: io.github.xingray.compose.nexus.controls.AvatarShape = _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarShape.Circle,
+    shape: AvatarShape = AvatarShape.Circle,
     backgroundColor: Color = Color(0xFFC0C4CC),
     icon: (@Composable () -> Unit)? = null,
     src: String? = null,
     srcSet: String? = null,
     alt: String = "",
-    fit: io.github.xingray.compose.nexus.controls.AvatarFit = _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.Cover,
+    fit: AvatarFit = AvatarFit.Cover,
     onError: ((String?) -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
@@ -64,18 +64,18 @@ fun NexusAvatar(
     val _srcSet = srcSet
     @Suppress("UNUSED_VARIABLE")
     val _fit: ContentScale = when (fit) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.Fill -> ContentScale.FillBounds
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.Contain -> ContentScale.Fit
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.Cover -> ContentScale.Crop
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.None -> ContentScale.None
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarFit.ScaleDown -> ContentScale.Inside
+        AvatarFit.Fill -> ContentScale.FillBounds
+        AvatarFit.Contain -> ContentScale.Fit
+        AvatarFit.Cover -> ContentScale.Crop
+        AvatarFit.None -> ContentScale.None
+        AvatarFit.ScaleDown -> ContentScale.Inside
     }
 
     val clipShape: Shape = when (shape) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarShape.Circle -> CircleShape
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarShape.Square -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base
+        AvatarShape.Circle -> CircleShape
+        AvatarShape.Square -> NexusTheme.shapes.base
     }
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
 
     var errorReported by remember(src) { mutableStateOf(false) }
     val hasImage = !src.isNullOrBlank()
@@ -94,16 +94,16 @@ fun NexusAvatar(
             .background(backgroundColor),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+        ProvideContentColorTextStyle(
             contentColor = colorScheme.white,
-            textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+            textStyle = NexusTheme.typography.base,
         ) {
             when {
                 hasImage && !imageError -> {
                     // Placeholder image rendering in common module.
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "IMG",
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                        style = NexusTheme.typography.extraSmall,
                         color = colorScheme.white.copy(alpha = 0.9f),
                     )
                 }
@@ -111,7 +111,7 @@ fun NexusAvatar(
                 icon != null -> icon()
                 content != null -> content()
                 alt.isNotBlank() -> {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = alt.take(2).uppercase(),
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
@@ -119,7 +119,7 @@ fun NexusAvatar(
                 }
 
                 else -> {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "?")
+                    NexusText(text = "?")
                 }
             }
         }
@@ -128,10 +128,10 @@ fun NexusAvatar(
 
 @Composable
 fun NexusAvatarGroup(
-    items: List<io.github.xingray.compose.nexus.controls.AvatarGroupItem>,
+    items: List<AvatarGroupItem>,
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
-    shape: io.github.xingray.compose.nexus.controls.AvatarShape = _root_ide_package_.io.github.xingray.compose.nexus.controls.AvatarShape.Circle,
+    shape: AvatarShape = AvatarShape.Circle,
     collapseAvatars: Boolean = false,
     collapseAvatarsTooltip: Boolean = false,
     maxCollapseAvatars: Int = 1,
@@ -154,7 +154,7 @@ fun NexusAvatarGroup(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         visibleItems.forEachIndexed { index, item ->
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusAvatar(
+            NexusAvatar(
                 modifier = Modifier.offset(x = (index * 0).dp),
                 size = size,
                 shape = shape,
@@ -164,20 +164,20 @@ fun NexusAvatarGroup(
                 alt = item.alt,
                 content = {
                     if (!item.text.isNullOrBlank()) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = item.text)
+                        NexusText(text = item.text)
                     } else if (item.alt.isNotBlank()) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = item.alt.take(2).uppercase())
+                        NexusText(text = item.alt.take(2).uppercase())
                     }
                 },
             )
         }
         if (hidden > 0) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusAvatar(
+            NexusAvatar(
                 size = size,
                 shape = shape,
-                backgroundColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.fill.dark,
+                backgroundColor = NexusTheme.colorScheme.fill.dark,
                 content = {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = if (tooltipText.isNullOrBlank()) "+$hidden" else "+$hidden($tooltipText)")
+                    NexusText(text = if (tooltipText.isNullOrBlank()) "+$hidden" else "+$hidden($tooltipText)")
                 },
             )
         }

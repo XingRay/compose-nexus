@@ -83,8 +83,8 @@ fun rememberPaginationState(
     pageCount: Int = 1,
     pageSize: Int = 10,
     total: Int = 0,
-): io.github.xingray.compose.nexus.controls.PaginationState = remember(pageCount, pageSize, total) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.PaginationState(
+): PaginationState = remember(pageCount, pageSize, total) {
+    PaginationState(
         initialPage = initialPage,
         initialPageSize = pageSize,
         initialTotal = total,
@@ -94,9 +94,9 @@ fun rememberPaginationState(
 
 @Composable
 fun NexusPagination(
-    state: io.github.xingray.compose.nexus.controls.PaginationState,
+    state: PaginationState,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     pagerCount: Int = 7,
     background: Boolean = false,
     layout: String = "prev, pager, next, jumper, ->, total",
@@ -130,28 +130,28 @@ fun NexusPagination(
         if (currentPage != null) state.updateCurrentPage(currentPage)
     }
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val effectivePagerCount = pagerCount.coerceAtLeast(5).let { if (it % 2 == 0) it + 1 else it }
     val totalPageCount = state.pageCount.coerceAtLeast(1)
     if (hideOnSinglePage && totalPageCount <= 1) return
 
     val itemSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+        ComponentSize.Large -> 40.dp
+        ComponentSize.Default -> 32.dp
+        ComponentSize.Small -> 24.dp
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.small
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.small
+        ComponentSize.Small -> typography.extraSmall
     }
-    val pages = _root_ide_package_.io.github.xingray.compose.nexus.controls.buildPageList(state.currentPage, totalPageCount, effectivePagerCount)
+    val pages = buildPageList(state.currentPage, totalPageCount, effectivePagerCount)
     val sections = layout.split(",").map { it.trim() }.filter { it.isNotEmpty() }
     val splitIndex = sections.indexOf("->")
     val leftTokens = if (splitIndex >= 0) sections.take(splitIndex) else sections
     val rightTokens = if (splitIndex >= 0) sections.drop(splitIndex + 1) else emptyList()
-    val sizeSelectState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSelectState(initialSelected = state.pageSize)
+    val sizeSelectState = rememberSelectState(initialSelected = state.pageSize)
 
     LaunchedEffect(state.pageSize) {
         sizeSelectState.selected = state.pageSize
@@ -172,7 +172,7 @@ fun NexusPagination(
     fun RenderTokens(tokens: List<String>) {
         tokens.forEach { token ->
             when (token) {
-                "prev" -> _root_ide_package_.io.github.xingray.compose.nexus.controls.PaginationItem(
+                "prev" -> PaginationItem(
                     text = if (prevText.isNotBlank()) prevText else "‹",
                     isActive = false,
                     enabled = !disabled && state.currentPage > 1,
@@ -186,7 +186,7 @@ fun NexusPagination(
                     },
                 )
 
-                "next" -> _root_ide_package_.io.github.xingray.compose.nexus.controls.PaginationItem(
+                "next" -> PaginationItem(
                     text = if (nextText.isNotBlank()) nextText else "›",
                     isActive = false,
                     enabled = !disabled && state.currentPage < totalPageCount,
@@ -207,14 +207,14 @@ fun NexusPagination(
                                 modifier = Modifier.defaultMinSize(minWidth = itemSize, minHeight = itemSize),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "···",
                                     color = colorScheme.text.placeholder,
                                     style = textStyle,
                                 )
                             }
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.PaginationItem(
+                            PaginationItem(
                                 text = page.toString(),
                                 isActive = page == state.currentPage,
                                 enabled = !disabled,
@@ -231,7 +231,7 @@ fun NexusPagination(
                 }
 
                 "total" -> {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "Total ${state.total}",
                         color = colorScheme.text.secondary,
                         style = textStyle,
@@ -241,9 +241,9 @@ fun NexusPagination(
 
                 "sizes" -> {
                     val options = pageSizes.distinct().sorted().map {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOption(value = it, label = "$it / page")
+                        SelectOption(value = it, label = "$it / page")
                     }
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSelect(
+                    NexusSelect(
                         state = sizeSelectState,
                         options = options,
                         onSelect = {
@@ -263,19 +263,19 @@ fun NexusPagination(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "Go to",
                             color = colorScheme.text.secondary,
                             style = textStyle,
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+                        NexusInput(
                             value = pageInput,
                             onValueChange = { pageInput = it.filter(Char::isDigit) },
                             modifier = Modifier.width(58.dp),
                             size = size,
                             disabled = disabled,
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                        NexusButton(
                             text = "Go",
                             onClick = {
                                 val target = pageInput.toIntOrNull() ?: state.currentPage
@@ -318,8 +318,8 @@ private fun PaginationItem(
     textStyle: androidx.compose.ui.text.TextStyle,
     onClick: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
 
     val bgColor = when {
         isActive -> colorScheme.primary.base
@@ -354,7 +354,7 @@ private fun PaginationItem(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = text,
             color = textColor,
             style = textStyle,

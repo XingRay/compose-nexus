@@ -30,7 +30,7 @@ class StatisticState internal constructor(
 }
 
 @Composable
-fun rememberStatisticState(): io.github.xingray.compose.nexus.controls.StatisticState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.StatisticState() }
+fun rememberStatisticState(): StatisticState = remember { StatisticState() }
 
 @Stable
 class CountdownState internal constructor(
@@ -41,13 +41,13 @@ class CountdownState internal constructor(
 }
 
 @Composable
-fun rememberCountdownState(): io.github.xingray.compose.nexus.controls.CountdownState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.CountdownState() }
+fun rememberCountdownState(): CountdownState = remember { CountdownState() }
 
 @Composable
 fun NexusStatistic(
     value: Number = 0,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.StatisticState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberStatisticState(),
+    state: StatisticState = rememberStatisticState(),
     decimalSeparator: String = ".",
     groupSeparator: String = ",",
     precision: Int = 0,
@@ -61,11 +61,11 @@ fun NexusStatistic(
     prefixSlot: (@Composable () -> Unit)? = null,
     suffixSlot: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val rawValue = value.toDouble()
-    val display = formatter?.invoke(rawValue) ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.formatStatisticNumber(
+    val display = formatter?.invoke(rawValue) ?: formatStatisticNumber(
         value = rawValue,
         precision = precision,
         decimalSeparator = decimalSeparator,
@@ -80,7 +80,7 @@ fun NexusStatistic(
         if (titleSlot != null) {
             titleSlot()
         } else if (!title.isNullOrBlank()) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
                 color = colorScheme.text.secondary,
                 style = typography.small,
@@ -94,14 +94,14 @@ fun NexusStatistic(
             if (prefixSlot != null) {
                 prefixSlot()
             } else if (!prefix.isNullOrBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = prefix,
                     color = colorScheme.text.secondary,
                     style = typography.base,
                 )
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = state.displayValue,
                 color = valueColor ?: colorScheme.text.primary,
                 style = valueStyle ?: typography.extraLarge,
@@ -110,7 +110,7 @@ fun NexusStatistic(
             if (suffixSlot != null) {
                 suffixSlot()
             } else if (!suffix.isNullOrBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = suffix,
                     color = colorScheme.text.secondary,
                     style = typography.base,
@@ -124,7 +124,7 @@ fun NexusStatistic(
 fun NexusCountdown(
     value: Long,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.CountdownState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberCountdownState(),
+    state: CountdownState = rememberCountdownState(),
     format: String = "HH:mm:ss",
     prefix: String? = null,
     suffix: String? = null,
@@ -148,7 +148,7 @@ fun NexusCountdown(
                 onChange?.invoke(current)
                 last = current
             }
-            state.displayValue = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatCountdown(current, format)
+            state.displayValue = formatCountdown(current, format)
             if (current <= 0L) {
                 onFinish?.invoke()
                 break
@@ -158,7 +158,7 @@ fun NexusCountdown(
         }
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusStatistic(
+    NexusStatistic(
         value = 0,
         modifier = modifier,
         decimalSeparator = ".",
@@ -183,14 +183,14 @@ private fun formatStatisticNumber(
     groupSeparator: String,
 ): String {
     val safePrecision = precision.coerceIn(0, 9)
-    val factor = _root_ide_package_.io.github.xingray.compose.nexus.controls.pow10(safePrecision)
+    val factor = pow10(safePrecision)
     val scaled = round(value * factor).toLong()
     val negative = scaled < 0
     val absScaled = abs(scaled)
     val integerPart = absScaled / factor
     val decimalPart = absScaled % factor
 
-    val groupedInteger = _root_ide_package_.io.github.xingray.compose.nexus.controls.applyGroupSeparator(integerPart.toString(), groupSeparator)
+    val groupedInteger = applyGroupSeparator(integerPart.toString(), groupSeparator)
     val decimalText = if (safePrecision > 0) {
         decimalSeparator + decimalPart.toString().padStart(safePrecision, '0')
     } else {

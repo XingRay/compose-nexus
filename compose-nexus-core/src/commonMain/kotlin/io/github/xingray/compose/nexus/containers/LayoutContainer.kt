@@ -30,17 +30,17 @@ enum class NexusContainerDirection {
 @Composable
 fun NexusContainer(
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.containers.NexusContainerDirection = _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusContainerDirection.Horizontal,
+    direction: NexusContainerDirection = NexusContainerDirection.Horizontal,
     content: @Composable () -> Unit,
 ) {
     when (direction) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusContainerDirection.Horizontal -> {
+        NexusContainerDirection.Horizontal -> {
             Row(modifier = Modifier.fillMaxWidth().then(modifier)) {
                 content()
             }
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusContainerDirection.Vertical -> {
+        NexusContainerDirection.Vertical -> {
             Column(modifier = Modifier.fillMaxWidth().then(modifier)) {
                 content()
             }
@@ -61,7 +61,7 @@ fun NexusHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(height)
-            .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.light7)
+            .background(NexusTheme.colorScheme.primary.light7)
             .padding(horizontal = 16.dp)
             .then(modifier),
         contentAlignment = Alignment.CenterStart,
@@ -83,7 +83,7 @@ fun NexusAside(
         modifier = Modifier
             .width(width)
             .fillMaxHeight()
-            .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.success.light7)
+            .background(NexusTheme.colorScheme.success.light7)
             .padding(16.dp)
             .then(modifier),
         contentAlignment = Alignment.TopStart,
@@ -103,7 +103,7 @@ fun NexusMain(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.warning.light7)
+            .background(NexusTheme.colorScheme.warning.light7)
             .padding(16.dp)
             .then(modifier),
         contentAlignment = Alignment.TopStart,
@@ -125,7 +125,7 @@ fun NexusFooter(
         modifier = Modifier
             .fillMaxWidth()
             .height(height)
-            .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.danger.light7)
+            .background(NexusTheme.colorScheme.danger.light7)
             .padding(horizontal = 16.dp)
             .then(modifier),
         contentAlignment = Alignment.CenterStart,

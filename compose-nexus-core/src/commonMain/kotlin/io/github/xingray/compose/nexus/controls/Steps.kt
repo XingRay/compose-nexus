@@ -44,13 +44,13 @@ data class StepItem(
     val title: String,
     val description: String = "",
     val icon: (@Composable () -> Unit)? = null,
-    val status: io.github.xingray.compose.nexus.controls.StepStatus? = null,
+    val status: StepStatus? = null,
 )
 
 @Stable
 class StepsState(
     initialActive: Int = 0,
-    val steps: List<io.github.xingray.compose.nexus.controls.StepItem>,
+    val steps: List<StepItem>,
 ) {
     var active by mutableIntStateOf(initialActive.coerceIn(0, steps.lastIndex.coerceAtLeast(0)))
         private set
@@ -64,15 +64,15 @@ class StepsState(
 
     fun resolveStatus(
         index: Int,
-        processStatus: io.github.xingray.compose.nexus.controls.StepStatus,
-        finishStatus: io.github.xingray.compose.nexus.controls.StepStatus,
-    ): io.github.xingray.compose.nexus.controls.StepStatus {
-        val step = steps.getOrNull(index) ?: return _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait
+        processStatus: StepStatus,
+        finishStatus: StepStatus,
+    ): StepStatus {
+        val step = steps.getOrNull(index) ?: return StepStatus.Wait
         if (step.status != null) return step.status
         return when {
             index < active -> finishStatus
             index == active -> processStatus
-            else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait
+            else -> StepStatus.Wait
         }
     }
 }
@@ -80,24 +80,24 @@ class StepsState(
 @Composable
 fun rememberStepsState(
     initialActive: Int = 0,
-    steps: List<io.github.xingray.compose.nexus.controls.StepItem>,
-): io.github.xingray.compose.nexus.controls.StepsState = remember(steps) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.StepsState(initialActive, steps)
+    steps: List<StepItem>,
+): StepsState = remember(steps) {
+    StepsState(initialActive, steps)
 }
 
 @Composable
 fun NexusSteps(
-    state: io.github.xingray.compose.nexus.controls.StepsState,
+    state: StepsState,
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.controls.StepsDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.StepsDirection.Horizontal,
+    direction: StepsDirection = StepsDirection.Horizontal,
     space: Dp? = null,
-    processStatus: io.github.xingray.compose.nexus.controls.StepStatus = _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Process,
-    finishStatus: io.github.xingray.compose.nexus.controls.StepStatus = _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Finish,
+    processStatus: StepStatus = StepStatus.Process,
+    finishStatus: StepStatus = StepStatus.Finish,
     alignCenter: Boolean = false,
     simple: Boolean = false,
 ) {
     if (simple) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SimpleSteps(
+        SimpleSteps(
             state = state,
             modifier = modifier,
             processStatus = processStatus,
@@ -107,7 +107,7 @@ fun NexusSteps(
     }
 
     when (direction) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepsDirection.Horizontal -> _root_ide_package_.io.github.xingray.compose.nexus.controls.HorizontalSteps(
+        StepsDirection.Horizontal -> HorizontalSteps(
             state = state,
             modifier = modifier,
             space = space,
@@ -115,7 +115,7 @@ fun NexusSteps(
             finishStatus = finishStatus,
             alignCenter = alignCenter,
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepsDirection.Vertical -> _root_ide_package_.io.github.xingray.compose.nexus.controls.VerticalSteps(
+        StepsDirection.Vertical -> VerticalSteps(
             state = state,
             modifier = modifier,
             processStatus = processStatus,
@@ -127,37 +127,37 @@ fun NexusSteps(
 
 @Composable
 private fun SimpleSteps(
-    state: io.github.xingray.compose.nexus.controls.StepsState,
+    state: StepsState,
     modifier: Modifier,
-    processStatus: io.github.xingray.compose.nexus.controls.StepStatus,
-    finishStatus: io.github.xingray.compose.nexus.controls.StepStatus,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(colorScheme.fill.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .background(colorScheme.fill.light, NexusTheme.shapes.base)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         state.steps.forEachIndexed { index, step ->
             val status = state.resolveStatus(index, processStatus, finishStatus)
             val color = when (status) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Process -> colorScheme.primary.base
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Error -> colorScheme.danger.base
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Finish, _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Success -> colorScheme.text.primary
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait -> colorScheme.text.placeholder
+                StepStatus.Process -> colorScheme.primary.base
+                StepStatus.Error -> colorScheme.danger.base
+                StepStatus.Finish, StepStatus.Success -> colorScheme.text.primary
+                StepStatus.Wait -> colorScheme.text.placeholder
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = step.title,
                 color = color,
                 style = typography.small,
             )
             if (index < state.steps.lastIndex) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "  >  ",
                     color = colorScheme.text.placeholder,
                     style = typography.small,
@@ -169,11 +169,11 @@ private fun SimpleSteps(
 
 @Composable
 private fun HorizontalSteps(
-    state: io.github.xingray.compose.nexus.controls.StepsState,
+    state: StepsState,
     modifier: Modifier,
     space: Dp?,
-    processStatus: io.github.xingray.compose.nexus.controls.StepStatus,
-    finishStatus: io.github.xingray.compose.nexus.controls.StepStatus,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
     alignCenter: Boolean,
 ) {
     Row(
@@ -181,7 +181,7 @@ private fun HorizontalSteps(
         verticalAlignment = Alignment.Top,
     ) {
         state.steps.forEachIndexed { index, step ->
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.StepHead(
+            StepHead(
                 index = index,
                 step = step,
                 status = state.resolveStatus(index, processStatus, finishStatus),
@@ -194,10 +194,10 @@ private fun HorizontalSteps(
 
 @Composable
 private fun VerticalSteps(
-    state: io.github.xingray.compose.nexus.controls.StepsState,
+    state: StepsState,
     modifier: Modifier,
-    processStatus: io.github.xingray.compose.nexus.controls.StepStatus,
-    finishStatus: io.github.xingray.compose.nexus.controls.StepStatus,
+    processStatus: StepStatus,
+    finishStatus: StepStatus,
     alignCenter: Boolean,
 ) {
     Column(
@@ -208,10 +208,10 @@ private fun VerticalSteps(
             Row(
                 modifier = Modifier.padding(bottom = if (index < state.steps.lastIndex) 24.dp else 0.dp),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepCircle(index = index, status = status, step = step)
+                StepCircle(index = index, status = status, step = step)
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(horizontalAlignment = if (alignCenter) Alignment.CenterHorizontally else Alignment.Start) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.StepTextContent(step = step, status = status, alignCenter = alignCenter)
+                    StepTextContent(step = step, status = status, alignCenter = alignCenter)
                 }
             }
         }
@@ -221,8 +221,8 @@ private fun VerticalSteps(
 @Composable
 private fun StepHead(
     index: Int,
-    step: io.github.xingray.compose.nexus.controls.StepItem,
-    status: io.github.xingray.compose.nexus.controls.StepStatus,
+    step: StepItem,
+    status: StepStatus,
     alignCenter: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -239,29 +239,29 @@ private fun StepHead(
                     modifier = Modifier
                         .weight(1f)
                         .height(2.dp)
-                        .background(_root_ide_package_.io.github.xingray.compose.nexus.controls.stepLineColor(status)),
+                        .background(stepLineColor(status)),
                 )
             } else {
                 Spacer(modifier = Modifier.weight(1f))
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.StepCircle(index = index, status = status, step = step)
+            StepCircle(index = index, status = status, step = step)
             Spacer(modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepTextContent(step = step, status = status, alignCenter = alignCenter)
+        StepTextContent(step = step, status = status, alignCenter = alignCenter)
     }
 }
 
 @Composable
 private fun StepCircle(
     index: Int,
-    status: io.github.xingray.compose.nexus.controls.StepStatus,
-    step: io.github.xingray.compose.nexus.controls.StepItem,
+    status: StepStatus,
+    step: StepItem,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val bgColor: Color
     val contentColor: Color
@@ -269,25 +269,25 @@ private fun StepCircle(
     val displayText: String
 
     when (status) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Finish, _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Success -> {
+        StepStatus.Finish, StepStatus.Success -> {
             bgColor = colorScheme.primary.base
             contentColor = colorScheme.white
             borderColor = colorScheme.primary.base
             displayText = "✓"
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Process -> {
+        StepStatus.Process -> {
             bgColor = colorScheme.primary.base
             contentColor = colorScheme.white
             borderColor = colorScheme.primary.base
             displayText = (index + 1).toString()
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Error -> {
+        StepStatus.Error -> {
             bgColor = Color.Transparent
             contentColor = colorScheme.danger.base
             borderColor = colorScheme.danger.base
             displayText = "✕"
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait -> {
+        StepStatus.Wait -> {
             bgColor = Color.Transparent
             contentColor = colorScheme.text.placeholder
             borderColor = colorScheme.text.placeholder
@@ -306,7 +306,7 @@ private fun StepCircle(
         if (step.icon != null) {
             step.icon()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = displayText,
                 color = contentColor,
                 style = typography.extraSmall,
@@ -317,27 +317,27 @@ private fun StepCircle(
 
 @Composable
 private fun StepTextContent(
-    step: io.github.xingray.compose.nexus.controls.StepItem,
-    status: io.github.xingray.compose.nexus.controls.StepStatus,
+    step: StepItem,
+    status: StepStatus,
     alignCenter: Boolean,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val titleColor = when (status) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Process -> colorScheme.primary.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Error -> colorScheme.danger.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Finish, _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Success -> colorScheme.text.primary
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait -> colorScheme.text.placeholder
+        StepStatus.Process -> colorScheme.primary.base
+        StepStatus.Error -> colorScheme.danger.base
+        StepStatus.Finish, StepStatus.Success -> colorScheme.text.primary
+        StepStatus.Wait -> colorScheme.text.placeholder
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+    NexusText(
         text = step.title,
         color = titleColor,
         style = typography.small,
     )
     if (step.description.isNotEmpty()) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = step.description,
             color = colorScheme.text.secondary,
             style = typography.extraSmall,
@@ -347,10 +347,10 @@ private fun StepTextContent(
 }
 
 @Composable
-private fun stepLineColor(currentStatus: io.github.xingray.compose.nexus.controls.StepStatus): Color {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+private fun stepLineColor(currentStatus: StepStatus): Color {
+    val colorScheme = NexusTheme.colorScheme
     return when (currentStatus) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.StepStatus.Wait -> colorScheme.border.lighter
+        StepStatus.Wait -> colorScheme.border.lighter
         else -> colorScheme.primary.base
     }
 }

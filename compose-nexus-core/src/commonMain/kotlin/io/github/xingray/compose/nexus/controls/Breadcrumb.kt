@@ -23,9 +23,9 @@ fun NexusBreadcrumb(
     modifier: Modifier = Modifier,
     separator: String = "/",
     separatorIcon: (@Composable () -> Unit)? = null,
-    content: io.github.xingray.compose.nexus.controls.NexusBreadcrumbScope.() -> Unit,
+    content: NexusBreadcrumbScope.() -> Unit,
 ) {
-    val scope = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusBreadcrumbScopeImpl().apply(content)
+    val scope = NexusBreadcrumbScopeImpl().apply(content)
 
     Row(
         modifier = modifier,
@@ -44,10 +44,10 @@ fun NexusBreadcrumb(
                         separatorIcon()
                     }
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = " $separator ",
-                        color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.placeholder,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                        color = NexusTheme.colorScheme.text.placeholder,
+                        style = NexusTheme.typography.small,
                     )
                 }
             }
@@ -59,11 +59,11 @@ interface NexusBreadcrumbScope {
     fun item(content: @Composable () -> Unit)
 }
 
-private class NexusBreadcrumbScopeImpl : io.github.xingray.compose.nexus.controls.NexusBreadcrumbScope {
-    val items = mutableListOf<io.github.xingray.compose.nexus.controls.BreadcrumbEntry>()
+private class NexusBreadcrumbScopeImpl : NexusBreadcrumbScope {
+    val items = mutableListOf<BreadcrumbEntry>()
 
     override fun item(content: @Composable () -> Unit) {
-        items.add(_root_ide_package_.io.github.xingray.compose.nexus.controls.BreadcrumbEntry(content))
+        items.add(BreadcrumbEntry(content))
     }
 }
 
@@ -88,11 +88,11 @@ fun NexusBreadcrumbItem(
     onNavigate: ((to: Any, replace: Boolean) -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     if (isCurrent) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = text,
             color = colorScheme.text.primary,
             style = typography.small,
@@ -114,7 +114,7 @@ fun NexusBreadcrumbItem(
             if (content != null) {
                 content()
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = text,
                     color = colorScheme.primary.base,
                     style = typography.small,

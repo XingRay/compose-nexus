@@ -46,14 +46,14 @@ data class StatCard(
 fun NexusDashboardPage(
     modifier: Modifier = Modifier,
     title: String = "Dashboard",
-    stats: List<io.github.xingray.compose.nexus.templates.StatCard> = emptyList(),
+    stats: List<StatCard> = emptyList(),
     chartsContent: (@Composable () -> Unit)? = null,
     bottomContent: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     Column(
         modifier = modifier
@@ -63,7 +63,7 @@ fun NexusDashboardPage(
             .verticalScroll(rememberScrollState()),
     ) {
         // Title
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
@@ -87,20 +87,20 @@ fun NexusDashboardPage(
                             .padding(20.dp),
                     ) {
                         Column {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = stat.title,
                                 color = colorScheme.text.secondary,
                                 style = typography.small,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = stat.value,
                                     color = colorScheme.text.primary,
                                     style = typography.extraLarge,
                                 )
                                 if (stat.suffix.isNotEmpty()) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = " ${stat.suffix}",
                                         color = colorScheme.text.secondary,
                                         style = typography.small,
@@ -109,7 +109,7 @@ fun NexusDashboardPage(
                             }
                             if (stat.description.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(4.dp))
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = stat.description,
                                     color = colorScheme.text.placeholder,
                                     style = typography.extraSmall,

@@ -35,7 +35,7 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
 @Composable
 fun NexusCard(
     modifier: Modifier = Modifier,
-    shadow: io.github.xingray.compose.nexus.containers.CardShadow = _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Always,
+    shadow: CardShadow = CardShadow.Always,
     headerText: String? = null,
     footerText: String? = null,
     bodyModifier: Modifier = Modifier,
@@ -47,32 +47,32 @@ fun NexusCard(
     footer: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
-    val configShadow = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig.current.card.shadow
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
+    val configShadow = LocalNexusConfig.current.card.shadow
     val resolvedShadow = when (configShadow) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCardShadowMode.Always -> _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Always
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCardShadowMode.Hover -> _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Hover
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCardShadowMode.Never -> _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Never
+        NexusCardShadowMode.Always -> CardShadow.Always
+        NexusCardShadowMode.Hover -> CardShadow.Hover
+        NexusCardShadowMode.Never -> CardShadow.Never
         null -> shadow
     }
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val headerContent = header ?: headerText?.let {
-        @Composable { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = it) }
+        @Composable { NexusText(text = it) }
     }
     val footerContent = footer ?: footerText?.let {
-        @Composable { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = it) }
+        @Composable { NexusText(text = it) }
     }
 
     @Suppress("UNUSED_VARIABLE")
     val _unusedClasses = Triple(headerClass, bodyClass, footerClass)
 
     val elevation = when (resolvedShadow) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Always -> shadows.light.elevation
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Hover -> if (isHovered) shadows.light.elevation else 0.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CardShadow.Never -> 0.dp
+        CardShadow.Always -> shadows.light.elevation
+        CardShadow.Hover -> if (isHovered) shadows.light.elevation else 0.dp
+        CardShadow.Never -> 0.dp
     }
 
     Column(
@@ -85,9 +85,9 @@ fun NexusCard(
     ) {
         // Header
         if (headerContent != null) {
-            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+            ProvideContentColorTextStyle(
                 contentColor = colorScheme.text.primary,
-                textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                textStyle = NexusTheme.typography.base,
             ) {
                 Box(
                     modifier = Modifier
@@ -97,13 +97,13 @@ fun NexusCard(
                     headerContent()
                 }
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider(color = colorScheme.border.lighter)
+            NexusDivider(color = colorScheme.border.lighter)
         }
 
         // Body
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+        ProvideContentColorTextStyle(
             contentColor = colorScheme.text.regular,
-            textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+            textStyle = NexusTheme.typography.base,
         ) {
             Box(
                 modifier = Modifier
@@ -117,10 +117,10 @@ fun NexusCard(
 
         // Footer
         if (footerContent != null) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider(color = colorScheme.border.lighter)
-            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+            NexusDivider(color = colorScheme.border.lighter)
+            ProvideContentColorTextStyle(
                 contentColor = colorScheme.text.secondary,
-                textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                textStyle = NexusTheme.typography.small,
             ) {
                 Box(
                     modifier = Modifier

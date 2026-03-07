@@ -80,16 +80,16 @@ class TooltipState(initialVisible: Boolean = false) {
 }
 
 @Composable
-fun rememberTooltipState(initialVisible: Boolean = false): io.github.xingray.compose.nexus.controls.TooltipState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipState(initialVisible) }
+fun rememberTooltipState(initialVisible: Boolean = false): TooltipState =
+    remember { TooltipState(initialVisible) }
 
 @Composable
 fun NexusTooltip(
     text: String = "",
     modifier: Modifier = Modifier,
-    placement: io.github.xingray.compose.nexus.controls.TooltipPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Bottom,
-    theme: io.github.xingray.compose.nexus.controls.TooltipTheme = _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Dark,
-    trigger: io.github.xingray.compose.nexus.controls.TooltipTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Hover,
+    placement: TooltipPlacement = TooltipPlacement.Bottom,
+    theme: TooltipTheme = TooltipTheme.Dark,
+    trigger: TooltipTrigger = TooltipTrigger.Hover,
     disabled: Boolean = false,
     visible: Boolean? = null,
     offset: Int = 12,
@@ -97,7 +97,7 @@ fun NexusTooltip(
     hideAfter: Long = 200L,
     autoClose: Long = 0L,
     showArrow: Boolean = true,
-    state: io.github.xingray.compose.nexus.controls.TooltipState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTooltipState(),
+    state: TooltipState = rememberTooltipState(),
     onBeforeShow: ((event: Any?) -> Unit)? = null,
     onShow: ((event: Any?) -> Unit)? = null,
     onBeforeHide: ((event: Any?) -> Unit)? = null,
@@ -105,9 +105,9 @@ fun NexusTooltip(
     popupContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val typography = NexusTheme.typography
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -152,7 +152,7 @@ fun NexusTooltip(
 
     var anchorModifier = modifier
     when (trigger) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Hover -> {
+        TooltipTrigger.Hover -> {
             anchorModifier = anchorModifier.hoverable(interactionSource)
             LaunchedEffect(isHovered, disabled) {
                 if (disabled) {
@@ -165,7 +165,7 @@ fun NexusTooltip(
             }
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Click, _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.ContextMenu -> {
+        TooltipTrigger.Click, TooltipTrigger.ContextMenu -> {
             anchorModifier = anchorModifier.clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -174,7 +174,7 @@ fun NexusTooltip(
             }
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Focus -> {
+        TooltipTrigger.Focus -> {
             anchorModifier = anchorModifier
                 .focusable()
                 .onFocusChanged {
@@ -184,31 +184,31 @@ fun NexusTooltip(
     }
 
     val bgColor = when (theme) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Dark -> colorScheme.text.primary
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Light -> colorScheme.fill.blank
+        TooltipTheme.Dark -> colorScheme.text.primary
+        TooltipTheme.Light -> colorScheme.fill.blank
     }
     val textColor = when (theme) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Dark -> colorScheme.white
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Light -> colorScheme.text.regular
+        TooltipTheme.Dark -> colorScheme.white
+        TooltipTheme.Light -> colorScheme.text.regular
     }
     val borderColor = when (theme) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Dark -> Color.Transparent
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Light -> colorScheme.border.light
+        TooltipTheme.Dark -> Color.Transparent
+        TooltipTheme.Light -> colorScheme.border.light
     }
 
     val (popupAlignment, popupOffset, arrowText) = when (placement) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Top -> Triple(Alignment.TopCenter, IntOffset(0, -offset), "▼")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopStart -> Triple(Alignment.TopStart, IntOffset(0, -offset), "▼")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopEnd -> Triple(Alignment.TopEnd, IntOffset(0, -offset), "▼")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Bottom -> Triple(Alignment.BottomCenter, IntOffset(0, offset), "▲")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomStart -> Triple(Alignment.BottomStart, IntOffset(0, offset), "▲")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomEnd -> Triple(Alignment.BottomEnd, IntOffset(0, offset), "▲")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Left -> Triple(Alignment.CenterStart, IntOffset(-offset, 0), "▶")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftStart -> Triple(Alignment.TopStart, IntOffset(-offset, 0), "▶")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftEnd -> Triple(Alignment.BottomStart, IntOffset(-offset, 0), "▶")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Right -> Triple(Alignment.CenterEnd, IntOffset(offset, 0), "◀")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightStart -> Triple(Alignment.TopEnd, IntOffset(offset, 0), "◀")
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightEnd -> Triple(Alignment.BottomEnd, IntOffset(offset, 0), "◀")
+        TooltipPlacement.Top -> Triple(Alignment.TopCenter, IntOffset(0, -offset), "▼")
+        TooltipPlacement.TopStart -> Triple(Alignment.TopStart, IntOffset(0, -offset), "▼")
+        TooltipPlacement.TopEnd -> Triple(Alignment.TopEnd, IntOffset(0, -offset), "▼")
+        TooltipPlacement.Bottom -> Triple(Alignment.BottomCenter, IntOffset(0, offset), "▲")
+        TooltipPlacement.BottomStart -> Triple(Alignment.BottomStart, IntOffset(0, offset), "▲")
+        TooltipPlacement.BottomEnd -> Triple(Alignment.BottomEnd, IntOffset(0, offset), "▲")
+        TooltipPlacement.Left -> Triple(Alignment.CenterStart, IntOffset(-offset, 0), "▶")
+        TooltipPlacement.LeftStart -> Triple(Alignment.TopStart, IntOffset(-offset, 0), "▶")
+        TooltipPlacement.LeftEnd -> Triple(Alignment.BottomStart, IntOffset(-offset, 0), "▶")
+        TooltipPlacement.Right -> Triple(Alignment.CenterEnd, IntOffset(offset, 0), "◀")
+        TooltipPlacement.RightStart -> Triple(Alignment.TopEnd, IntOffset(offset, 0), "◀")
+        TooltipPlacement.RightEnd -> Triple(Alignment.BottomEnd, IntOffset(offset, 0), "◀")
     }
 
     Box(modifier = anchorModifier) {
@@ -224,17 +224,17 @@ fun NexusTooltip(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    if (showArrow && (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Right || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightStart || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightEnd)) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
+                    if (showArrow && (placement == TooltipPlacement.Right || placement == TooltipPlacement.RightStart || placement == TooltipPlacement.RightEnd)) {
+                        NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
                     }
-                    if (showArrow && (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Bottom || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomStart || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomEnd)) {
+                    if (showArrow && (placement == TooltipPlacement.Bottom || placement == TooltipPlacement.BottomStart || placement == TooltipPlacement.BottomEnd)) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
+                            NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
                         }
                     }
                     Box(
                         modifier = Modifier
-                            .shadow(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows.lighter.elevation, RoundedCornerShape(4.dp))
+                            .shadow(NexusTheme.shadows.lighter.elevation, RoundedCornerShape(4.dp))
                             .clip(shapes.base)
                             .background(bgColor)
                             .then(
@@ -246,14 +246,14 @@ fun NexusTooltip(
                             )
                             .padding(horizontal = 10.dp, vertical = 6.dp),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                        ProvideContentColorTextStyle(
                             contentColor = textColor,
                             textStyle = typography.extraSmall,
                         ) {
                             if (popupContent != null) {
                                 popupContent()
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = text,
                                     color = textColor,
                                     style = typography.extraSmall,
@@ -261,12 +261,12 @@ fun NexusTooltip(
                             }
                         }
                     }
-                    if (showArrow && (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Left || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftStart || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftEnd)) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
+                    if (showArrow && (placement == TooltipPlacement.Left || placement == TooltipPlacement.LeftStart || placement == TooltipPlacement.LeftEnd)) {
+                        NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
                     }
-                    if (showArrow && (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Top || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopStart || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopEnd)) {
+                    if (showArrow && (placement == TooltipPlacement.Top || placement == TooltipPlacement.TopStart || placement == TooltipPlacement.TopEnd)) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
+                            NexusText(text = arrowText, color = bgColor, style = typography.extraSmall)
                         }
                     }
                 }

@@ -60,12 +60,12 @@ class NexusScrollbarState internal constructor(
 fun rememberNexusScrollbarState(
     initialScrollTop: Int = 0,
     initialScrollLeft: Int = 0,
-): io.github.xingray.compose.nexus.controls.NexusScrollbarState {
+): NexusScrollbarState {
     val verticalScrollState = rememberScrollState(initial = initialScrollTop)
     val horizontalScrollState = rememberScrollState(initial = initialScrollLeft)
     val scope = rememberCoroutineScope()
     return remember(verticalScrollState, horizontalScrollState, scope) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusScrollbarState(
+        NexusScrollbarState(
             verticalScrollState = verticalScrollState,
             horizontalScrollState = horizontalScrollState,
             scope = scope,
@@ -76,18 +76,18 @@ fun rememberNexusScrollbarState(
 @Composable
 fun NexusScrollbar(
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.NexusScrollbarState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberNexusScrollbarState(),
+    state: NexusScrollbarState = rememberNexusScrollbarState(),
     height: Dp? = null,
     maxHeight: Dp? = null,
     always: Boolean = false,
     minSize: Dp = 20.dp,
     distance: Int = 0,
     onScroll: ((scrollLeft: Int, scrollTop: Int) -> Unit)? = null,
-    onEndReached: ((io.github.xingray.compose.nexus.controls.NexusScrollbarDirection) -> Unit)? = null,
+    onEndReached: ((NexusScrollbarDirection) -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colors = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
     var topReached by remember { mutableStateOf(false) }
     var bottomReached by remember { mutableStateOf(false) }
     var leftReached by remember { mutableStateOf(false) }
@@ -102,10 +102,10 @@ fun NexusScrollbar(
             val left = state.horizontalScrollState.value <= distance
             val right = state.horizontalScrollState.value >= (state.horizontalScrollState.maxValue - distance).coerceAtLeast(0)
 
-            if (top && !topReached) onEndReached(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusScrollbarDirection.Top)
-            if (bottom && !bottomReached) onEndReached(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusScrollbarDirection.Bottom)
-            if (left && !leftReached) onEndReached(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusScrollbarDirection.Left)
-            if (right && !rightReached) onEndReached(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusScrollbarDirection.Right)
+            if (top && !topReached) onEndReached(NexusScrollbarDirection.Top)
+            if (bottom && !bottomReached) onEndReached(NexusScrollbarDirection.Bottom)
+            if (left && !leftReached) onEndReached(NexusScrollbarDirection.Left)
+            if (right && !rightReached) onEndReached(NexusScrollbarDirection.Right)
 
             topReached = top
             bottomReached = bottom

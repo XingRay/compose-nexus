@@ -47,34 +47,34 @@ private data class NexusRowLayoutConfig(
     val rowWidth: Dp,
 )
 
-private val LocalNexusRowLayoutConfig = compositionLocalOf<io.github.xingray.compose.nexus.controls.NexusRowLayoutConfig?> { null }
+private val LocalNexusRowLayoutConfig = compositionLocalOf<NexusRowLayoutConfig?> { null }
 
 @Composable
 fun NexusRow(
     modifier: Modifier = Modifier,
     gutter: Dp = 0.dp,
-    justify: io.github.xingray.compose.nexus.controls.NexusRowJustify = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.Start,
-    align: io.github.xingray.compose.nexus.controls.NexusRowAlign = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowAlign.Top,
+    justify: NexusRowJustify = NexusRowJustify.Start,
+    align: NexusRowAlign = NexusRowAlign.Top,
     content: @Composable () -> Unit,
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth().then(modifier)) {
         val rowWidth = maxWidth
-        val unitWidth = rowWidth / _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS
+        val unitWidth = rowWidth / GRID_COLUMNS
         val arrangement = when (justify) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.Start -> Arrangement.spacedBy(gutter, Alignment.Start)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.End -> Arrangement.spacedBy(gutter, Alignment.End)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.Center -> Arrangement.spacedBy(gutter, Alignment.CenterHorizontally)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.SpaceAround -> Arrangement.SpaceAround
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.SpaceBetween -> Arrangement.SpaceBetween
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowJustify.SpaceEvenly -> Arrangement.SpaceEvenly
+            NexusRowJustify.Start -> Arrangement.spacedBy(gutter, Alignment.Start)
+            NexusRowJustify.End -> Arrangement.spacedBy(gutter, Alignment.End)
+            NexusRowJustify.Center -> Arrangement.spacedBy(gutter, Alignment.CenterHorizontally)
+            NexusRowJustify.SpaceAround -> Arrangement.SpaceAround
+            NexusRowJustify.SpaceBetween -> Arrangement.SpaceBetween
+            NexusRowJustify.SpaceEvenly -> Arrangement.SpaceEvenly
         }
         val verticalAlignment = when (align) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowAlign.Top -> Alignment.Top
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowAlign.Middle -> Alignment.CenterVertically
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowAlign.Bottom -> Alignment.Bottom
+            NexusRowAlign.Top -> Alignment.Top
+            NexusRowAlign.Middle -> Alignment.CenterVertically
+            NexusRowAlign.Bottom -> Alignment.Bottom
         }
         CompositionLocalProvider(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusRowLayoutConfig provides _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRowLayoutConfig(
+            LocalNexusRowLayoutConfig provides NexusRowLayoutConfig(
                 unitWidth = unitWidth,
                 rowWidth = rowWidth,
             )
@@ -93,18 +93,18 @@ fun NexusRow(
 @Composable
 fun NexusCol(
     modifier: Modifier = Modifier,
-    span: Int = _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS,
+    span: Int = GRID_COLUMNS,
     offset: Int = 0,
     push: Int = 0,
     pull: Int = 0,
-    xs: io.github.xingray.compose.nexus.controls.NexusColSize? = null,
-    sm: io.github.xingray.compose.nexus.controls.NexusColSize? = null,
-    md: io.github.xingray.compose.nexus.controls.NexusColSize? = null,
-    lg: io.github.xingray.compose.nexus.controls.NexusColSize? = null,
-    xl: io.github.xingray.compose.nexus.controls.NexusColSize? = null,
+    xs: NexusColSize? = null,
+    sm: NexusColSize? = null,
+    md: NexusColSize? = null,
+    lg: NexusColSize? = null,
+    xl: NexusColSize? = null,
     content: @Composable () -> Unit,
 ) {
-    val rowConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusRowLayoutConfig.current
+    val rowConfig = LocalNexusRowLayoutConfig.current
     if (rowConfig == null) {
         Box(modifier = modifier) {
             content()
@@ -112,7 +112,7 @@ fun NexusCol(
         return
     }
 
-    val responsive = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveResponsiveSize(
+    val responsive = resolveResponsiveSize(
         rowWidth = rowConfig.rowWidth,
         xs = xs,
         sm = sm,
@@ -120,13 +120,13 @@ fun NexusCol(
         lg = lg,
         xl = xl,
     )
-    val resolvedSpan = (responsive?.span ?: span).coerceIn(0, _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS)
-    val resolvedOffset = (responsive?.offset ?: offset).coerceIn(0, _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS)
-    val resolvedPush = (responsive?.push ?: push).coerceIn(-_root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS,
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS
+    val resolvedSpan = (responsive?.span ?: span).coerceIn(0, GRID_COLUMNS)
+    val resolvedOffset = (responsive?.offset ?: offset).coerceIn(0, GRID_COLUMNS)
+    val resolvedPush = (responsive?.push ?: push).coerceIn(-GRID_COLUMNS,
+        GRID_COLUMNS
     )
-    val resolvedPull = (responsive?.pull ?: pull).coerceIn(-_root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS,
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.GRID_COLUMNS
+    val resolvedPull = (responsive?.pull ?: pull).coerceIn(-GRID_COLUMNS,
+        GRID_COLUMNS
     )
     val shift = resolvedPush - resolvedPull
 
@@ -148,12 +148,12 @@ fun NexusCol(
 
 private fun resolveResponsiveSize(
     rowWidth: Dp,
-    xs: io.github.xingray.compose.nexus.controls.NexusColSize?,
-    sm: io.github.xingray.compose.nexus.controls.NexusColSize?,
-    md: io.github.xingray.compose.nexus.controls.NexusColSize?,
-    lg: io.github.xingray.compose.nexus.controls.NexusColSize?,
-    xl: io.github.xingray.compose.nexus.controls.NexusColSize?,
-): io.github.xingray.compose.nexus.controls.NexusColSize? {
+    xs: NexusColSize?,
+    sm: NexusColSize?,
+    md: NexusColSize?,
+    lg: NexusColSize?,
+    xl: NexusColSize?,
+): NexusColSize? {
     return when {
         rowWidth >= 1920.dp -> xl ?: lg ?: md ?: sm ?: xs
         rowWidth >= 1200.dp -> lg ?: md ?: sm ?: xs

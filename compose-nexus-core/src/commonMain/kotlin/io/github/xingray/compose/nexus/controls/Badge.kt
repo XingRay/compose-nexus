@@ -25,15 +25,15 @@ fun NexusBadge(
     max: Int = 99,
     isDot: Boolean = false,
     hidden: Boolean = false,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger,
+    type: NexusType = NexusType.Danger,
     showZero: Boolean = true,
     color: Color? = null,
     offset: Pair<Int, Int> = 0 to 0,
     contentSlot: (@Composable (String) -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val badgeColor = color ?: (colorScheme.typeColor(type)?.base ?: colorScheme.danger.base)
 
     val valueText = when (value) {
@@ -103,7 +103,7 @@ fun NexusBadge(
                     if (contentSlot != null) {
                         contentSlot(valueText)
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = valueText,
                             color = colorScheme.white,
                             style = typography.extraSmall,

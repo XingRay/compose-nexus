@@ -41,17 +41,17 @@ import io.github.xingray.compose.nexus.theme.NexusType
  */
 @Composable
 fun NexusWizardPage(
-    steps: List<io.github.xingray.compose.nexus.controls.StepItem>,
+    steps: List<StepItem>,
     modifier: Modifier = Modifier,
     title: String = "Wizard",
-    stepsState: io.github.xingray.compose.nexus.controls.StepsState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberStepsState(steps = steps),
+    stepsState: StepsState = rememberStepsState(steps = steps),
     onFinish: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
     stepContent: @Composable (stepIndex: Int) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -60,7 +60,7 @@ fun NexusWizardPage(
             .padding(20.dp),
     ) {
         // Title
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
@@ -69,7 +69,7 @@ fun NexusWizardPage(
         Spacer(modifier = Modifier.height(20.dp))
 
         // Steps indicator
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSteps(
+        NexusSteps(
             state = stepsState,
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,39 +96,39 @@ fun NexusWizardPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Navigation buttons
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+        NexusDivider()
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             // Left: Cancel
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = { onCancel?.invoke() }) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Cancel")
+            NexusButton(onClick = { onCancel?.invoke() }) {
+                NexusText(text = "Cancel")
             }
 
             // Right: Prev / Next / Submit
             Row {
                 if (stepsState.active > 0) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = { stepsState.prev() }) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Previous")
+                    NexusButton(onClick = { stepsState.prev() }) {
+                        NexusText(text = "Previous")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
                 if (stepsState.active < steps.lastIndex) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         onClick = { stepsState.next() },
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                        type = NexusType.Primary,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Next")
+                        NexusText(text = "Next")
                     }
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         onClick = { onFinish?.invoke() },
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success,
+                        type = NexusType.Success,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Submit")
+                        NexusText(text = "Submit")
                     }
                 }
             }

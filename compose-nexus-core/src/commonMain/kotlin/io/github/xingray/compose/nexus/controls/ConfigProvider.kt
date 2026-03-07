@@ -16,7 +16,7 @@ enum class NexusCardShadowMode {
 
 data class NexusButtonConfig(
     val autoInsertSpace: Boolean? = null,
-    val type: io.github.xingray.compose.nexus.theme.NexusType? = null,
+    val type: NexusType? = null,
     val plain: Boolean? = null,
     val text: Boolean? = null,
     val round: Boolean? = null,
@@ -24,12 +24,12 @@ data class NexusButtonConfig(
 )
 
 data class NexusLinkConfig(
-    val type: io.github.xingray.compose.nexus.theme.NexusType? = null,
-    val underline: io.github.xingray.compose.nexus.controls.NexusLinkUnderline? = null,
+    val type: NexusType? = null,
+    val underline: NexusLinkUnderline? = null,
 )
 
 data class NexusCardConfig(
-    val shadow: io.github.xingray.compose.nexus.controls.NexusCardShadowMode? = null,
+    val shadow: NexusCardShadowMode? = null,
 )
 
 data class NexusDialogConfig(
@@ -48,17 +48,17 @@ data class NexusTableConfig(
 
 data class NexusConfig(
     val locale: String? = null,
-    val size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    val size: ComponentSize? = null,
     val zIndex: Int? = null,
     val namespace: String? = null,
-    val button: io.github.xingray.compose.nexus.controls.NexusButtonConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButtonConfig(),
-    val link: io.github.xingray.compose.nexus.controls.NexusLinkConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkConfig(),
-    val card: io.github.xingray.compose.nexus.controls.NexusCardConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCardConfig(),
-    val dialog: io.github.xingray.compose.nexus.controls.NexusDialogConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDialogConfig(),
-    val message: io.github.xingray.compose.nexus.controls.NexusMessageConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusMessageConfig(),
+    val button: NexusButtonConfig = NexusButtonConfig(),
+    val link: NexusLinkConfig = NexusLinkConfig(),
+    val card: NexusCardConfig = NexusCardConfig(),
+    val dialog: NexusDialogConfig = NexusDialogConfig(),
+    val message: NexusMessageConfig = NexusMessageConfig(),
     val emptyValues: List<Any?>? = null,
     val valueOnClear: Any? = null,
-    val table: io.github.xingray.compose.nexus.controls.NexusTableConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTableConfig(),
+    val table: NexusTableConfig = NexusTableConfig(),
 ) {
     fun merge(parent: NexusConfig): NexusConfig {
         return copy(
@@ -78,7 +78,7 @@ data class NexusConfig(
     }
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusButtonConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusButtonConfig): io.github.xingray.compose.nexus.controls.NexusButtonConfig {
+private fun NexusButtonConfig.merge(parent: NexusButtonConfig): NexusButtonConfig {
     return copy(
         autoInsertSpace = autoInsertSpace ?: parent.autoInsertSpace,
         type = type ?: parent.type,
@@ -89,18 +89,18 @@ private fun io.github.xingray.compose.nexus.controls.NexusButtonConfig.merge(par
     )
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusLinkConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusLinkConfig): io.github.xingray.compose.nexus.controls.NexusLinkConfig {
+private fun NexusLinkConfig.merge(parent: NexusLinkConfig): NexusLinkConfig {
     return copy(
         type = type ?: parent.type,
         underline = underline ?: parent.underline,
     )
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusCardConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusCardConfig): io.github.xingray.compose.nexus.controls.NexusCardConfig {
+private fun NexusCardConfig.merge(parent: NexusCardConfig): NexusCardConfig {
     return copy(shadow = shadow ?: parent.shadow)
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusDialogConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusDialogConfig): io.github.xingray.compose.nexus.controls.NexusDialogConfig {
+private fun NexusDialogConfig.merge(parent: NexusDialogConfig): NexusDialogConfig {
     return copy(
         alignCenter = alignCenter ?: parent.alignCenter,
         draggable = draggable ?: parent.draggable,
@@ -108,24 +108,24 @@ private fun io.github.xingray.compose.nexus.controls.NexusDialogConfig.merge(par
     )
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusMessageConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusMessageConfig): io.github.xingray.compose.nexus.controls.NexusMessageConfig {
+private fun NexusMessageConfig.merge(parent: NexusMessageConfig): NexusMessageConfig {
     return copy(max = max ?: parent.max)
 }
 
-private fun io.github.xingray.compose.nexus.controls.NexusTableConfig.merge(parent: io.github.xingray.compose.nexus.controls.NexusTableConfig): io.github.xingray.compose.nexus.controls.NexusTableConfig {
+private fun NexusTableConfig.merge(parent: NexusTableConfig): NexusTableConfig {
     return copy(showOverflowTooltip = showOverflowTooltip ?: parent.showOverflowTooltip)
 }
 
-val LocalNexusConfig = staticCompositionLocalOf { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusConfig() }
+val LocalNexusConfig = staticCompositionLocalOf { NexusConfig() }
 
 @Composable
 fun NexusConfigProvider(
-    config: io.github.xingray.compose.nexus.controls.NexusConfig,
+    config: NexusConfig,
     content: @Composable () -> Unit,
 ) {
-    val parent = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig.current
+    val parent = LocalNexusConfig.current
     val merged = remember(parent, config) { config.merge(parent) }
-    CompositionLocalProvider(_root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig provides merged) {
+    CompositionLocalProvider(LocalNexusConfig provides merged) {
         content()
     }
 }
@@ -133,21 +133,21 @@ fun NexusConfigProvider(
 @Composable
 fun NexusConfigProvider(
     locale: String? = null,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     zIndex: Int? = null,
     namespace: String? = null,
-    button: io.github.xingray.compose.nexus.controls.NexusButtonConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButtonConfig(),
-    link: io.github.xingray.compose.nexus.controls.NexusLinkConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkConfig(),
-    card: io.github.xingray.compose.nexus.controls.NexusCardConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCardConfig(),
-    dialog: io.github.xingray.compose.nexus.controls.NexusDialogConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDialogConfig(),
-    message: io.github.xingray.compose.nexus.controls.NexusMessageConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusMessageConfig(),
+    button: NexusButtonConfig = NexusButtonConfig(),
+    link: NexusLinkConfig = NexusLinkConfig(),
+    card: NexusCardConfig = NexusCardConfig(),
+    dialog: NexusDialogConfig = NexusDialogConfig(),
+    message: NexusMessageConfig = NexusMessageConfig(),
     emptyValues: List<Any?>? = null,
     valueOnClear: Any? = null,
-    table: io.github.xingray.compose.nexus.controls.NexusTableConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTableConfig(),
+    table: NexusTableConfig = NexusTableConfig(),
     content: @Composable () -> Unit,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusConfigProvider(
-        config = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusConfig(
+    NexusConfigProvider(
+        config = NexusConfig(
             locale = locale,
             size = size,
             zIndex = zIndex,

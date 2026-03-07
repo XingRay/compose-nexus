@@ -49,7 +49,7 @@ data class NexusFormRule(
     val min: Int? = null,
     val max: Int? = null,
     val message: String = "Invalid field",
-    val trigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormValidateTrigger.Submit,
+    val trigger: FormValidateTrigger = FormValidateTrigger.Submit,
     val validator: ((Any?) -> String?)? = null,
 )
 
@@ -60,7 +60,7 @@ class NexusFormState(
     private val model = mutableStateMapOf<String, Any?>().apply { putAll(initialModel) }
     private val initialValues = mutableStateMapOf<String, Any?>().apply { putAll(initialModel) }
     private val fieldErrors = mutableStateMapOf<String, String?>()
-    private val fieldStatuses = mutableStateMapOf<String, io.github.xingray.compose.nexus.controls.FormItemValidateStatus>()
+    private val fieldStatuses = mutableStateMapOf<String, FormItemValidateStatus>()
 
     fun setFieldValue(prop: String, value: Any?) {
         model[prop] = value
@@ -70,13 +70,13 @@ class NexusFormState(
 
     fun setFieldError(prop: String, error: String?) {
         fieldErrors[prop] = error
-        fieldStatuses[prop] = if (error.isNullOrBlank()) _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Success else _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Error
+        fieldStatuses[prop] = if (error.isNullOrBlank()) FormItemValidateStatus.Success else FormItemValidateStatus.Error
     }
 
     fun getError(prop: String): String? = fieldErrors[prop]
 
-    fun getStatus(prop: String): io.github.xingray.compose.nexus.controls.FormItemValidateStatus =
-        fieldStatuses[prop] ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.None
+    fun getStatus(prop: String): FormItemValidateStatus =
+        fieldStatuses[prop] ?: FormItemValidateStatus.None
 
     fun setInitialValues(values: Map<String, Any?>) {
         initialValues.clear()
@@ -101,9 +101,9 @@ class NexusFormState(
     }
 
     fun validate(
-        rules: Map<String, List<io.github.xingray.compose.nexus.controls.NexusFormRule>>,
+        rules: Map<String, List<NexusFormRule>>,
         props: List<String>? = null,
-        trigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormValidateTrigger.Submit,
+        trigger: FormValidateTrigger = FormValidateTrigger.Submit,
         onValidate: ((prop: String, isValid: Boolean, message: String?) -> Unit)? = null,
     ): Boolean {
         val keys = props ?: rules.keys.toList()
@@ -122,24 +122,24 @@ class NexusFormState(
 
     fun validateField(
         prop: String,
-        rules: List<io.github.xingray.compose.nexus.controls.NexusFormRule>,
-        trigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormValidateTrigger.Submit,
+        rules: List<NexusFormRule>,
+        trigger: FormValidateTrigger = FormValidateTrigger.Submit,
         onValidate: ((prop: String, isValid: Boolean, message: String?) -> Unit)? = null,
     ): Boolean {
         val value = model[prop]
-        fieldStatuses[prop] = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Validating
+        fieldStatuses[prop] = FormItemValidateStatus.Validating
         val message = runValidation(value, rules, trigger)
         val isValid = message == null
         fieldErrors[prop] = message
-        fieldStatuses[prop] = if (isValid) _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Success else _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Error
+        fieldStatuses[prop] = if (isValid) FormItemValidateStatus.Success else FormItemValidateStatus.Error
         onValidate?.invoke(prop, isValid, message)
         return isValid
     }
 
     private fun runValidation(
         value: Any?,
-        rules: List<io.github.xingray.compose.nexus.controls.NexusFormRule>,
-        trigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger,
+        rules: List<NexusFormRule>,
+        trigger: FormValidateTrigger,
     ): String? {
         val activeRules = rules.filter { shouldRunRule(it.trigger, trigger) }
         activeRules.forEach { rule ->
@@ -164,9 +164,9 @@ class NexusFormState(
         return null
     }
 
-    private fun shouldRunRule(ruleTrigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger, currentTrigger: io.github.xingray.compose.nexus.controls.FormValidateTrigger): Boolean {
-        if (currentTrigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.FormValidateTrigger.Submit) return true
-        return ruleTrigger == currentTrigger || ruleTrigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.FormValidateTrigger.Submit
+    private fun shouldRunRule(ruleTrigger: FormValidateTrigger, currentTrigger: FormValidateTrigger): Boolean {
+        if (currentTrigger == FormValidateTrigger.Submit) return true
+        return ruleTrigger == currentTrigger || ruleTrigger == FormValidateTrigger.Submit
     }
 
     private fun isEmptyValue(value: Any?): Boolean = when (value) {
@@ -180,37 +180,37 @@ class NexusFormState(
 @Composable
 fun rememberNexusFormState(
     initialModel: Map<String, Any?> = emptyMap(),
-): io.github.xingray.compose.nexus.controls.NexusFormState = androidx.compose.runtime.remember {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusFormState(initialModel = initialModel)
+): NexusFormState = androidx.compose.runtime.remember {
+    NexusFormState(initialModel = initialModel)
 }
 
 internal data class FormConfig(
-    val state: io.github.xingray.compose.nexus.controls.NexusFormState,
-    val rules: Map<String, List<io.github.xingray.compose.nexus.controls.NexusFormRule>>,
+    val state: NexusFormState,
+    val rules: Map<String, List<NexusFormRule>>,
     val inline: Boolean,
-    val labelPosition: io.github.xingray.compose.nexus.controls.LabelPosition,
+    val labelPosition: LabelPosition,
     val labelWidth: Dp,
     val labelSuffix: String,
     val hideRequiredAsterisk: Boolean,
-    val requireAsteriskPosition: io.github.xingray.compose.nexus.controls.FormAsteriskPosition,
+    val requireAsteriskPosition: FormAsteriskPosition,
     val showMessage: Boolean,
     val inlineMessage: Boolean,
     val statusIcon: Boolean,
-    val size: io.github.xingray.compose.nexus.theme.ComponentSize?,
+    val size: ComponentSize?,
     val disabled: Boolean,
     val onValidate: ((prop: String, isValid: Boolean, message: String?) -> Unit)?,
 )
 
 internal val LocalFormConfig = compositionLocalOf {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.FormConfig(
-        state = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusFormState(),
+    FormConfig(
+        state = NexusFormState(),
         rules = emptyMap(),
         inline = false,
-        labelPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Right,
+        labelPosition = LabelPosition.Right,
         labelWidth = 80.dp,
         labelSuffix = "",
         hideRequiredAsterisk = false,
-        requireAsteriskPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormAsteriskPosition.Left,
+        requireAsteriskPosition = FormAsteriskPosition.Left,
         showMessage = true,
         inlineMessage = false,
         statusIcon = false,
@@ -223,23 +223,23 @@ internal val LocalFormConfig = compositionLocalOf {
 @Composable
 fun NexusForm(
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.NexusFormState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberNexusFormState(),
-    rules: Map<String, List<io.github.xingray.compose.nexus.controls.NexusFormRule>> = emptyMap(),
+    state: NexusFormState = rememberNexusFormState(),
+    rules: Map<String, List<NexusFormRule>> = emptyMap(),
     inline: Boolean = false,
-    labelPosition: io.github.xingray.compose.nexus.controls.LabelPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Right,
+    labelPosition: LabelPosition = LabelPosition.Right,
     labelWidth: Dp = 80.dp,
     labelSuffix: String = "",
     hideRequiredAsterisk: Boolean = false,
-    requireAsteriskPosition: io.github.xingray.compose.nexus.controls.FormAsteriskPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormAsteriskPosition.Left,
+    requireAsteriskPosition: FormAsteriskPosition = FormAsteriskPosition.Left,
     showMessage: Boolean = true,
     inlineMessage: Boolean = false,
     statusIcon: Boolean = false,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     onValidate: ((prop: String, isValid: Boolean, message: String?) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val config = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormConfig(
+    val config = FormConfig(
         state = state,
         rules = rules,
         inline = inline,
@@ -256,8 +256,8 @@ fun NexusForm(
         onValidate = onValidate,
     )
 
-    CompositionLocalProvider(_root_ide_package_.io.github.xingray.compose.nexus.controls.LocalFormConfig provides config) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusConfigProvider(size = size) {
+    CompositionLocalProvider(LocalFormConfig provides config) {
+        NexusConfigProvider(size = size) {
             val baseModifier = modifier
                 .fillMaxWidth()
                 .alpha(if (disabled) 0.72f else 1f)
@@ -287,22 +287,22 @@ fun NexusFormItem(
     label: String = "",
     modifier: Modifier = Modifier,
     prop: String? = null,
-    labelPosition: io.github.xingray.compose.nexus.controls.LabelPosition? = null,
+    labelPosition: LabelPosition? = null,
     labelWidth: Dp? = null,
     required: Boolean = false,
-    rules: List<io.github.xingray.compose.nexus.controls.NexusFormRule> = emptyList(),
+    rules: List<NexusFormRule> = emptyList(),
     error: String? = null,
     showMessage: Boolean? = null,
     inlineMessage: Boolean? = null,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
-    validateStatus: io.github.xingray.compose.nexus.controls.FormItemValidateStatus = _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.None,
+    size: ComponentSize? = null,
+    validateStatus: FormItemValidateStatus = FormItemValidateStatus.None,
     labelContent: (@Composable () -> Unit)? = null,
     errorContent: (@Composable (String) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val config = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalFormConfig.current
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val config = LocalFormConfig.current
 
     val effectiveLabelPosition = labelPosition ?: config.labelPosition
     val effectiveLabelWidth = labelWidth ?: config.labelWidth
@@ -312,28 +312,28 @@ fun NexusFormItem(
     val shouldShowAsterisk = !config.hideRequiredAsterisk && (required || itemRules.any { it.required })
     val message = error ?: prop?.let { config.state.getError(it) }
     val status = when {
-        validateStatus != _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.None -> validateStatus
+        validateStatus != FormItemValidateStatus.None -> validateStatus
         prop != null -> config.state.getStatus(prop)
-        !message.isNullOrBlank() -> _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Error
-        else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.None
+        !message.isNullOrBlank() -> FormItemValidateStatus.Error
+        else -> FormItemValidateStatus.None
     }
 
     val defaultLabel: @Composable () -> Unit = {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (shouldShowAsterisk && config.requireAsteriskPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.FormAsteriskPosition.Left) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            if (shouldShowAsterisk && config.requireAsteriskPosition == FormAsteriskPosition.Left) {
+                NexusText(
                     text = "* ",
                     color = colorScheme.danger.base,
                     style = typography.base,
                 )
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = label + config.labelSuffix,
                 color = colorScheme.text.regular,
                 style = typography.base,
             )
-            if (shouldShowAsterisk && config.requireAsteriskPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.FormAsteriskPosition.Right) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            if (shouldShowAsterisk && config.requireAsteriskPosition == FormAsteriskPosition.Right) {
+                NexusText(
                     text = " *",
                     color = colorScheme.danger.base,
                     style = typography.base,
@@ -344,17 +344,17 @@ fun NexusFormItem(
 
     val itemContent: @Composable () -> Unit = {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusConfigProvider(size = size) {
+            NexusConfigProvider(size = size) {
                 content()
             }
             if (config.statusIcon) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ValidationStatusIcon(status = status)
+                ValidationStatusIcon(status = status)
             }
             if (effectiveShowMessage && effectiveInlineMessage && !message.isNullOrBlank()) {
                 if (errorContent != null) {
                     errorContent(message)
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = message,
                         color = colorScheme.danger.base,
                         style = typography.extraSmall,
@@ -366,7 +366,7 @@ fun NexusFormItem(
 
     val baseModifier = if (config.inline) modifier else modifier.fillMaxWidth()
     when (effectiveLabelPosition) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Top -> {
+        LabelPosition.Top -> {
             Column(modifier = baseModifier) {
                 Box(modifier = Modifier.padding(bottom = 6.dp)) {
                     (labelContent ?: defaultLabel).invoke()
@@ -377,7 +377,7 @@ fun NexusFormItem(
                         if (errorContent != null) {
                             errorContent(message)
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = message,
                                 color = colorScheme.danger.base,
                                 style = typography.extraSmall,
@@ -387,7 +387,7 @@ fun NexusFormItem(
                 }
             }
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Left, _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Right -> {
+        LabelPosition.Left, LabelPosition.Right -> {
             Row(
                 modifier = baseModifier,
                 verticalAlignment = Alignment.Top,
@@ -397,7 +397,7 @@ fun NexusFormItem(
                         .width(effectiveLabelWidth)
                         .padding(top = 8.dp, end = 12.dp),
                     contentAlignment = when (effectiveLabelPosition) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.LabelPosition.Right -> Alignment.CenterEnd
+                        LabelPosition.Right -> Alignment.CenterEnd
                         else -> Alignment.CenterStart
                     },
                 ) {
@@ -411,7 +411,7 @@ fun NexusFormItem(
                             if (errorContent != null) {
                                 errorContent(message)
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = message,
                                     color = colorScheme.danger.base,
                                     style = typography.extraSmall,
@@ -432,18 +432,18 @@ fun NexusFormItem(
 
 @Composable
 private fun ValidationStatusIcon(
-    status: io.github.xingray.compose.nexus.controls.FormItemValidateStatus,
+    status: FormItemValidateStatus,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val (text, color) = when (status) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Error -> "✕" to colorScheme.danger.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Validating -> "…" to colorScheme.primary.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.Success -> "✓" to colorScheme.success.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.FormItemValidateStatus.None -> return
+        FormItemValidateStatus.Error -> "✕" to colorScheme.danger.base
+        FormItemValidateStatus.Validating -> "…" to colorScheme.primary.base
+        FormItemValidateStatus.Success -> "✓" to colorScheme.success.base
+        FormItemValidateStatus.None -> return
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+    NexusText(
         text = text,
         color = color,
         style = typography.small,

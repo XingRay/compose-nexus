@@ -32,7 +32,7 @@ fun generateTypeColor(
     base: Color,
     mixLight: Color = Color.White,
     mixDark: Color = Color.Black,
-): io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+): TypeColor = TypeColor(
     base = base,
     light1 = base.mix(mixLight, 0.1f),
     light2 = base.mix(mixLight, 0.2f),
@@ -132,20 +132,20 @@ data class DisabledColors(
 
 @Immutable
 data class NexusColorScheme(
-    val primary: io.github.xingray.compose.nexus.theme.TypeColor,
-    val success: io.github.xingray.compose.nexus.theme.TypeColor,
-    val warning: io.github.xingray.compose.nexus.theme.TypeColor,
-    val danger: io.github.xingray.compose.nexus.theme.TypeColor,
-    val info: io.github.xingray.compose.nexus.theme.TypeColor,
+    val primary: TypeColor,
+    val success: TypeColor,
+    val warning: TypeColor,
+    val danger: TypeColor,
+    val info: TypeColor,
     val white: Color,
     val black: Color,
-    val text: io.github.xingray.compose.nexus.theme.TextColors,
-    val border: io.github.xingray.compose.nexus.theme.BorderColors,
-    val fill: io.github.xingray.compose.nexus.theme.FillColors,
-    val background: io.github.xingray.compose.nexus.theme.BackgroundColors,
-    val overlay: io.github.xingray.compose.nexus.theme.OverlayColors,
-    val mask: io.github.xingray.compose.nexus.theme.MaskColors,
-    val disabled: io.github.xingray.compose.nexus.theme.DisabledColors,
+    val text: TextColors,
+    val border: BorderColors,
+    val fill: FillColors,
+    val background: BackgroundColors,
+    val overlay: OverlayColors,
+    val mask: MaskColors,
+    val disabled: DisabledColors,
 )
 
 // ============================================================================
@@ -153,7 +153,7 @@ data class NexusColorScheme(
 // ============================================================================
 
 fun lightColorScheme(
-    primary: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+    primary: TypeColor = TypeColor(
         base = Color(0xFF409EFF),
         light1 = Color(0xFF53A8FF),
         light2 = Color(0xFF66B1FF),
@@ -166,7 +166,7 @@ fun lightColorScheme(
         light9 = Color(0xFFECF5FF),
         dark2 = Color(0xFF337ECC),
     ),
-    success: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+    success: TypeColor = TypeColor(
         base = Color(0xFF67C23A),
         light1 = Color(0xFF76C84E),
         light2 = Color(0xFF85CE61),
@@ -179,7 +179,7 @@ fun lightColorScheme(
         light9 = Color(0xFFF0F9EB),
         dark2 = Color(0xFF529B2E),
     ),
-    warning: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+    warning: TypeColor = TypeColor(
         base = Color(0xFFE6A23C),
         light1 = Color(0xFFE8AB50),
         light2 = Color(0xFFEBB563),
@@ -192,7 +192,7 @@ fun lightColorScheme(
         light9 = Color(0xFFFCF6EC),
         dark2 = Color(0xFFB88230),
     ),
-    danger: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+    danger: TypeColor = TypeColor(
         base = Color(0xFFF56C6C),
         light1 = Color(0xFFF67B7B),
         light2 = Color(0xFFF78989),
@@ -205,7 +205,7 @@ fun lightColorScheme(
         light9 = Color(0xFFFEF0F0),
         dark2 = Color(0xFFC45656),
     ),
-    info: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.TypeColor(
+    info: TypeColor = TypeColor(
         base = Color(0xFF909399),
         light1 = Color(0xFF9B9EA3),
         light2 = Color(0xFFA6A9AD),
@@ -220,14 +220,14 @@ fun lightColorScheme(
     ),
     white: Color = Color(0xFFFFFFFF),
     black: Color = Color(0xFF000000),
-    text: io.github.xingray.compose.nexus.theme.TextColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.TextColors(
+    text: TextColors = TextColors(
         primary = Color(0xFF303133),
         regular = Color(0xFF606266),
         secondary = Color(0xFF909399),
         placeholder = Color(0xFFA8ABB2),
         disabled = Color(0xFFC0C4CC),
     ),
-    border: io.github.xingray.compose.nexus.theme.BorderColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.BorderColors(
+    border: BorderColors = BorderColors(
         base = Color(0xFFDCDFE6),
         light = Color(0xFFE4E7ED),
         lighter = Color(0xFFEBEEF5),
@@ -235,7 +235,7 @@ fun lightColorScheme(
         dark = Color(0xFFD4D7DE),
         darker = Color(0xFFCDD0D6),
     ),
-    fill: io.github.xingray.compose.nexus.theme.FillColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.FillColors(
+    fill: FillColors = FillColors(
         base = Color(0xFFF0F2F5),
         light = Color(0xFFF5F7FA),
         lighter = Color(0xFFFAFAFA),
@@ -244,26 +244,26 @@ fun lightColorScheme(
         darker = Color(0xFFE6E8EB),
         blank = Color(0xFFFFFFFF),
     ),
-    background: io.github.xingray.compose.nexus.theme.BackgroundColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.BackgroundColors(
+    background: BackgroundColors = BackgroundColors(
         base = Color(0xFFFFFFFF),
         page = Color(0xFFF2F3F5),
         overlay = Color(0xFFFFFFFF),
     ),
-    overlay: io.github.xingray.compose.nexus.theme.OverlayColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.OverlayColors(
+    overlay: OverlayColors = OverlayColors(
         base = Color(0xCC000000),       // rgba(0,0,0,0.8)
         light = Color(0xB3000000),      // rgba(0,0,0,0.7)
         lighter = Color(0x80000000),    // rgba(0,0,0,0.5)
     ),
-    mask: io.github.xingray.compose.nexus.theme.MaskColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.MaskColors(
+    mask: MaskColors = MaskColors(
         base = Color(0xE6FFFFFF),       // rgba(255,255,255,0.9)
         extraLight = Color(0x4DFFFFFF), // rgba(255,255,255,0.3)
     ),
-    disabled: io.github.xingray.compose.nexus.theme.DisabledColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.DisabledColors(
+    disabled: DisabledColors = DisabledColors(
         background = Color(0xFFF5F7FA),   // fill-color-light
         text = Color(0xFFA8ABB2),         // text-color-placeholder
         border = Color(0xFFE4E7ED),       // border-color-light
     ),
-): io.github.xingray.compose.nexus.theme.NexusColorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusColorScheme(
+): NexusColorScheme = NexusColorScheme(
     primary = primary,
     success = success,
     warning = warning,
@@ -285,36 +285,36 @@ fun lightColorScheme(
 // ============================================================================
 
 fun darkColorScheme(
-    primary: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(
+    primary: TypeColor = generateTypeColor(
         base = Color(0xFF409EFF),
         mixLight = Color(0xFF141414),
     ),
-    success: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(
+    success: TypeColor = generateTypeColor(
         base = Color(0xFF67C23A),
         mixLight = Color(0xFF141414),
     ),
-    warning: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(
+    warning: TypeColor = generateTypeColor(
         base = Color(0xFFE6A23C),
         mixLight = Color(0xFF141414),
     ),
-    danger: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(
+    danger: TypeColor = generateTypeColor(
         base = Color(0xFFF56C6C),
         mixLight = Color(0xFF141414),
     ),
-    info: io.github.xingray.compose.nexus.theme.TypeColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(
+    info: TypeColor = generateTypeColor(
         base = Color(0xFF909399),
         mixLight = Color(0xFF141414),
     ),
     white: Color = Color(0xFFFFFFFF),
     black: Color = Color(0xFF000000),
-    text: io.github.xingray.compose.nexus.theme.TextColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.TextColors(
+    text: TextColors = TextColors(
         primary = Color(0xFFE5EAF3),
         regular = Color(0xFFCFD3DC),
         secondary = Color(0xFFA3A6AD),
         placeholder = Color(0xFF8D9095),
         disabled = Color(0xFF6C6E72),
     ),
-    border: io.github.xingray.compose.nexus.theme.BorderColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.BorderColors(
+    border: BorderColors = BorderColors(
         base = Color(0xFF4C4D4F),
         light = Color(0xFF414243),
         lighter = Color(0xFF363637),
@@ -322,7 +322,7 @@ fun darkColorScheme(
         dark = Color(0xFF58585A),
         darker = Color(0xFF636466),
     ),
-    fill: io.github.xingray.compose.nexus.theme.FillColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.FillColors(
+    fill: FillColors = FillColors(
         base = Color(0xFF303030),
         light = Color(0xFF262727),
         lighter = Color(0xFF1D1D1D),
@@ -331,26 +331,26 @@ fun darkColorScheme(
         darker = Color(0xFF424243),
         blank = Color(0xFF141414),
     ),
-    background: io.github.xingray.compose.nexus.theme.BackgroundColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.BackgroundColors(
+    background: BackgroundColors = BackgroundColors(
         base = Color(0xFF141414),
         page = Color(0xFF0A0A0A),
         overlay = Color(0xFF1D1E1F),
     ),
-    overlay: io.github.xingray.compose.nexus.theme.OverlayColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.OverlayColors(
+    overlay: OverlayColors = OverlayColors(
         base = Color(0xCC000000),
         light = Color(0xB3000000),
         lighter = Color(0x80000000),
     ),
-    mask: io.github.xingray.compose.nexus.theme.MaskColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.MaskColors(
+    mask: MaskColors = MaskColors(
         base = Color(0xCC000000),       // rgba(0,0,0,0.8)
         extraLight = Color(0x4D000000), // rgba(0,0,0,0.3)
     ),
-    disabled: io.github.xingray.compose.nexus.theme.DisabledColors = _root_ide_package_.io.github.xingray.compose.nexus.theme.DisabledColors(
+    disabled: DisabledColors = DisabledColors(
         background = Color(0xFF262727), // fill-color-light (dark)
         text = Color(0xFF8D9095),       // text-color-placeholder (dark)
         border = Color(0xFF414243),     // border-color-light (dark)
     ),
-): io.github.xingray.compose.nexus.theme.NexusColorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusColorScheme(
+): NexusColorScheme = NexusColorScheme(
     primary = primary,
     success = success,
     warning = warning,

@@ -69,15 +69,15 @@ class LoadingServiceState(initialVisible: Boolean = false) {
 }
 
 @Composable
-fun rememberLoadingServiceState(initialVisible: Boolean = false): io.github.xingray.compose.nexus.controls.LoadingServiceState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingServiceState(initialVisible) }
+fun rememberLoadingServiceState(initialVisible: Boolean = false): LoadingServiceState =
+    remember { LoadingServiceState(initialVisible) }
 
 @Composable
 fun NexusLoadingServiceHost(
-    state: io.github.xingray.compose.nexus.controls.LoadingServiceState,
+    state: LoadingServiceState,
     modifier: Modifier = Modifier,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLoading(
+    NexusLoading(
         modifier = modifier,
         loading = state.visible,
         text = state.text,
@@ -124,7 +124,7 @@ fun NexusLoading(
         ) {
             content()
             if (internalLoading) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingOverlay(
+                LoadingOverlay(
                     modifier = Modifier.fillMaxSize(),
                     text = text,
                     spinnerSize = spinnerSize,
@@ -140,7 +140,7 @@ fun NexusLoading(
     if (!internalLoading) return
 
     if (fullscreen) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingOverlay(
+        LoadingOverlay(
             modifier = modifier.fillMaxSize(),
             text = text,
             spinnerSize = spinnerSize,
@@ -149,7 +149,7 @@ fun NexusLoading(
             spinner = spinner,
         )
     } else {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingSpinner(
+        LoadingSpinner(
             modifier = modifier,
             text = text,
             spinnerSize = spinnerSize,
@@ -167,7 +167,7 @@ private fun LoadingOverlay(
     backgroundColor: Color?,
     spinner: (@Composable () -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
 
     Box(
         modifier = modifier
@@ -184,7 +184,7 @@ private fun LoadingOverlay(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingSpinner(text = text, spinnerSize = spinnerSize, spinner = spinner)
+        LoadingSpinner(text = text, spinnerSize = spinnerSize, spinner = spinner)
     }
 }
 
@@ -195,8 +195,8 @@ private fun LoadingSpinner(
     spinnerSize: Dp,
     spinner: (@Composable () -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val infiniteTransition = rememberInfiniteTransition(label = "loading-spin")
     val rotation by infiniteTransition.animateFloat(
@@ -237,7 +237,7 @@ private fun LoadingSpinner(
 
         if (text != null) {
             Spacer(modifier = Modifier.height(12.dp))
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = text,
                 color = colorScheme.primary.base,
                 style = typography.small,

@@ -54,17 +54,17 @@ data class ProgressColorStop(
 fun NexusProgress(
     percentage: Float,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.controls.ProgressType = _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Line,
-    status: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+    type: ProgressType = ProgressType.Line,
+    status: NexusType = NexusType.Primary,
     strokeWidth: Dp = 6.dp,
     textInside: Boolean = false,
     indeterminate: Boolean = false,
     duration: Float = 3f,
     color: Color? = null,
     colorFunction: ((Float) -> Color)? = null,
-    colorStops: List<io.github.xingray.compose.nexus.controls.ProgressColorStop> = emptyList(),
+    colorStops: List<ProgressColorStop> = emptyList(),
     showText: Boolean = true,
-    strokeLinecap: io.github.xingray.compose.nexus.controls.ProgressStrokeLinecap = _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressStrokeLinecap.Round,
+    strokeLinecap: ProgressStrokeLinecap = ProgressStrokeLinecap.Round,
     format: ((Float) -> String)? = null,
     striped: Boolean = false,
     stripedFlow: Boolean = false,
@@ -72,11 +72,11 @@ fun NexusProgress(
     width: Dp? = null,
     content: (@Composable (percentage: Float) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val clamped = percentage.coerceIn(0f, 100f)
     val animatedPercentage by animateFloatAsState(
         targetValue = clamped,
-        animationSpec = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion.tweenDefault(),
+        animationSpec = NexusTheme.motion.tweenDefault(),
         label = "progress",
     )
 
@@ -107,9 +107,9 @@ fun NexusProgress(
         label = "indeterminateStart",
     )
 
-    val displayPercent = if (indeterminate) ((indeterminateStart * 100f).coerceIn(0f, 100f)) else animatedPercentage
+    if (indeterminate) ((indeterminateStart * 100f).coerceIn(0f, 100f)) else animatedPercentage
     val fraction = if (indeterminate) 0.3f else (animatedPercentage / 100f)
-    val activeColor = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveProgressColor(
+    val activeColor = resolveProgressColor(
         percentage = animatedPercentage,
         color = color,
         colorFunction = colorFunction,
@@ -119,13 +119,13 @@ fun NexusProgress(
     val trackColor = colorScheme.border.lighter
     val text = format?.invoke(animatedPercentage) ?: "${animatedPercentage.toInt()}%"
     val cap = when (strokeLinecap) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressStrokeLinecap.Butt -> StrokeCap.Butt
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressStrokeLinecap.Round -> StrokeCap.Round
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressStrokeLinecap.Square -> StrokeCap.Square
+        ProgressStrokeLinecap.Butt -> StrokeCap.Butt
+        ProgressStrokeLinecap.Round -> StrokeCap.Round
+        ProgressStrokeLinecap.Square -> StrokeCap.Square
     }
 
     when (type) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Line -> _root_ide_package_.io.github.xingray.compose.nexus.controls.LineProgress(
+        ProgressType.Line -> LineProgress(
             modifier = modifier,
             fraction = fraction,
             indeterminate = indeterminate,
@@ -142,7 +142,7 @@ fun NexusProgress(
             content = content,
         )
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Circle, _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Dashboard -> _root_ide_package_.io.github.xingray.compose.nexus.controls.CircleLikeProgress(
+        ProgressType.Circle, ProgressType.Dashboard -> CircleLikeProgress(
             modifier = modifier,
             type = type,
             fraction = fraction,
@@ -177,8 +177,8 @@ private fun LineProgress(
     text: String,
     content: (@Composable (Float) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val barHeight = max(strokeWidth.value, if (textInside) 18f else strokeWidth.value).dp
 
     Row(
@@ -190,7 +190,7 @@ private fun LineProgress(
             modifier = Modifier
                 .weight(1f)
                 .height(barHeight)
-                .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+                .clip(NexusTheme.shapes.base)
                 .background(trackColor),
         ) {
             Canvas(modifier = Modifier.fillMaxWidth().height(barHeight)) {
@@ -230,7 +230,7 @@ private fun LineProgress(
                     if (content != null) {
                         content(fraction * 100f)
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = text,
                             color = colorScheme.white,
                             style = typography.extraSmall,
@@ -244,7 +244,7 @@ private fun LineProgress(
             if (content != null) {
                 content(fraction * 100f)
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = if (indeterminate) "..." else text,
                     color = colorScheme.text.regular,
                     style = typography.extraSmall,
@@ -257,7 +257,7 @@ private fun LineProgress(
 @Composable
 private fun CircleLikeProgress(
     modifier: Modifier,
-    type: io.github.xingray.compose.nexus.controls.ProgressType,
+    type: ProgressType,
     fraction: Float,
     indeterminate: Boolean,
     indeterminateStart: Float,
@@ -270,10 +270,10 @@ private fun CircleLikeProgress(
     size: Dp,
     cap: StrokeCap,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val baseSweep = if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Dashboard) 270f else 360f
-    val startAngle = if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.ProgressType.Dashboard) 135f else -90f
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val baseSweep = if (type == ProgressType.Dashboard) 270f else 360f
+    val startAngle = if (type == ProgressType.Dashboard) 135f else -90f
     val drawFraction = if (indeterminate) 0.25f else fraction.coerceIn(0f, 1f)
     val dynamicStart = if (indeterminate) startAngle + indeterminateStart * baseSweep else startAngle
 
@@ -310,7 +310,7 @@ private fun CircleLikeProgress(
             if (content != null) {
                 content(drawFraction * 100f)
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = if (indeterminate) "..." else text,
                     color = colorScheme.text.primary,
                     style = typography.base,
@@ -324,7 +324,7 @@ private fun resolveProgressColor(
     percentage: Float,
     color: Color?,
     colorFunction: ((Float) -> Color)?,
-    colorStops: List<io.github.xingray.compose.nexus.controls.ProgressColorStop>,
+    colorStops: List<ProgressColorStop>,
     defaultColor: Color,
 ): Color {
     if (color != null) return color

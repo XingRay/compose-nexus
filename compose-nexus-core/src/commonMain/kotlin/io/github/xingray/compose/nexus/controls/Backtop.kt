@@ -51,9 +51,9 @@ fun NexusBacktop(
         AnimatedVisibility(visible = visible) {
             Box(
                 modifier = modifier
-                    .shadow(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows.default.elevation, CircleShape)
+                    .shadow(NexusTheme.shadows.default.elevation, CircleShape)
                     .clip(CircleShape)
-                    .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.fill.blank)
+                    .background(NexusTheme.colorScheme.fill.blank)
                     .clickable {
                         scope.launch {
                             scrollState?.animateScrollTo(0)
@@ -67,10 +67,10 @@ fun NexusBacktop(
                 if (content != null) {
                     content()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "↑",
-                        color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        color = NexusTheme.colorScheme.primary.base,
+                        style = NexusTheme.typography.base,
                     )
                 }
             }

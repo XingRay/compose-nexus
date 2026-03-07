@@ -43,7 +43,7 @@ fun NexusWatermark(
     rotate: Float = -22f,
     zIndex: Float = 9f,
     content: List<String> = listOf("Element Plus"),
-    font: io.github.xingray.compose.nexus.controls.WatermarkFont = _root_ide_package_.io.github.xingray.compose.nexus.controls.WatermarkFont(),
+    font: WatermarkFont = WatermarkFont(),
     gap: Pair<Int, Int> = 100 to 100,
     offset: Pair<Int, Int>? = null,
     image: (@Composable () -> Unit)? = null,
@@ -90,7 +90,7 @@ fun NexusWatermark(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 content.forEach { line ->
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = line,
                                         color = font.color.copy(alpha = 1f),
                                         style = TextStyle(

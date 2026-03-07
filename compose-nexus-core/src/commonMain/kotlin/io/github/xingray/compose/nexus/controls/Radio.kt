@@ -64,14 +64,14 @@ class RadioGroupState<T>(initialSelected: T? = null) {
 @Composable
 fun <T> rememberRadioGroupState(
     initialSelected: T? = null,
-): io.github.xingray.compose.nexus.controls.RadioGroupState<T> = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.RadioGroupState(initialSelected) }
+): RadioGroupState<T> = remember { RadioGroupState(initialSelected) }
 
-internal val LocalRadioGroupState = compositionLocalOf<io.github.xingray.compose.nexus.controls.RadioGroupState<Any?>?> { null }
+internal val LocalRadioGroupState = compositionLocalOf<RadioGroupState<Any?>?> { null }
 
 internal data class RadioGroupConfig(
-    val size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    val size: ComponentSize? = null,
     val disabled: Boolean = false,
-    val type: io.github.xingray.compose.nexus.controls.NexusRadioGroupType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioGroupType.Radio,
+    val type: NexusRadioGroupType = NexusRadioGroupType.Radio,
     val fill: Color = Color.Unspecified,
     val textColor: Color = Color.Unspecified,
     val name: String? = null,
@@ -79,27 +79,27 @@ internal data class RadioGroupConfig(
     val validateEvent: Boolean = true,
 )
 
-internal val LocalRadioGroupConfig = compositionLocalOf { _root_ide_package_.io.github.xingray.compose.nexus.controls.RadioGroupConfig() }
+internal val LocalRadioGroupConfig = compositionLocalOf { RadioGroupConfig() }
 
 @Composable
 fun <T> NexusRadioGroup(
-    state: io.github.xingray.compose.nexus.controls.RadioGroupState<T>,
+    state: RadioGroupState<T>,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     validateEvent: Boolean = true,
-    textColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.white,
-    fill: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base,
+    textColor: Color = NexusTheme.colorScheme.white,
+    fill: Color = NexusTheme.colorScheme.primary.base,
     name: String? = null,
-    options: List<io.github.xingray.compose.nexus.controls.NexusRadioOption> = emptyList(),
-    props: io.github.xingray.compose.nexus.controls.NexusRadioOptionProps = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioOptionProps(),
-    type: io.github.xingray.compose.nexus.controls.NexusRadioGroupType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioGroupType.Radio,
+    options: List<NexusRadioOption> = emptyList(),
+    props: NexusRadioOptionProps = NexusRadioOptionProps(),
+    type: NexusRadioGroupType = NexusRadioGroupType.Radio,
     onChange: ((T) -> Unit)? = null,
     content: @Composable () -> Unit = {},
 ) {
     @Suppress("UNCHECKED_CAST")
-    val anyState = state as io.github.xingray.compose.nexus.controls.RadioGroupState<Any?>
-    val config = _root_ide_package_.io.github.xingray.compose.nexus.controls.RadioGroupConfig(
+    val anyState = state as RadioGroupState<Any?>
+    val config = RadioGroupConfig(
         size = size,
         disabled = disabled,
         type = type,
@@ -113,14 +113,13 @@ fun <T> NexusRadioGroup(
         },
     )
 
-    fun optionValue(option: io.github.xingray.compose.nexus.controls.NexusRadioOption): Any? = option.payload[props.value] ?: option.value
-    fun optionLabel(option: io.github.xingray.compose.nexus.controls.NexusRadioOption): String {
+    fun optionValue(option: NexusRadioOption): Any? = option.payload[props.value] ?: option.value
+    fun optionLabel(option: NexusRadioOption): String {
         val payloadLabel = option.payload[props.label]?.toString()
         return payloadLabel ?: option.label ?: optionValue(option)?.toString().orEmpty()
     }
-    fun optionDisabled(option: io.github.xingray.compose.nexus.controls.NexusRadioOption): Boolean {
-        val payloadDisabled = option.payload[props.disabled]
-        return when (payloadDisabled) {
+    fun optionDisabled(option: NexusRadioOption): Boolean {
+        return when (val payloadDisabled = option.payload[props.disabled]) {
             is Boolean -> payloadDisabled
             is String -> payloadDisabled.equals("true", ignoreCase = true)
             else -> option.disabled
@@ -128,8 +127,8 @@ fun <T> NexusRadioGroup(
     }
 
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupState provides anyState,
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupConfig provides config,
+        LocalRadioGroupState provides anyState,
+        LocalRadioGroupConfig provides config,
     ) {
         Row(
             modifier = modifier,
@@ -139,19 +138,19 @@ fun <T> NexusRadioGroup(
             if (options.isNotEmpty()) {
                 options.forEach { option ->
                     val value = optionValue(option)
-                    if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioGroupType.Button) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioButton(
+                    if (type == NexusRadioGroupType.Button) {
+                        NexusRadioButton(
                             value = value,
                             disabled = optionDisabled(option),
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = optionLabel(option))
+                            NexusText(text = optionLabel(option))
                         }
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadio(
+                        NexusRadio(
                             value = value,
                             disabled = optionDisabled(option),
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = optionLabel(option))
+                            NexusText(text = optionLabel(option))
                         }
                     }
                 }
@@ -166,12 +165,12 @@ fun NexusRadio(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     border: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.RadioVisual(
+    RadioVisual(
         selected = selected,
         onClick = onClick,
         modifier = modifier,
@@ -186,19 +185,19 @@ fun NexusRadio(
 fun NexusRadio(
     value: Any?,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     border: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    val groupState = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupState.current
-    val groupConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupConfig.current
+    val groupState = LocalRadioGroupState.current
+    val groupConfig = LocalRadioGroupConfig.current
     val selected = groupState?.selected == value
     val actualDisabled = disabled || groupConfig.disabled
-    val actualSize = size ?: groupConfig.size ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default
+    val actualSize = size ?: groupConfig.size ?: ComponentSize.Default
 
-    if (groupConfig.type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioGroupType.Button) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusRadioButton(
+    if (groupConfig.type == NexusRadioGroupType.Button) {
+        NexusRadioButton(
             value = value,
             modifier = modifier,
             size = actualSize,
@@ -206,7 +205,7 @@ fun NexusRadio(
             label = label,
         )
     } else {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.RadioVisual(
+        RadioVisual(
             selected = selected,
             onClick = {
                 if (!actualDisabled) {
@@ -227,29 +226,29 @@ fun NexusRadio(
 fun NexusRadioButton(
     value: Any?,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    val groupState = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupState.current
-    val groupConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalRadioGroupConfig.current
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val actualSize = size ?: groupConfig.size ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default
+    val groupState = LocalRadioGroupState.current
+    val groupConfig = LocalRadioGroupConfig.current
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val actualSize = size ?: groupConfig.size ?: ComponentSize.Default
     val selected = groupState?.selected == value
     val actualDisabled = disabled || groupConfig.disabled
     val fillColor = if (groupConfig.fill == Color.Unspecified) colorScheme.primary.base else groupConfig.fill
     val activeTextColor = if (groupConfig.textColor == Color.Unspecified) colorScheme.white else groupConfig.textColor
 
     val height = when (actualSize) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+        ComponentSize.Large -> 40.dp
+        ComponentSize.Default -> 32.dp
+        ComponentSize.Small -> 24.dp
     }
     val textStyle = when (actualSize) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
 
     val bg = when {
@@ -273,9 +272,9 @@ fun NexusRadioButton(
     Box(
         modifier = modifier
             .defaultMinSize(minHeight = height)
-            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .clip(NexusTheme.shapes.base)
             .background(bg)
-            .border(1.dp, borderColor, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .border(1.dp, borderColor, NexusTheme.shapes.base)
             .then(
                 if (!actualDisabled) {
                     Modifier
@@ -294,11 +293,11 @@ fun NexusRadioButton(
             .padding(horizontal = 12.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(textColor) {
+        ProvideContentColor(textColor) {
             if (label != null) {
                 label()
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = value?.toString().orEmpty(), style = textStyle)
+                NexusText(text = value?.toString().orEmpty(), style = textStyle)
             }
         }
     }
@@ -309,31 +308,31 @@ private fun RadioVisual(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize,
+    size: ComponentSize,
     disabled: Boolean,
     border: Boolean,
     label: (@Composable () -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val outerSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 16.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 14.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 12.dp
+        ComponentSize.Large -> 16.dp
+        ComponentSize.Default -> 14.dp
+        ComponentSize.Small -> 12.dp
     }
     val innerSize = outerSize - 6.dp
     val radioHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+        ComponentSize.Large -> 40.dp
+        ComponentSize.Default -> 32.dp
+        ComponentSize.Small -> 24.dp
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
 
     val borderColor = when {
@@ -352,8 +351,8 @@ private fun RadioVisual(
                 if (border) {
                     Modifier
                         .defaultMinSize(minHeight = radioHeight)
-                        .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
-                        .border(1.dp, if (selected) colorScheme.primary.base else colorScheme.border.base, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+                        .clip(NexusTheme.shapes.base)
+                        .border(1.dp, if (selected) colorScheme.primary.base else colorScheme.border.base, NexusTheme.shapes.base)
                         .padding(horizontal = 10.dp, vertical = 6.dp)
                 } else {
                     Modifier
@@ -394,7 +393,7 @@ private fun RadioVisual(
         }
 
         if (label != null) {
-            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(textColor) {
+            ProvideContentColor(textColor) {
                 label()
             }
         }

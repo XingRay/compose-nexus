@@ -68,7 +68,7 @@ fun NexusInputNumber(
     value: Double,
     onValueChange: (Double) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     min: Double = -Double.MAX_VALUE,
     max: Double = Double.MAX_VALUE,
     step: Double = 1.0,
@@ -77,10 +77,10 @@ fun NexusInputNumber(
     disabled: Boolean = false,
     readonly: Boolean = false,
     controls: Boolean = true,
-    controlsPosition: io.github.xingray.compose.nexus.controls.NexusInputNumberControlsPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberControlsPosition.Default,
+    controlsPosition: NexusInputNumberControlsPosition = NexusInputNumberControlsPosition.Default,
     placeholder: String = "",
-    valueOnClear: io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear.NaN,
-    align: io.github.xingray.compose.nexus.controls.NexusInputNumberAlign = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberAlign.Center,
+    valueOnClear: NexusInputNumberValueOnClear = NexusInputNumberValueOnClear.NaN,
+    align: NexusInputNumberAlign = NexusInputNumberAlign.Center,
     disabledScientific: Boolean = false,
     increaseIcon: (@Composable () -> Unit)? = null,
     decreaseIcon: (@Composable () -> Unit)? = null,
@@ -92,32 +92,32 @@ fun NexusInputNumber(
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val sizes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.sizes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val sizes = NexusTheme.sizes
+    val typography = NexusTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     var focusedSnapshot by remember { mutableStateOf(value) }
-    var text by remember { mutableStateOf(_root_ide_package_.io.github.xingray.compose.nexus.controls.formatValue(value, precision)) }
+    var text by remember { mutableStateOf(formatValue(value, precision)) }
 
     val height: Dp = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.componentLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.componentDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.componentSmall
+        ComponentSize.Large -> sizes.componentLarge
+        ComponentSize.Default -> sizes.componentDefault
+        ComponentSize.Small -> sizes.componentSmall
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
     val alignStyle = when (align) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberAlign.Left -> TextAlign.Left
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberAlign.Center -> TextAlign.Center
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberAlign.Right -> TextAlign.Right
+        NexusInputNumberAlign.Left -> TextAlign.Left
+        NexusInputNumberAlign.Center -> TextAlign.Center
+        NexusInputNumberAlign.Right -> TextAlign.Right
     }
 
     val borderColor = when {
@@ -130,7 +130,7 @@ fun NexusInputNumber(
 
     LaunchedEffect(value, precision) {
         if (!isFocused) {
-            text = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatValue(value, precision)
+            text = formatValue(value, precision)
         }
     }
 
@@ -143,21 +143,21 @@ fun NexusInputNumber(
         } else {
             clamped
         }
-        val effectivePrecision = precision ?: if (stepStrictly) _root_ide_package_.io.github.xingray.compose.nexus.controls.decimalPlaces(step) else null
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.applyPrecision(strictValue, effectivePrecision)
+        val effectivePrecision = precision ?: if (stepStrictly) decimalPlaces(step) else null
+        return applyPrecision(strictValue, effectivePrecision)
             .coerceIn(min, max)
     }
 
     fun clearValue(): Double = when (valueOnClear) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear.NaN -> Double.NaN
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear.Min -> min
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear.Max -> max
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberValueOnClear.Zero -> 0.0.coerceIn(min, max)
+        NexusInputNumberValueOnClear.NaN -> Double.NaN
+        NexusInputNumberValueOnClear.Min -> min
+        NexusInputNumberValueOnClear.Max -> max
+        NexusInputNumberValueOnClear.Zero -> 0.0.coerceIn(min, max)
     }
 
     fun commit(newValue: Double, oldValue: Double) {
         onValueChange(newValue)
-        if (!_root_ide_package_.io.github.xingray.compose.nexus.controls.numberEquals(newValue, oldValue)) {
+        if (!numberEquals(newValue, oldValue)) {
             onChange?.invoke(newValue, oldValue)
         }
     }
@@ -195,7 +195,7 @@ fun NexusInputNumber(
         val base = if (value.isNaN()) 0.0 else value
         val old = value
         val next = normalize(base + delta)
-        text = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatValue(next, precision)
+        text = formatValue(next, precision)
         commit(next, old)
     }
 
@@ -210,15 +210,15 @@ fun NexusInputNumber(
             .border(1.dp, borderColor, shapes.base),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (controls && controlsPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberControlsPosition.Default) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.StepButton(
+        if (controls && controlsPosition == NexusInputNumberControlsPosition.Default) {
+            StepButton(
                 enabled = canDecrease,
                 size = height,
                 symbol = "−",
                 customIcon = decreaseIcon,
                 onClick = { changeByStep(-step) },
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.Separator(height = height, borderColor = borderColor)
+            Separator(height = height, borderColor = borderColor)
         }
 
         Row(
@@ -229,7 +229,7 @@ fun NexusInputNumber(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             if (prefix != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.placeholder) {
+                ProvideContentColor(colorScheme.text.placeholder) {
                     prefix()
                 }
             }
@@ -252,7 +252,7 @@ fun NexusInputNumber(
                                 parsed != null -> normalize(parsed)
                                 else -> Double.NaN
                             }
-                            text = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatValue(committed, precision)
+                            text = formatValue(committed, precision)
                             commit(committed, focusedSnapshot)
                         }
                     },
@@ -272,7 +272,7 @@ fun NexusInputNumber(
                 decorationBox = { innerTextField ->
                     Box(contentAlignment = Alignment.Center) {
                         if (text.isEmpty() && placeholder.isNotEmpty()) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = placeholder,
                                 color = colorScheme.text.placeholder,
                                 style = textStyle,
@@ -284,37 +284,37 @@ fun NexusInputNumber(
             )
 
             if (suffix != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.placeholder) {
+                ProvideContentColor(colorScheme.text.placeholder) {
                     suffix()
                 }
             }
         }
 
-        if (controls && controlsPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberControlsPosition.Default) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.Separator(height = height, borderColor = borderColor)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.StepButton(
+        if (controls && controlsPosition == NexusInputNumberControlsPosition.Default) {
+            Separator(height = height, borderColor = borderColor)
+            StepButton(
                 enabled = canIncrease,
                 size = height,
                 symbol = "+",
                 customIcon = increaseIcon,
                 onClick = { changeByStep(step) },
             )
-        } else if (controls && controlsPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumberControlsPosition.Right) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.Separator(height = height, borderColor = borderColor)
+        } else if (controls && controlsPosition == NexusInputNumberControlsPosition.Right) {
+            Separator(height = height, borderColor = borderColor)
             Column(
                 modifier = Modifier
                     .width(height)
                     .fillMaxHeight(),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepButton(
+                StepButton(
                     enabled = canIncrease,
                     size = height / 2,
                     symbol = "+",
                     customIcon = increaseIcon,
                     onClick = { changeByStep(step) },
                 )
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.Separator(height = 1.dp, borderColor = borderColor, vertical = false)
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.StepButton(
+                Separator(height = 1.dp, borderColor = borderColor, vertical = false)
+                StepButton(
                     enabled = canDecrease,
                     size = height / 2,
                     symbol = "−",
@@ -334,8 +334,8 @@ private fun StepButton(
     customIcon: (@Composable () -> Unit)?,
     onClick: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     Box(
         modifier = Modifier
             .size(size)
@@ -352,13 +352,13 @@ private fun StepButton(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(
+        ProvideContentColor(
             if (enabled) colorScheme.text.regular else colorScheme.disabled.text,
         ) {
             if (customIcon != null) {
                 customIcon()
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = symbol, style = typography.medium)
+                NexusText(text = symbol, style = typography.medium)
             }
         }
     }

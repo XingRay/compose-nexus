@@ -34,7 +34,7 @@ fun NexusRate(
     onValueChange: (Float) -> Unit,
     modifier: Modifier = Modifier,
     max: Int = 5,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     allowHalf: Boolean = false,
     lowThreshold: Int = 2,
@@ -51,20 +51,20 @@ fun NexusRate(
     disabledVoidIcon: String = "★",
     showText: Boolean = false,
     showScore: Boolean = false,
-    textColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
+    textColor: Color = NexusTheme.colorScheme.text.regular,
     texts: List<String> = listOf("Extremely bad", "Disappointed", "Fair", "Satisfied", "Surprise"),
     scoreTemplate: String = "{value}",
     clearable: Boolean = false,
     onChange: ((Float) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     var hoverValue by remember { mutableFloatStateOf(0f) }
     val displayValue = if (!disabled && hoverValue > 0f) hoverValue else value
     val starSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 24.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 16.dp
+        ComponentSize.Large -> 24.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
     }
     val levelColor = when {
         displayValue <= lowThreshold -> colors.getOrElse(0) { colors.firstOrNull() ?: Color(0xFFF7BA2A) }
@@ -98,7 +98,7 @@ fun NexusRate(
                     modifier = Modifier.size(starSize),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = if (disabled) disabledVoidIcon else voidIcon,
                         color = if (disabled) disabledVoidColor else voidColor,
                         style = typography.large,
@@ -111,7 +111,7 @@ fun NexusRate(
                                 .clipToBounds(),
                             contentAlignment = Alignment.CenterStart,
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = levelIcon,
                                 color = if (disabled) levelColor.copy(alpha = 0.6f) else levelColor,
                                 style = typography.large,
@@ -164,14 +164,14 @@ fun NexusRate(
                 val scoreValue = if (value % 1f == 0f) {
                     value.toInt().toString()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.oneDecimal(value)
+                    oneDecimal(value)
                 }
                 scoreTemplate.replace("{value}", scoreValue)
             } else {
                 val index = ceil(value.coerceAtLeast(1f)).toInt().coerceIn(1, texts.size) - 1
                 texts.getOrElse(index) { "" }
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = text,
                 color = if (disabled) colorScheme.text.disabled else textColor,
                 style = typography.small.merge(androidx.compose.ui.text.TextStyle(textAlign = TextAlign.Start)),

@@ -42,10 +42,10 @@ data class NexusDate(
  */
 @Stable
 class DatePickerState(
-    initialDate: io.github.xingray.compose.nexus.controls.NexusDate? = null,
+    initialDate: NexusDate? = null,
 ) {
     var selectedDate by mutableStateOf(initialDate)
-    val selectedDates = mutableStateListOf<io.github.xingray.compose.nexus.controls.NexusDate>()
+    val selectedDates = mutableStateListOf<NexusDate>()
     var viewYear by mutableIntStateOf(initialDate?.year ?: 2026)
         private set
     var viewMonth by mutableIntStateOf(initialDate?.month ?: 1)
@@ -56,20 +56,20 @@ class DatePickerState(
     fun open() { isOpen = true }
     fun close() { isOpen = false }
 
-    fun select(date: io.github.xingray.compose.nexus.controls.NexusDate) {
+    fun select(date: NexusDate) {
         selectedDate = date
         viewYear = date.year
         viewMonth = date.month
         isOpen = false
     }
 
-    fun selectWithoutClosing(date: io.github.xingray.compose.nexus.controls.NexusDate) {
+    fun selectWithoutClosing(date: NexusDate) {
         selectedDate = date
         viewYear = date.year
         viewMonth = date.month
     }
 
-    fun toggleDate(date: io.github.xingray.compose.nexus.controls.NexusDate) {
+    fun toggleDate(date: NexusDate) {
         if (date in selectedDates) {
             selectedDates.remove(date)
         } else {
@@ -106,8 +106,8 @@ class DatePickerState(
 
 @Composable
 fun rememberDatePickerState(
-    initialDate: io.github.xingray.compose.nexus.controls.NexusDate? = null,
-): io.github.xingray.compose.nexus.controls.DatePickerState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.DatePickerState(initialDate) }
+    initialDate: NexusDate? = null,
+): DatePickerState = remember { DatePickerState(initialDate) }
 
 enum class NexusDatePickerPanelType {
     Year,
@@ -134,13 +134,13 @@ enum class NexusDatePickerPanelType {
  */
 @Composable
 fun NexusDatePicker(
-    state: io.github.xingray.compose.nexus.controls.DatePickerState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberDatePickerState(),
+    state: DatePickerState = rememberDatePickerState(),
     modifier: Modifier = Modifier,
     placeholder: String = "Select date",
     disabled: Boolean = false,
     clearable: Boolean = true,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
-    type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Date,
+    size: io.github.xingray.compose.nexus.theme.ComponentSize = io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    type: NexusDatePickerPanelType = NexusDatePickerPanelType.Date,
     showFooter: Boolean = true,
     showConfirm: Boolean = true,
     showWeekNumber: Boolean = false,
@@ -148,17 +148,17 @@ fun NexusDatePicker(
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
-    onPanelChange: ((io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType) -> Unit)? = null,
-    onDateChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)? = null,
+    onPanelChange: ((NexusDate, NexusDatePickerPanelType) -> Unit)? = null,
+    onDateChange: ((NexusDate) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val displayText = state.selectedDate?.let {
         when (type) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Month, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Months, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.MonthRange ->
+            NexusDatePickerPanelType.Month, NexusDatePickerPanelType.Months, NexusDatePickerPanelType.MonthRange ->
                 "${it.year}-${it.month.toString().padStart(2, '0')}"
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Year, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Years, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.YearRange ->
+            NexusDatePickerPanelType.Year, NexusDatePickerPanelType.Years, NexusDatePickerPanelType.YearRange ->
                 "${it.year}"
             else -> "${it.year}-${it.month.toString().padStart(2, '0')}-${it.day.toString().padStart(2, '0')}"
         }
@@ -166,7 +166,7 @@ fun NexusDatePicker(
 
     Column(modifier = modifier) {
         // Input trigger
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = displayText,
             onValueChange = { newValue ->
                 if (newValue.isEmpty() && displayText.isNotEmpty()) {
@@ -191,7 +191,7 @@ fun NexusDatePicker(
                 ),
             suffix = {
                 if (clearable && displayText.isNotEmpty() && !disabled) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "✕",
                         style = typography.extraSmall,
                         color = colorScheme.text.placeholder,
@@ -201,7 +201,7 @@ fun NexusDatePicker(
                         },
                     )
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "📅", style = typography.extraSmall)
+                    NexusText(text = "📅", style = typography.extraSmall)
                 }
             },
         )
@@ -217,7 +217,7 @@ fun NexusDatePicker(
                     onBlur?.invoke()
                 },
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanel(
+                NexusDatePickerPanel(
                     state = state,
                     type = type,
                     border = true,
@@ -228,9 +228,9 @@ fun NexusDatePicker(
                     onDateChange = {
                         onDateChange?.invoke(it)
                         if (type !in setOf(
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Dates,
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Months,
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Years,
+                                NexusDatePickerPanelType.Dates,
+                                NexusDatePickerPanelType.Months,
+                                NexusDatePickerPanelType.Years,
                             )
                         ) {
                             state.close()
@@ -246,22 +246,22 @@ fun NexusDatePicker(
 
 @Composable
 fun NexusDatePickerPanel(
-    state: io.github.xingray.compose.nexus.controls.DatePickerState,
+    state: DatePickerState,
     modifier: Modifier = Modifier,
     border: Boolean = true,
     disabled: Boolean = false,
     clearable: Boolean = true,
-    type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Date,
+    type: NexusDatePickerPanelType = NexusDatePickerPanelType.Date,
     showFooter: Boolean = false,
     showConfirm: Boolean = false,
     showWeekNumber: Boolean = false,
-    onPanelChange: ((io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType) -> Unit)? = null,
+    onPanelChange: ((NexusDate, NexusDatePickerPanelType) -> Unit)? = null,
     onClear: (() -> Unit)? = null,
-    onDateChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)? = null,
+    onDateChange: ((NexusDate) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -279,42 +279,42 @@ fun NexusDatePickerPanel(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NavButton("«", disabled = disabled) {
+                NavButton("«", disabled = disabled) {
                     state.prevYear()
                     onPanelChange?.invoke(
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, state.viewMonth, 1),
+                        NexusDate(state.viewYear, state.viewMonth, 1),
                         type,
                     )
                 }
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NavButton("‹", disabled = disabled) {
+                NavButton("‹", disabled = disabled) {
                     state.prevMonth()
                     onPanelChange?.invoke(
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, state.viewMonth, 1),
+                        NexusDate(state.viewYear, state.viewMonth, 1),
                         type,
                     )
                 }
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = when (type) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Year, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Years -> "${state.viewYear - 6} - ${state.viewYear + 5}"
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Month, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Months, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.MonthRange -> "${state.viewYear}"
+                    NexusDatePickerPanelType.Year, NexusDatePickerPanelType.Years -> "${state.viewYear - 6} - ${state.viewYear + 5}"
+                    NexusDatePickerPanelType.Month, NexusDatePickerPanelType.Months, NexusDatePickerPanelType.MonthRange -> "${state.viewYear}"
                     else -> "${state.viewYear} / ${state.viewMonth.toString().padStart(2, '0')}"
                 },
                 color = colorScheme.text.primary,
                 style = typography.base,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NavButton("›", disabled = disabled) {
+                NavButton("›", disabled = disabled) {
                     state.nextMonth()
                     onPanelChange?.invoke(
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, state.viewMonth, 1),
+                        NexusDate(state.viewYear, state.viewMonth, 1),
                         type,
                     )
                 }
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NavButton("»", disabled = disabled) {
+                NavButton("»", disabled = disabled) {
                     state.nextYear()
                     onPanelChange?.invoke(
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, state.viewMonth, 1),
+                        NexusDate(state.viewYear, state.viewMonth, 1),
                         type,
                     )
                 }
@@ -322,31 +322,31 @@ fun NexusDatePickerPanel(
         }
 
         when (type) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Year,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Years,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.YearRange -> {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.YearPanel(
+            NexusDatePickerPanelType.Year,
+            NexusDatePickerPanelType.Years,
+            NexusDatePickerPanelType.YearRange -> {
+                YearPanel(
                     state = state,
                     disabled = disabled,
-                    multiple = type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Years,
+                    multiple = type == NexusDatePickerPanelType.Years,
                     onDateChange = onDateChange,
                 )
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Month,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Months,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.MonthRange -> {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MonthPanel(
+            NexusDatePickerPanelType.Month,
+            NexusDatePickerPanelType.Months,
+            NexusDatePickerPanelType.MonthRange -> {
+                MonthPanel(
                     state = state,
                     disabled = disabled,
-                    multiple = type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Months,
+                    multiple = type == NexusDatePickerPanelType.Months,
                     onDateChange = onDateChange,
                 )
             }
             else -> {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DatePanel(
+                DatePanel(
                     state = state,
                     disabled = disabled,
-                    multiple = type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Dates,
+                    multiple = type == NexusDatePickerPanelType.Dates,
                     showWeekNumber = showWeekNumber,
                     onDateChange = onDateChange,
                 )
@@ -362,7 +362,7 @@ fun NexusDatePickerPanel(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (clearable) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "Clear",
                         color = if (disabled) colorScheme.text.disabled else colorScheme.text.secondary,
                         style = typography.small,
@@ -383,12 +383,12 @@ fun NexusDatePickerPanel(
                     )
                 }
                 if (showConfirm) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = "Confirm",
                         onClick = { state.close() },
-                        size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                        size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
                         disabled = disabled,
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                        type = io.github.xingray.compose.nexus.theme.NexusType.Primary,
                     )
                 }
             }
@@ -398,10 +398,10 @@ fun NexusDatePickerPanel(
 
 @Composable
 private fun NavButton(text: String, disabled: Boolean = false, onClick: () -> Unit) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+    NexusText(
         text = text,
         color = if (disabled) colorScheme.text.disabled else colorScheme.text.secondary,
         style = typography.base,
@@ -421,14 +421,14 @@ private fun NavButton(text: String, disabled: Boolean = false, onClick: () -> Un
 
 @Composable
 private fun DatePanel(
-    state: io.github.xingray.compose.nexus.controls.DatePickerState,
+    state: DatePickerState,
     disabled: Boolean,
     multiple: Boolean,
     showWeekNumber: Boolean,
-    onDateChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)?,
+    onDateChange: ((NexusDate) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val weekdays = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     Row(
@@ -437,18 +437,18 @@ private fun DatePanel(
     ) {
         if (showWeekNumber) {
             Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "W", color = colorScheme.text.secondary, style = typography.extraSmall)
+                NexusText(text = "W", color = colorScheme.text.secondary, style = typography.extraSmall)
             }
         }
         weekdays.forEach { day ->
             Box(modifier = Modifier.size(32.dp), contentAlignment = Alignment.Center) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = day, color = colorScheme.text.secondary, style = typography.extraSmall)
+                NexusText(text = day, color = colorScheme.text.secondary, style = typography.extraSmall)
             }
         }
     }
 
-    val daysInMonth = _root_ide_package_.io.github.xingray.compose.nexus.controls.daysInMonth(state.viewYear, state.viewMonth)
-    val firstDayOfWeek = _root_ide_package_.io.github.xingray.compose.nexus.controls.dayOfWeek(state.viewYear, state.viewMonth, 1)
+    val daysInMonth = daysInMonth(state.viewYear, state.viewMonth)
+    val firstDayOfWeek = dayOfWeek(state.viewYear, state.viewMonth, 1)
     val totalCells = firstDayOfWeek + daysInMonth
     val rows = (totalCells + 6) / 7
 
@@ -462,16 +462,16 @@ private fun DatePanel(
                     val weekStart = row * 7 - firstDayOfWeek + 1
                     val weekNo = if (weekStart > 0) ((weekStart - 1) / 7 + 1) else row + 1
                     Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = weekNo.toString(), color = colorScheme.text.placeholder, style = typography.extraSmall)
+                        NexusText(text = weekNo.toString(), color = colorScheme.text.placeholder, style = typography.extraSmall)
                     }
                 }
                 for (col in 0..6) {
                     val cellIndex = row * 7 + col
                     val dayNum = cellIndex - firstDayOfWeek + 1
                     if (dayNum in 1..daysInMonth) {
-                        val date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, state.viewMonth, dayNum)
+                        val date = NexusDate(state.viewYear, state.viewMonth, dayNum)
                         val isSelected = if (multiple) date in state.selectedDates else state.selectedDate == date
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.DayCell(
+                        DayCell(
                             day = dayNum,
                             isSelected = isSelected,
                             isCurrentMonth = true,
@@ -496,10 +496,10 @@ private fun DatePanel(
 
 @Composable
 private fun MonthPanel(
-    state: io.github.xingray.compose.nexus.controls.DatePickerState,
+    state: DatePickerState,
     disabled: Boolean,
     multiple: Boolean,
-    onDateChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)?,
+    onDateChange: ((NexusDate) -> Unit)?,
 ) {
     val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
     Column(modifier = Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -507,13 +507,13 @@ private fun MonthPanel(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 for (col in 0 until 3) {
                     val month = row * 3 + col + 1
-                    val date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(state.viewYear, month, 1)
+                    val date = NexusDate(state.viewYear, month, 1)
                     val selected = if (multiple) date in state.selectedDates else state.selectedDate?.let { it.year == date.year && it.month == date.month } == true
                     Box(
                         modifier = Modifier
                             .size(width = 80.dp, height = 44.dp)
                             .clip(CircleShape)
-                            .background(if (selected) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base else Color.Transparent)
+                            .background(if (selected) NexusTheme.colorScheme.primary.base else Color.Transparent)
                             .then(
                                 if (!disabled) {
                                     Modifier
@@ -532,10 +532,10 @@ private fun MonthPanel(
                             ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = months[month - 1],
-                            color = if (selected) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.white else if (disabled) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.disabled else _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                            color = if (selected) NexusTheme.colorScheme.white else if (disabled) NexusTheme.colorScheme.text.disabled else NexusTheme.colorScheme.text.regular,
+                            style = NexusTheme.typography.small,
                         )
                     }
                 }
@@ -546,10 +546,10 @@ private fun MonthPanel(
 
 @Composable
 private fun YearPanel(
-    state: io.github.xingray.compose.nexus.controls.DatePickerState,
+    state: DatePickerState,
     disabled: Boolean,
     multiple: Boolean,
-    onDateChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)?,
+    onDateChange: ((NexusDate) -> Unit)?,
 ) {
     val startYear = state.viewYear - 6
     Column(modifier = Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -557,13 +557,13 @@ private fun YearPanel(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 for (col in 0 until 3) {
                     val year = startYear + row * 3 + col
-                    val date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(year, 1, 1)
+                    val date = NexusDate(year, 1, 1)
                     val selected = if (multiple) date in state.selectedDates else state.selectedDate?.year == year
                     Box(
                         modifier = Modifier
                             .size(width = 80.dp, height = 44.dp)
                             .clip(CircleShape)
-                            .background(if (selected) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base else Color.Transparent)
+                            .background(if (selected) NexusTheme.colorScheme.primary.base else Color.Transparent)
                             .then(
                                 if (!disabled) {
                                     Modifier
@@ -582,10 +582,10 @@ private fun YearPanel(
                             ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = year.toString(),
-                            color = if (selected) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.white else if (disabled) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.disabled else _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                            color = if (selected) NexusTheme.colorScheme.white else if (disabled) NexusTheme.colorScheme.text.disabled else NexusTheme.colorScheme.text.regular,
+                            style = NexusTheme.typography.small,
                         )
                     }
                 }
@@ -602,8 +602,8 @@ private fun DayCell(
     disabled: Boolean = false,
     onClick: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val bgColor = if (isSelected) colorScheme.primary.base else Color.Transparent
     val textColor = when {
@@ -629,7 +629,7 @@ private fun DayCell(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = day.toString(),
             color = textColor,
             style = typography.extraSmall,
@@ -641,7 +641,7 @@ private fun DayCell(
 private fun daysInMonth(year: Int, month: Int): Int = when (month) {
     1, 3, 5, 7, 8, 10, 12 -> 31
     4, 6, 9, 11 -> 30
-    2 -> if (_root_ide_package_.io.github.xingray.compose.nexus.controls.isLeapYear(year)) 29 else 28
+    2 -> if (isLeapYear(year)) 29 else 28
     else -> 30
 }
 

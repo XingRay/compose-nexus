@@ -58,19 +58,19 @@ class NexusColorPickerState(
 @Composable
 fun rememberNexusColorPickerState(
     initialVisible: Boolean = false,
-): io.github.xingray.compose.nexus.controls.NexusColorPickerState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorPickerState(initialVisible) }
+): NexusColorPickerState = remember { NexusColorPickerState(initialVisible) }
 
 @Composable
 fun NexusColorPicker(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.NexusColorPickerState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberNexusColorPickerState(),
+    state: NexusColorPickerState = rememberNexusColorPickerState(),
     disabled: Boolean = false,
     clearable: Boolean = true,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     showAlpha: Boolean = false,
-    colorFormat: io.github.xingray.compose.nexus.controls.NexusColorFormat? = null,
+    colorFormat: NexusColorFormat? = null,
     predefine: List<String> = emptyList(),
     validateEvent: Boolean = true,
     onChange: ((String) -> Unit)? = null,
@@ -79,8 +79,8 @@ fun NexusColorPicker(
     onBlur: (() -> Unit)? = null,
     onClear: (() -> Unit)? = null,
 ) {
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colors = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -88,17 +88,17 @@ fun NexusColorPicker(
     var panelWidthPx by remember { mutableIntStateOf(280) }
 
     val controlHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+        ComponentSize.Large -> 40.dp
+        ComponentSize.Default -> 32.dp
+        ComponentSize.Small -> 24.dp
     }
     val previewSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 16.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 12.dp
+        ComponentSize.Large -> 20.dp
+        ComponentSize.Default -> 16.dp
+        ComponentSize.Small -> 12.dp
     }
 
-    val parsedColor = remember(value) { _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePickerColor(value) }
+    val parsedColor = remember(value) { parsePickerColor(value) }
 
     Box(modifier = modifier) {
         Row(
@@ -138,23 +138,23 @@ fun NexusColorPicker(
             Box(
                 modifier = Modifier
                     .size(previewSize)
-                    .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+                    .clip(NexusTheme.shapes.small)
                     .drawCheckerboardBackground()
                     .background(parsedColor ?: colors.fill.blank)
-                    .border(1.dp, colors.border.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small),
+                    .border(1.dp, colors.border.light, NexusTheme.shapes.small),
             )
 
             if (value.isBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "Pick",
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                    style = NexusTheme.typography.small,
                     color = colors.text.placeholder,
                     modifier = Modifier.weight(1f),
                 )
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = value,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                    style = NexusTheme.typography.small,
                     color = if (disabled) colors.text.disabled else colors.text.regular,
                     modifier = Modifier.weight(1f),
                     truncated = true,
@@ -162,9 +162,9 @@ fun NexusColorPicker(
             }
 
             if (clearable && value.isNotBlank() && isHovered && !disabled) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "✕",
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                    style = NexusTheme.typography.extraSmall,
                     color = colors.text.secondary,
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -175,9 +175,9 @@ fun NexusColorPicker(
                     },
                 )
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = if (state.isVisible) "▴" else "▾",
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                    style = NexusTheme.typography.extraSmall,
                     color = colors.text.placeholder,
                 )
             }
@@ -193,7 +193,7 @@ fun NexusColorPicker(
                     onBlur?.invoke()
                 },
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorPickerPanel(
+                NexusColorPickerPanel(
                     value = if (value.isBlank()) "#409EFF" else value,
                     onValueChange = {
                         onValueChange(it)

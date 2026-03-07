@@ -46,7 +46,7 @@ enum class ErrorType {
 @Composable
 fun NexusErrorPage(
     modifier: Modifier = Modifier,
-    errorType: io.github.xingray.compose.nexus.templates.ErrorType = _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.NotFound,
+    errorType: ErrorType = ErrorType.NotFound,
     title: String? = null,
     subtitle: String? = null,
     errorCode: String? = null,
@@ -54,35 +54,35 @@ fun NexusErrorPage(
     onRetry: (() -> Unit)? = null,
     extraActions: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val resolvedCode = errorCode ?: when (errorType) {
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.NotFound -> "404"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Forbidden -> "403"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.ServerError -> "500"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Custom -> "Error"
+        ErrorType.NotFound -> "404"
+        ErrorType.Forbidden -> "403"
+        ErrorType.ServerError -> "500"
+        ErrorType.Custom -> "Error"
     }
 
     val resolvedTitle = title ?: when (errorType) {
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.NotFound -> "Page Not Found"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Forbidden -> "Access Denied"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.ServerError -> "Server Error"
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Custom -> "Something Went Wrong"
+        ErrorType.NotFound -> "Page Not Found"
+        ErrorType.Forbidden -> "Access Denied"
+        ErrorType.ServerError -> "Server Error"
+        ErrorType.Custom -> "Something Went Wrong"
     }
 
     val resolvedSubtitle = subtitle ?: when (errorType) {
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.NotFound -> "The page you are looking for does not exist."
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Forbidden -> "You do not have permission to access this page."
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.ServerError -> "An unexpected error occurred. Please try again later."
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Custom -> "Please check your connection or try again."
+        ErrorType.NotFound -> "The page you are looking for does not exist."
+        ErrorType.Forbidden -> "You do not have permission to access this page."
+        ErrorType.ServerError -> "An unexpected error occurred. Please try again later."
+        ErrorType.Custom -> "Please check your connection or try again."
     }
 
     val accentColor: Color = when (errorType) {
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.NotFound -> colorScheme.info.base
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Forbidden -> colorScheme.warning.base
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.ServerError -> colorScheme.danger.base
-        _root_ide_package_.io.github.xingray.compose.nexus.templates.ErrorType.Custom -> colorScheme.primary.base
+        ErrorType.NotFound -> colorScheme.info.base
+        ErrorType.Forbidden -> colorScheme.warning.base
+        ErrorType.ServerError -> colorScheme.danger.base
+        ErrorType.Custom -> colorScheme.primary.base
     }
 
     Box(
@@ -96,7 +96,7 @@ fun NexusErrorPage(
             modifier = Modifier.padding(40.dp),
         ) {
             // Error code
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = resolvedCode,
                 color = accentColor.copy(alpha = 0.3f),
                 style = typography.extraLarge,
@@ -106,7 +106,7 @@ fun NexusErrorPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Title
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = resolvedTitle,
                 color = colorScheme.text.primary,
                 style = typography.extraLarge,
@@ -115,7 +115,7 @@ fun NexusErrorPage(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Subtitle
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = resolvedSubtitle,
                 color = colorScheme.text.secondary,
                 style = typography.base,
@@ -126,16 +126,16 @@ fun NexusErrorPage(
             // Action buttons
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (onGoBack != null) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         onClick = onGoBack,
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                        type = NexusType.Primary,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Go Home")
+                        NexusText(text = "Go Home")
                     }
                 }
                 if (onRetry != null) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = onRetry) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Retry")
+                    NexusButton(onClick = onRetry) {
+                        NexusText(text = "Retry")
                     }
                 }
             }

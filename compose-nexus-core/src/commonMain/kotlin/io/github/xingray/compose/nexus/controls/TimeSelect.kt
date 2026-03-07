@@ -27,11 +27,11 @@ class TimeSelectState(
 @Composable
 fun rememberTimeSelectState(
     initialValue: String? = null,
-): io.github.xingray.compose.nexus.controls.TimeSelectState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeSelectState(initialValue) }
+): TimeSelectState = remember { TimeSelectState(initialValue) }
 
 @Composable
 fun NexusTimeSelect(
-    state: io.github.xingray.compose.nexus.controls.TimeSelectState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTimeSelectState(),
+    state: TimeSelectState = rememberTimeSelectState(),
     modifier: Modifier = Modifier,
     start: String = "09:00",
     end: String = "18:00",
@@ -44,7 +44,7 @@ fun NexusTimeSelect(
     disabled: Boolean = false,
     editable: Boolean = true,
     clearable: Boolean = true,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     prefixIcon: (@Composable () -> Unit)? = null,
     clearIcon: (@Composable () -> Unit)? = null,
     emptyValues: Set<Any?> = setOf(null, ""),
@@ -55,7 +55,7 @@ fun NexusTimeSelect(
     onClear: (() -> Unit)? = null,
 ) {
     val options = remember(start, end, step, minTime, maxTime, includeEndTime, format) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.buildTimeSelectOptions(
+        buildTimeSelectOptions(
             start = start,
             end = end,
             step = step,
@@ -65,7 +65,7 @@ fun NexusTimeSelect(
             format = format,
         )
     }
-    val selectState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSelectState<String>()
+    val selectState = rememberSelectState<String>()
 
     LaunchedEffect(state.value) {
         if (selectState.selected != state.value) {
@@ -73,7 +73,7 @@ fun NexusTimeSelect(
         }
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSelect(
+    NexusSelect(
         state = selectState,
         options = options,
         onSelect = {
@@ -87,7 +87,7 @@ fun NexusTimeSelect(
         clearable = clearable,
         clearIcon = clearIcon,
         filterable = editable,
-        prefix = prefixIcon ?: { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "🕐") },
+        prefix = prefixIcon ?: { NexusText(text = "🕐") },
         emptyValues = emptyValues,
         valueOnClear = valueOnClear,
         onVisibleChange = { state.expanded = it },
@@ -121,22 +121,22 @@ private fun buildTimeSelectOptions(
     maxTime: String?,
     includeEndTime: Boolean,
     format: String,
-): List<io.github.xingray.compose.nexus.controls.SelectOption<String>> {
-    val startMinute = _root_ide_package_.io.github.xingray.compose.nexus.controls.parseTimeToMinutes(start) ?: return emptyList()
-    val endMinute = _root_ide_package_.io.github.xingray.compose.nexus.controls.parseTimeToMinutes(end) ?: return emptyList()
-    val stepMinute = _root_ide_package_.io.github.xingray.compose.nexus.controls.parseTimeToMinutes(step)?.takeIf { it > 0 } ?: 30
+): List<SelectOption<String>> {
+    val startMinute = parseTimeToMinutes(start) ?: return emptyList()
+    val endMinute = parseTimeToMinutes(end) ?: return emptyList()
+    val stepMinute = parseTimeToMinutes(step)?.takeIf { it > 0 } ?: 30
     val minMinute = minTime?.let(::parseTimeToMinutes)
     val maxMinute = maxTime?.let(::parseTimeToMinutes)
     if (startMinute > endMinute) return emptyList()
 
-    val result = mutableListOf<io.github.xingray.compose.nexus.controls.SelectOption<String>>()
+    val result = mutableListOf<SelectOption<String>>()
     var current = startMinute
     while (current < endMinute || (includeEndTime && current == endMinute)) {
-        val label = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatMinutes(current, format)
+        val label = formatMinutes(current, format)
         val disabled = (minMinute != null && current < minMinute) ||
             (maxMinute != null && current > maxMinute)
         result.add(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOption(
+            SelectOption(
                 value = label,
                 label = label,
                 disabled = disabled,

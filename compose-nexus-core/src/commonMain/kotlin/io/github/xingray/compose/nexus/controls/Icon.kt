@@ -45,11 +45,11 @@ fun NexusIcon(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     size: Dp = 16.dp,
-    color: Color = _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current,
+    color: Color = LocalContentColor.current,
     spinning: Boolean = false,
 ) {
     val colorFilter = if (color.isSpecified) ColorFilter.tint(color) else null
-    val spinModifier = _root_ide_package_.io.github.xingray.compose.nexus.controls.spinningModifier(spinning)
+    val spinModifier = spinningModifier(spinning)
     val semanticsModifier = if (contentDescription != null) {
         Modifier.semantics {
             this.contentDescription = contentDescription
@@ -80,10 +80,10 @@ fun NexusIcon(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     size: Dp = 16.dp,
-    color: Color = _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current,
+    color: Color = LocalContentColor.current,
     spinning: Boolean = false,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusIcon(
+    NexusIcon(
         painter = rememberVectorPainter(imageVector),
         contentDescription = contentDescription,
         modifier = modifier,
@@ -101,11 +101,11 @@ fun NexusIcon(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     size: Dp = 16.dp,
-    color: Color = _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current,
+    color: Color = LocalContentColor.current,
     spinning: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val spinModifier = _root_ide_package_.io.github.xingray.compose.nexus.controls.spinningModifier(spinning)
+    val spinModifier = spinningModifier(spinning)
     val semanticsModifier = if (contentDescription != null) {
         Modifier.semantics {
             this.contentDescription = contentDescription
@@ -120,7 +120,7 @@ fun NexusIcon(
             .size(size)
             .then(spinModifier),
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(color) {
+        ProvideContentColor(color) {
             content()
         }
     }

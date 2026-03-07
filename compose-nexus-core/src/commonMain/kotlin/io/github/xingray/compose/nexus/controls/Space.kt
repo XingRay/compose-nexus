@@ -28,14 +28,14 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
 @Composable
 fun NexusSpace(
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.controls.SpaceDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal,
-    size: Dp = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.sizes.spacingSmall,
+    direction: SpaceDirection = SpaceDirection.Horizontal,
+    size: Dp = NexusTheme.sizes.spacingSmall,
     verticalSize: Dp = size,
     wrap: Boolean = false,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable () -> Unit,
 ) {
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal && wrap) {
+    if (direction == SpaceDirection.Horizontal && wrap) {
         FlowRow(
             modifier = modifier,
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(size),
@@ -45,7 +45,7 @@ fun NexusSpace(
         return
     }
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal) {
+    if (direction == SpaceDirection.Horizontal) {
         Row(
             modifier = modifier,
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(size),
@@ -68,11 +68,11 @@ fun NexusSpace(
 fun NexusSpace(
     items: List<@Composable () -> Unit>,
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.controls.SpaceDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal,
-    spaceSize: io.github.xingray.compose.nexus.controls.NexusSpaceSize = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSpaceSize.Small,
+    direction: SpaceDirection = SpaceDirection.Horizontal,
+    spaceSize: NexusSpaceSize = NexusSpaceSize.Small,
     wrap: Boolean = false,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
-    spacer: io.github.xingray.compose.nexus.controls.NexusSpaceSpacer? = null,
+    spacer: NexusSpaceSpacer? = null,
     fill: Boolean = false,
     fillRatio: Int = 100,
 ) {
@@ -82,7 +82,7 @@ fun NexusSpace(
 
     val fraction = (fillRatio / 100f).coerceIn(0.01f, 1f)
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal && wrap) {
+    if (direction == SpaceDirection.Horizontal && wrap) {
         FlowRow(
             modifier = modifier,
             horizontalArrangement = if (spacer == null) {
@@ -99,14 +99,14 @@ fun NexusSpace(
                     item()
                 }
                 if (index < items.lastIndex && spacer != null) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
+                    RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
                 }
             }
         }
         return
     }
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal) {
+    if (direction == SpaceDirection.Horizontal) {
         Row(
             modifier = modifier,
             verticalAlignment = alignment,
@@ -119,7 +119,7 @@ fun NexusSpace(
                 }
                 if (index < items.lastIndex) {
                     if (spacer != null) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
+                        RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
                     } else {
                         Spacer(modifier = Modifier.width(spaceSize.horizontal))
                     }
@@ -136,7 +136,7 @@ fun NexusSpace(
                 }
                 if (index < items.lastIndex) {
                     if (spacer != null) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
+                        RenderSpaceSpacer(spacer = spacer, direction = direction, size = spaceSize)
                     } else {
                         Spacer(modifier = Modifier.height(spaceSize.vertical))
                     }
@@ -167,23 +167,23 @@ data class NexusSpaceSize(
 
 @Composable
 private fun RenderSpaceSpacer(
-    spacer: io.github.xingray.compose.nexus.controls.NexusSpaceSpacer,
-    direction: io.github.xingray.compose.nexus.controls.SpaceDirection,
-    size: io.github.xingray.compose.nexus.controls.NexusSpaceSize,
+    spacer: NexusSpaceSpacer,
+    direction: SpaceDirection,
+    size: NexusSpaceSize,
 ) {
     when (spacer) {
-        is io.github.xingray.compose.nexus.controls.NexusSpaceSpacer.Literal -> _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        is NexusSpaceSpacer.Literal -> NexusText(
             text = spacer.text,
-            color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary
+            color = NexusTheme.colorScheme.text.secondary
         )
-        is io.github.xingray.compose.nexus.controls.NexusSpaceSpacer.Numeric -> _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        is NexusSpaceSpacer.Numeric -> NexusText(
             text = spacer.value.toString(),
-            color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary
+            color = NexusTheme.colorScheme.text.secondary
         )
-        is io.github.xingray.compose.nexus.controls.NexusSpaceSpacer.Content -> spacer.content()
+        is NexusSpaceSpacer.Content -> spacer.content()
     }
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SpaceDirection.Horizontal) {
+    if (direction == SpaceDirection.Horizontal) {
         Spacer(modifier = Modifier.width(size.horizontal))
     } else {
         Spacer(modifier = Modifier.height(size.vertical))

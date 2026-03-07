@@ -71,12 +71,12 @@ private data class ButtonColors(
 )
 
 private data class ButtonGroupConfig(
-    val size: io.github.xingray.compose.nexus.theme.ComponentSize?,
-    val type: io.github.xingray.compose.nexus.theme.NexusType?,
+    val size: ComponentSize?,
+    val type: NexusType?,
 )
 
 private val LocalButtonGroupConfig = compositionLocalOf {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonGroupConfig(
+    ButtonGroupConfig(
         size = null,
         type = null,
     )
@@ -138,7 +138,7 @@ private fun Modifier.drawShapeOverlayStroke(
 
 @Composable
 private fun resolveButtonColors(
-    type: io.github.xingray.compose.nexus.theme.NexusType,
+    type: NexusType,
     plain: Boolean,
     dashed: Boolean,
     text: Boolean,
@@ -148,21 +148,21 @@ private fun resolveButtonColors(
     isHovered: Boolean,
     isPressed: Boolean,
     disabled: Boolean,
-): io.github.xingray.compose.nexus.controls.ButtonColors {
-    val cs = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+): ButtonColors {
+    val cs = NexusTheme.colorScheme
 
     // Custom color button
     if (customColor != null) {
-        val tc = _root_ide_package_.io.github.xingray.compose.nexus.theme.generateTypeColor(customColor)
+        val tc = generateTypeColor(customColor)
         if (disabled) {
             return if (plain) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = cs.fill.blank,
                     content = tc.light5,
                     border = tc.light5,
                 )
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = tc.light5,
                     content = cs.white,
                     border = tc.light5,
@@ -171,17 +171,17 @@ private fun resolveButtonColors(
         }
         if (plain) {
             return when {
-                isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isPressed -> ButtonColors(
                     background = tc.dark2,
                     content = cs.white,
                     border = tc.dark2,
                 )
-                isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isHovered -> ButtonColors(
                     background = tc.base,
                     content = cs.white,
                     border = tc.base,
                 )
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                else -> ButtonColors(
                     background = Color.Transparent,
                     content = tc.base,
                     border = tc.base,
@@ -189,17 +189,17 @@ private fun resolveButtonColors(
             }
         }
         return when {
-            isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isPressed -> ButtonColors(
                 background = tc.dark2,
                 content = cs.white,
                 border = tc.dark2,
             )
-            isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isHovered -> ButtonColors(
                 background = tc.light3,
                 content = cs.white,
                 border = tc.light3,
             )
-            else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            else -> ButtonColors(
                 background = tc.base,
                 content = cs.white,
                 border = tc.base,
@@ -207,19 +207,19 @@ private fun resolveButtonColors(
         }
     }
 
-    val tc: io.github.xingray.compose.nexus.theme.TypeColor? = cs.typeColor(type)
+    val tc: TypeColor? = cs.typeColor(type)
 
     // Link button
     if (link) {
         val baseColor = tc?.base ?: cs.primary.base
         if (disabled) {
-            return _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            return ButtonColors(
                 background = Color.Transparent,
                 content = cs.text.placeholder,
                 border = Color.Transparent,
             )
         }
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+        return ButtonColors(
             background = Color.Transparent,
             content = when {
                 isPressed -> tc?.dark2 ?: cs.primary.dark2
@@ -234,13 +234,13 @@ private fun resolveButtonColors(
     if (text) {
         val baseColor = tc?.base ?: cs.text.regular
         if (disabled) {
-            return _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            return ButtonColors(
                 background = if (bg) cs.fill.light else Color.Transparent,
                 content = cs.text.placeholder,
                 border = Color.Transparent,
             )
         }
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+        return ButtonColors(
             background = when {
                 bg && isPressed -> cs.fill.darker
                 bg && isHovered -> cs.fill.light
@@ -262,13 +262,13 @@ private fun resolveButtonColors(
     if (dashed) {
         if (disabled) {
             return if (tc != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = tc.light9,
                     content = tc.light5,
                     border = tc.light8,
                 )
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = cs.fill.blank,
                     content = cs.text.placeholder,
                     border = cs.border.lighter,
@@ -278,17 +278,17 @@ private fun resolveButtonColors(
         if (tc == null) {
             // Default type dashed
             return when {
-                isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isPressed -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.primary.base,
                     border = cs.primary.light5,
                 )
-                isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isHovered -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.primary.base,
                     border = cs.primary.base,
                 )
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                else -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.text.regular,
                     border = cs.border.base,
@@ -297,17 +297,17 @@ private fun resolveButtonColors(
         }
         // Typed dashed
         return when {
-            isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isPressed -> ButtonColors(
                 background = tc.light9,
                 content = tc.dark2,
                 border = tc.dark2,
             )
-            isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isHovered -> ButtonColors(
                 background = tc.light9,
                 content = tc.base,
                 border = tc.base,
             )
-            else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            else -> ButtonColors(
                 background = tc.light9,
                 content = tc.base,
                 border = tc.light5,
@@ -319,20 +319,20 @@ private fun resolveButtonColors(
     if (disabled) {
         return if (tc != null) {
             if (plain) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = tc.light9,
                     content = tc.light5,
                     border = tc.light8,
                 )
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                ButtonColors(
                     background = tc.light5,
                     content = cs.white,
                     border = tc.light5,
                 )
             }
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            ButtonColors(
                 background = cs.fill.blank,
                 content = cs.text.placeholder,
                 border = cs.border.lighter,
@@ -344,17 +344,17 @@ private fun resolveButtonColors(
     if (tc == null) {
         if (plain) {
             return when {
-                isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isPressed -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.primary.base,
                     border = cs.primary.light5,
                 )
-                isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                isHovered -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.primary.base,
                     border = cs.primary.base,
                 )
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+                else -> ButtonColors(
                     background = cs.fill.blank,
                     content = cs.text.regular,
                     border = cs.border.base,
@@ -362,17 +362,17 @@ private fun resolveButtonColors(
             }
         }
         return when {
-            isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isPressed -> ButtonColors(
                 background = cs.primary.light9,
                 content = cs.primary.base,
                 border = cs.primary.light5,
             )
-            isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isHovered -> ButtonColors(
                 background = cs.primary.light9,
                 content = cs.primary.base,
                 border = cs.primary.light7,
             )
-            else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            else -> ButtonColors(
                 background = cs.fill.blank,
                 content = cs.text.regular,
                 border = cs.border.base,
@@ -383,17 +383,17 @@ private fun resolveButtonColors(
     // Typed button — plain variant
     if (plain) {
         return when {
-            isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isPressed -> ButtonColors(
                 background = tc.dark2,
                 content = cs.white,
                 border = tc.dark2,
             )
-            isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            isHovered -> ButtonColors(
                 background = tc.base,
                 content = cs.white,
                 border = tc.base,
             )
-            else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+            else -> ButtonColors(
                 background = tc.light9,
                 content = tc.base,
                 border = tc.light5,
@@ -403,17 +403,17 @@ private fun resolveButtonColors(
 
     // Typed button — solid variant
     return when {
-        isPressed -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+        isPressed -> ButtonColors(
             background = tc.dark2,
             content = cs.white,
             border = tc.dark2,
         )
-        isHovered -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+        isHovered -> ButtonColors(
             background = tc.light3,
             content = cs.white,
             border = tc.light3,
         )
-        else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonColors(
+        else -> ButtonColors(
             background = tc.base,
             content = cs.white,
             border = tc.base,
@@ -485,8 +485,8 @@ private fun LoadingSpinner(color: Color, size: Dp = 14.dp) {
 fun NexusButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType? = null,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    type: NexusType? = null,
+    size: ComponentSize? = null,
     plain: Boolean = false,
     text: Boolean = false,
     bg: Boolean = false,
@@ -503,15 +503,15 @@ fun NexusButton(
     loadingContent: (@Composable () -> Unit)? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val sizes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.sizes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val cs = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val config = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig.current
+    val shapes = NexusTheme.shapes
+    val sizes = NexusTheme.sizes
+    val typography = NexusTheme.typography
+    val cs = NexusTheme.colorScheme
+    val config = LocalNexusConfig.current
     val buttonConfig = config.button
-    val groupConfig = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalButtonGroupConfig.current
-    val resolvedType = type ?: groupConfig.type ?: buttonConfig.type ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default
-    val resolvedSize = size ?: groupConfig.size ?: config.size ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default
+    val groupConfig = LocalButtonGroupConfig.current
+    val resolvedType = type ?: groupConfig.type ?: buttonConfig.type ?: NexusType.Default
+    val resolvedSize = size ?: groupConfig.size ?: config.size ?: ComponentSize.Default
     val resolvedPlain = plain || (buttonConfig.plain == true)
     val resolvedText = text || (buttonConfig.text == true)
     val resolvedRound = round || (buttonConfig.round == true)
@@ -520,7 +520,7 @@ fun NexusButton(
     // keep API parity with Element Plus tag prop even though Compose does not render HTML tags directly.
     @Suppress("UNUSED_VARIABLE")
     val currentTag = tag
-    val shouldAutoInsertSpace = autoInsertSpace || (buttonConfig.autoInsertSpace == true)
+    autoInsertSpace || (buttonConfig.autoInsertSpace == true)
 
     val isDisabled = disabled || loading
     val interactionSource = remember { MutableInteractionSource() }
@@ -528,7 +528,7 @@ fun NexusButton(
     val isPressed by interactionSource.collectIsPressedAsState()
     val isFocused by interactionSource.collectIsFocusedAsState()
 
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveButtonColors(
+    val colors = resolveButtonColors(
         type = resolvedType,
         plain = resolvedPlain,
         dashed = resolvedDashed,
@@ -550,19 +550,19 @@ fun NexusButton(
 
     // Sizing
     val buttonHeight: Dp = when (resolvedSize) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.componentLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.componentDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.componentSmall
+        ComponentSize.Large -> sizes.componentLarge
+        ComponentSize.Default -> sizes.componentDefault
+        ComponentSize.Small -> sizes.componentSmall
     }
     val horizontalPad: Dp = when (resolvedSize) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 16.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 12.dp
+        ComponentSize.Large -> 20.dp
+        ComponentSize.Default -> 16.dp
+        ComponentSize.Small -> 12.dp
     }
     val textStyle = when (resolvedSize) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
 
     // Circle buttons have equal width/height with no padding
@@ -627,13 +627,13 @@ fun NexusButton(
                         .pointerHoverIcon(PointerIcon.Hand)
                 } else {
                     Modifier
-                        .pointerHoverIcon(_root_ide_package_.io.github.xingray.compose.nexus.foundation.NotAllowedPointerIcon)
+                        .pointerHoverIcon(NotAllowedPointerIcon)
                 }
             )
             .alpha(loadingAlpha),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+        ProvideContentColorTextStyle(
             contentColor = colors.content,
             textStyle = textStyle,
         ) {
@@ -644,14 +644,14 @@ fun NexusButton(
             ) {
                 if (loading) {
                     val spinnerSize = when (resolvedSize) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 16.dp
-                        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 14.dp
-                        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 12.dp
+                        ComponentSize.Large -> 16.dp
+                        ComponentSize.Default -> 14.dp
+                        ComponentSize.Small -> 12.dp
                     }
                     if (loadingContent != null) {
                         loadingContent()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.LoadingSpinner(color = colors.content, size = spinnerSize)
+                        LoadingSpinner(color = colors.content, size = spinnerSize)
                     }
                 } else if (icon != null) {
                     icon()
@@ -667,8 +667,8 @@ fun NexusButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType? = null,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    type: NexusType? = null,
+    size: ComponentSize? = null,
     plain: Boolean = false,
     textButton: Boolean = false,
     bg: Boolean = false,
@@ -684,9 +684,9 @@ fun NexusButton(
     icon: (@Composable () -> Unit)? = null,
     loadingContent: (@Composable () -> Unit)? = null,
 ) {
-    val configAutoInsertSpace = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig.current.button.autoInsertSpace == true
+    val configAutoInsertSpace = LocalNexusConfig.current.button.autoInsertSpace == true
     val shouldAutoInsertSpace = autoInsertSpace || configAutoInsertSpace
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+    NexusButton(
         onClick = onClick,
         modifier = modifier,
         type = type,
@@ -706,7 +706,7 @@ fun NexusButton(
         icon = icon,
         loadingContent = loadingContent,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = text.withAutoInsertedSpace(shouldAutoInsertSpace))
+        NexusText(text = text.withAutoInsertedSpace(shouldAutoInsertSpace))
     }
 }
 
@@ -729,24 +729,24 @@ enum class ButtonGroupDirection {
 @Composable
 fun NexusButtonGroup(
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.controls.ButtonGroupDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonGroupDirection.Horizontal,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
-    type: io.github.xingray.compose.nexus.theme.NexusType? = null,
+    direction: ButtonGroupDirection = ButtonGroupDirection.Horizontal,
+    size: ComponentSize? = null,
+    type: NexusType? = null,
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalButtonGroupConfig provides _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonGroupConfig(
+        LocalButtonGroupConfig provides ButtonGroupConfig(
             size = size,
             type = type,
         ),
     ) {
         when (direction) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonGroupDirection.Horizontal -> {
+            ButtonGroupDirection.Horizontal -> {
                 Row(modifier = modifier) {
                     content()
                 }
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.ButtonGroupDirection.Vertical -> {
+            ButtonGroupDirection.Vertical -> {
                 Column(modifier = modifier) {
                     content()
                 }

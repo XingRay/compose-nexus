@@ -76,8 +76,8 @@ fun NexusInput(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.controls.NexusInputType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Text,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    type: NexusInputType = NexusInputType.Text,
+    size: ComponentSize = ComponentSize.Default,
     placeholder: String = "",
     disabled: Boolean = false,
     readonly: Boolean = false,
@@ -87,7 +87,7 @@ fun NexusInput(
     maxLength: Int = 0,
     minLength: Int = 0,
     showWordLimit: Boolean = false,
-    wordLimitPosition: io.github.xingray.compose.nexus.controls.NexusWordLimitPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusWordLimitPosition.Inside,
+    wordLimitPosition: NexusWordLimitPosition = NexusWordLimitPosition.Inside,
     formatter: ((String) -> String)? = null,
     parser: ((String) -> String)? = null,
     prefix: (@Composable () -> Unit)? = null,
@@ -96,8 +96,8 @@ fun NexusInput(
     append: (@Composable () -> Unit)? = null,
     rows: Int = 2,
     autosize: Boolean = false,
-    autosizeOptions: io.github.xingray.compose.nexus.controls.NexusTextareaAutosize? = null,
-    resize: io.github.xingray.compose.nexus.controls.NexusTextareaResize = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTextareaResize.None,
+    autosizeOptions: NexusTextareaAutosize? = null,
+    resize: NexusTextareaResize = NexusTextareaResize.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
@@ -109,10 +109,10 @@ fun NexusInput(
     onBlur: (() -> Unit)? = null,
     onClear: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val sizes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.sizes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val sizes = NexusTheme.sizes
+    val typography = NexusTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -121,23 +121,23 @@ fun NexusInput(
     var passwordVisible by remember { mutableStateOf(false) }
     var focusedSnapshot by remember { mutableStateOf(value) }
 
-    val isTextarea = type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Textarea
-    val isPasswordMode = type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Password || showPassword
+    val isTextarea = type == NexusInputType.Textarea
+    val isPasswordMode = type == NexusInputType.Password || showPassword
 
     val controlHeight: Dp = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.componentLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.componentDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.componentSmall
+        ComponentSize.Large -> sizes.componentLarge
+        ComponentSize.Default -> sizes.componentDefault
+        ComponentSize.Small -> sizes.componentSmall
     }
     val horizontalPadding: Dp = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.inputPaddingLarge
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.inputPaddingDefault
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.inputPaddingSmall
+        ComponentSize.Large -> sizes.inputPaddingLarge
+        ComponentSize.Default -> sizes.inputPaddingDefault
+        ComponentSize.Small -> sizes.inputPaddingSmall
     }
     val textStyle: TextStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.extraSmall
     }
 
     val borderColor = when {
@@ -151,7 +151,7 @@ fun NexusInput(
 
     val displayValue = when {
         isTextarea -> value
-        type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Text && formatter != null -> formatter(value)
+        type == NexusInputType.Text && formatter != null -> formatter(value)
         else -> value
     }
 
@@ -175,7 +175,7 @@ fun NexusInput(
     }
 
     val filteredOnValueChange: (String) -> Unit = { rawInput ->
-        val parsed = if (!isTextarea && type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Text && parser != null) {
+        val parsed = if (!isTextarea && type == NexusInputType.Text && parser != null) {
             parser(rawInput)
         } else {
             rawInput
@@ -224,7 +224,7 @@ fun NexusInput(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (!isTextarea && prepend != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.regular) {
+                ProvideContentColor(colorScheme.text.regular) {
                     prepend()
                 }
             }
@@ -245,7 +245,7 @@ fun NexusInput(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         if (!isTextarea && prefix != null) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.placeholder) {
+                            ProvideContentColor(colorScheme.text.placeholder) {
                                 Box(modifier = Modifier.padding(end = 2.dp)) {
                                     prefix()
                                 }
@@ -291,7 +291,7 @@ fun NexusInput(
                                         contentAlignment = if (isTextarea) Alignment.TopStart else Alignment.CenterStart,
                                     ) {
                                         if (value.isEmpty() && placeholder.isNotEmpty()) {
-                                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                            NexusText(
                                                 text = placeholder,
                                                 color = colorScheme.text.placeholder,
                                                 style = textStyle,
@@ -324,7 +324,7 @@ fun NexusInput(
                                 if (clearIcon != null) {
                                     clearIcon()
                                 } else {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = "✕",
                                         color = colorScheme.text.placeholder,
                                         style = typography.extraSmall,
@@ -349,7 +349,7 @@ fun NexusInput(
                                     ),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = if (passwordVisible) "◉" else "◎",
                                     color = colorScheme.text.placeholder,
                                     style = typography.extraSmall,
@@ -358,15 +358,15 @@ fun NexusInput(
                         }
 
                         if (!isTextarea && suffix != null) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.placeholder) {
+                            ProvideContentColor(colorScheme.text.placeholder) {
                                 Box(modifier = Modifier.padding(start = 2.dp)) {
                                     suffix()
                                 }
                             }
                         }
 
-                        if (!isTextarea && wordLimitEnabled && wordLimitPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusWordLimitPosition.Inside) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        if (!isTextarea && wordLimitEnabled && wordLimitPosition == NexusWordLimitPosition.Inside) {
+                            NexusText(
                                 text = wordCountText,
                                 color = if (value.length < minLength && value.isNotEmpty()) {
                                     colorScheme.warning.base
@@ -378,14 +378,14 @@ fun NexusInput(
                         }
                     }
 
-                    if (isTextarea && wordLimitEnabled && wordLimitPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusWordLimitPosition.Inside) {
+                    if (isTextarea && wordLimitEnabled && wordLimitPosition == NexusWordLimitPosition.Inside) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(end = 2.dp, bottom = 2.dp),
                             contentAlignment = Alignment.BottomEnd,
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = wordCountText,
                                 color = if (value.length < minLength && value.isNotEmpty()) {
                                     colorScheme.warning.base
@@ -400,20 +400,20 @@ fun NexusInput(
             }
 
             if (!isTextarea && append != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColor(colorScheme.text.regular) {
+                ProvideContentColor(colorScheme.text.regular) {
                     append()
                 }
             }
         }
 
-        if (wordLimitEnabled && wordLimitPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusWordLimitPosition.Outside) {
+        if (wordLimitEnabled && wordLimitPosition == NexusWordLimitPosition.Outside) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 2.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = wordCountText,
                     color = if (value.length < minLength && value.isNotEmpty()) {
                         colorScheme.warning.base

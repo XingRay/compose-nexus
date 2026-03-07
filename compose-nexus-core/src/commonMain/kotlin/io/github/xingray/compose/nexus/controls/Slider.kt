@@ -52,14 +52,14 @@ fun NexusSlider(
     disabled: Boolean = false,
     showInput: Boolean = false,
     showInputControls: Boolean = true,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
-    inputSize: io.github.xingray.compose.nexus.theme.ComponentSize = size,
+    size: ComponentSize = ComponentSize.Default,
+    inputSize: ComponentSize = size,
     showStops: Boolean = false,
     showTooltip: Boolean = true,
     formatTooltip: ((Float) -> String)? = null,
     vertical: Boolean = false,
     height: Dp = 180.dp,
-    placement: io.github.xingray.compose.nexus.controls.NexusSliderPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Top,
+    placement: NexusSliderPlacement = NexusSliderPlacement.Top,
     marks: Map<Float, String> = emptyMap(),
     onChange: ((Float) -> Unit)? = null,
     onInput: ((Float) -> Unit)? = null,
@@ -71,7 +71,7 @@ fun NexusSlider(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderSingleTrack(
+            SliderSingleTrack(
                 value = clamped,
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f),
@@ -90,10 +90,10 @@ fun NexusSlider(
                 onChange = onChange,
                 onInput = onInput,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputNumber(
+            NexusInputNumber(
                 value = clamped.toDouble(),
                 onValueChange = {
-                    val normalized = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(it.toFloat(), min, max, step)
+                    val normalized = snapValue(it.toFloat(), min, max, step)
                     onValueChange(normalized)
                     onInput?.invoke(normalized)
                     onChange?.invoke(normalized)
@@ -108,7 +108,7 @@ fun NexusSlider(
             )
         }
     } else {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderSingleTrack(
+        SliderSingleTrack(
             value = clamped,
             onValueChange = onValueChange,
             modifier = modifier,
@@ -139,30 +139,30 @@ fun NexusRangeSlider(
     max: Float = 100f,
     step: Float = 1f,
     disabled: Boolean = false,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     showStops: Boolean = false,
     showTooltip: Boolean = true,
     formatTooltip: ((Float) -> String)? = null,
-    placement: io.github.xingray.compose.nexus.controls.NexusSliderPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Top,
+    placement: NexusSliderPlacement = NexusSliderPlacement.Top,
     marks: Map<Float, String> = emptyMap(),
     onChange: ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
     onInput: ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val trackHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 8.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 6.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 4.dp
+        ComponentSize.Large -> 8.dp
+        ComponentSize.Default -> 6.dp
+        ComponentSize.Small -> 4.dp
     }
     val thumbSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 22.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 16.dp
+        ComponentSize.Large -> 22.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
     }
-    val topExtra = if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Top) 30.dp else 0.dp
-    val bottomExtra = (if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
+    val topExtra = if (showTooltip && placement == NexusSliderPlacement.Top) 30.dp else 0.dp
+    val bottomExtra = (if (showTooltip && placement == NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
         (if (marks.isNotEmpty()) 20.dp else 0.dp)
-    val normalized = _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRange(values, min, max, step)
+    val normalized = normalizeRange(values, min, max, step)
 
     BoxWithConstraints(
         modifier = modifier
@@ -172,8 +172,8 @@ fun NexusRangeSlider(
         val trackWidthPx = (maxWidth - thumbSize).value
         val trackTop = topExtra + (thumbSize - trackHeight) / 2
         val halfThumbPx = thumbSize.value / 2f
-        val startFraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(normalized.start, min, max)
-        val endFraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(normalized.endInclusive, min, max)
+        val startFraction = fractionOf(normalized.start, min, max)
+        val endFraction = fractionOf(normalized.endInclusive, min, max)
         val startOffsetPx = startFraction * trackWidthPx
         val endOffsetPx = endFraction * trackWidthPx
 
@@ -219,11 +219,11 @@ fun NexusRangeSlider(
 
         marks.forEach { (markValue, label) ->
             if (markValue in min..max) {
-                val markFraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(markValue, min, max)
+                val markFraction = fractionOf(markValue, min, max)
                 val xPx = markFraction * trackWidthPx + halfThumbPx
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = label,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                    style = NexusTheme.typography.extraSmall,
                     color = colorScheme.text.placeholder,
                     modifier = Modifier.offset { IntOffset(xPx.roundToInt() - 10, (trackTop + thumbSize + 2.dp).roundToPx()) },
                 )
@@ -235,19 +235,19 @@ fun NexusRangeSlider(
             if (isStartThumb) {
                 val clampedPx = offsetPx.coerceIn(0f, endOffsetPx)
                 startDragOffset = clampedPx
-                val v = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
-                lastRange = _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRange(v..lastRange.endInclusive, min, max, step)
+                val v = snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
+                lastRange = normalizeRange(v..lastRange.endInclusive, min, max, step)
             } else {
                 val clampedPx = offsetPx.coerceIn(startOffsetPx, trackWidthPx)
                 endDragOffset = clampedPx
-                val v = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
-                lastRange = _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRange(lastRange.start..v, min, max, step)
+                val v = snapValue(min + (clampedPx / trackWidthPx) * (max - min), min, max, step)
+                lastRange = normalizeRange(lastRange.start..v, min, max, step)
             }
             onValueChange(lastRange)
             onInput?.invoke(lastRange)
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderThumb(
+        SliderThumb(
             modifier = Modifier
                 .offset { IntOffset(startOffsetPx.roundToInt(), topExtra.roundToPx()) }
                 .pointerInput(disabled, startOffsetPx, endOffsetPx, min, max, step) {
@@ -264,7 +264,7 @@ fun NexusRangeSlider(
             disabled = disabled,
         )
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderThumb(
+        SliderThumb(
             modifier = Modifier
                 .offset { IntOffset(endOffsetPx.roundToInt(), topExtra.roundToPx()) }
                 .pointerInput(disabled, startOffsetPx, endOffsetPx, min, max, step) {
@@ -283,12 +283,12 @@ fun NexusRangeSlider(
 
         if (showTooltip) {
             val formatter = formatTooltip ?: { it.roundToInt().toString() }
-            val y = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderTooltip(
+            val y = if (placement == NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
+            SliderTooltip(
                 text = formatter(lastRange.start),
                 modifier = Modifier.offset { IntOffset(startOffsetPx.roundToInt() - 10, y.roundToPx()) },
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderTooltip(
+            SliderTooltip(
                 text = formatter(lastRange.endInclusive),
                 modifier = Modifier.offset { IntOffset(endOffsetPx.roundToInt() - 10, y.roundToPx()) },
             )
@@ -305,34 +305,34 @@ private fun SliderSingleTrack(
     max: Float,
     step: Float,
     disabled: Boolean,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize,
+    size: ComponentSize,
     showStops: Boolean,
     showTooltip: Boolean,
     formatTooltip: ((Float) -> String)?,
     vertical: Boolean,
     height: Dp,
-    placement: io.github.xingray.compose.nexus.controls.NexusSliderPlacement,
+    placement: NexusSliderPlacement,
     marks: Map<Float, String>,
     onChange: ((Float) -> Unit)?,
     onInput: ((Float) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val trackThickness = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 8.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 6.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 4.dp
+        ComponentSize.Large -> 8.dp
+        ComponentSize.Default -> 6.dp
+        ComponentSize.Small -> 4.dp
     }
     val thumbSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 22.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 16.dp
+        ComponentSize.Large -> 22.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
     }
-    val normalizedValue = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(value, min, max, step)
+    val normalizedValue = snapValue(value, min, max, step)
     var lastValue by remember(normalizedValue) { mutableFloatStateOf(normalizedValue) }
 
     if (!vertical) {
-        val topExtra = if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Top) 30.dp else 0.dp
-        val bottomExtra = (if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
+        val topExtra = if (showTooltip && placement == NexusSliderPlacement.Top) 30.dp else 0.dp
+        val bottomExtra = (if (showTooltip && placement == NexusSliderPlacement.Bottom) 30.dp else 0.dp) +
             (if (marks.isNotEmpty() || showStops) 20.dp else 0.dp)
         BoxWithConstraints(
             modifier = modifier
@@ -340,14 +340,14 @@ private fun SliderSingleTrack(
                 .height(thumbSize + topExtra + bottomExtra),
         ) {
             val trackWidthPx = (maxWidth - thumbSize).value
-            val fraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(normalizedValue, min, max)
+            val fraction = fractionOf(normalizedValue, min, max)
             val thumbOffsetPx = fraction * trackWidthPx
             val halfThumbPx = thumbSize.value / 2f
             val trackTop = topExtra + (thumbSize - trackThickness) / 2
 
             fun emitFromOffset(offsetPx: Float) {
                 val raw = min + (offsetPx / trackWidthPx) * (max - min)
-                val next = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(raw, min, max, step)
+                val next = snapValue(raw, min, max, step)
                 lastValue = next
                 onValueChange(next)
                 onInput?.invoke(next)
@@ -386,18 +386,18 @@ private fun SliderSingleTrack(
 
             marks.forEach { (markValue, label) ->
                 if (markValue in min..max) {
-                    val markFraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(markValue, min, max)
+                    val markFraction = fractionOf(markValue, min, max)
                     val xPx = markFraction * trackWidthPx + halfThumbPx
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = label,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                        style = NexusTheme.typography.extraSmall,
                         color = colorScheme.text.placeholder,
                         modifier = Modifier.offset { IntOffset(xPx.roundToInt() - 10, (trackTop + thumbSize + 2.dp).roundToPx()) },
                     )
                 }
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderThumb(
+            SliderThumb(
                 modifier = Modifier
                     .offset { IntOffset(thumbOffsetPx.roundToInt(), topExtra.roundToPx()) }
                     .pointerInput(disabled, value, min, max, step) {
@@ -416,29 +416,29 @@ private fun SliderSingleTrack(
 
             if (showTooltip) {
                 val formatter = formatTooltip ?: { it.roundToInt().toString() }
-                val y = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderTooltip(
+                val y = if (placement == NexusSliderPlacement.Bottom) topExtra + thumbSize + 2.dp else 0.dp
+                SliderTooltip(
                     text = formatter(normalizedValue),
                     modifier = Modifier.offset { IntOffset(thumbOffsetPx.roundToInt() - 10, y.roundToPx()) },
                 )
             }
         }
     } else {
-        val leftExtra = if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Left) 42.dp else 0.dp
-        val rightExtra = if (showTooltip && placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Right) 42.dp else 0.dp
+        val leftExtra = if (showTooltip && placement == NexusSliderPlacement.Left) 42.dp else 0.dp
+        val rightExtra = if (showTooltip && placement == NexusSliderPlacement.Right) 42.dp else 0.dp
         BoxWithConstraints(
             modifier = modifier
                 .width(thumbSize + leftExtra + rightExtra)
                 .height(height),
         ) {
             val trackHeightPx = (maxHeight - thumbSize).value
-            val fraction = _root_ide_package_.io.github.xingray.compose.nexus.controls.fractionOf(normalizedValue, min, max)
+            val fraction = fractionOf(normalizedValue, min, max)
             val thumbOffsetYPx = (1f - fraction) * trackHeightPx
             val trackLeft = leftExtra + (thumbSize - trackThickness) / 2
 
             fun emitFromOffset(offsetYPx: Float) {
                 val raw = min + (1f - offsetYPx / trackHeightPx) * (max - min)
-                val next = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(raw, min, max, step)
+                val next = snapValue(raw, min, max, step)
                 lastValue = next
                 onValueChange(next)
                 onInput?.invoke(next)
@@ -466,7 +466,7 @@ private fun SliderSingleTrack(
                     .background(if (disabled) colorScheme.primary.light5 else colorScheme.primary.base),
             )
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderThumb(
+            SliderThumb(
                 modifier = Modifier
                     .offset { IntOffset(leftExtra.roundToPx(), thumbOffsetYPx.roundToInt()) }
                     .pointerInput(disabled, value, min, max, step) {
@@ -485,8 +485,8 @@ private fun SliderSingleTrack(
 
             if (showTooltip) {
                 val formatter = formatTooltip ?: { it.roundToInt().toString() }
-                val x = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSliderPlacement.Left) 0.dp else leftExtra + thumbSize + 2.dp
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.SliderTooltip(
+                val x = if (placement == NexusSliderPlacement.Left) 0.dp else leftExtra + thumbSize + 2.dp
+                SliderTooltip(
                     text = formatter(normalizedValue),
                     modifier = Modifier.offset { IntOffset(x.roundToPx(), thumbOffsetYPx.roundToInt()) },
                 )
@@ -501,7 +501,7 @@ private fun SliderThumb(
     size: Dp,
     disabled: Boolean,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     Box(
         modifier = modifier
             .size(size)
@@ -524,16 +524,16 @@ private fun SliderTooltip(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     Box(
         modifier = modifier
-            .background(colorScheme.text.primary, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .background(colorScheme.text.primary, NexusTheme.shapes.base)
             .padding(horizontal = 8.dp, vertical = 4.dp),
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = text,
             color = colorScheme.white,
-            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+            style = NexusTheme.typography.extraSmall,
         )
     }
 }
@@ -558,7 +558,7 @@ private fun normalizeRange(
     max: Float,
     step: Float,
 ): ClosedFloatingPointRange<Float> {
-    val start = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(values.start, min, max, step)
-    val end = _root_ide_package_.io.github.xingray.compose.nexus.controls.snapValue(values.endInclusive, min, max, step)
+    val start = snapValue(values.start, min, max, step)
+    val end = snapValue(values.endInclusive, min, max, step)
     return if (start <= end) start..end else end..start
 }

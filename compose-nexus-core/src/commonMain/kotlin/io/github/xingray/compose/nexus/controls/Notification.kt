@@ -55,9 +55,9 @@ class NotificationHandle internal constructor(private val onClose: () -> Unit) {
 class NotificationEntry(
     val title: String,
     val message: String = "",
-    val type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
+    val type: NexusType = NexusType.Default,
     val duration: Long = 4500L,
-    val position: io.github.xingray.compose.nexus.controls.NotificationPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight,
+    val position: NotificationPosition = NotificationPosition.TopRight,
     val showClose: Boolean = true,
     val offset: Dp = 16.dp,
     val onClose: (() -> Unit)? = null,
@@ -76,22 +76,22 @@ class NotificationEntry(
 
 @Stable
 class NotificationState {
-    internal val notifications = mutableStateListOf<io.github.xingray.compose.nexus.controls.NotificationEntry>()
+    internal val notifications = mutableStateListOf<NotificationEntry>()
 
     fun show(
         title: String,
         message: String = "",
-        type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
+        type: NexusType = NexusType.Default,
         duration: Long = 4500L,
-        position: io.github.xingray.compose.nexus.controls.NotificationPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight,
+        position: NotificationPosition = NotificationPosition.TopRight,
         showClose: Boolean = true,
         offset: Dp = 16.dp,
         onClose: (() -> Unit)? = null,
         onClick: (() -> Unit)? = null,
         icon: (@Composable () -> Unit)? = null,
         closeIcon: (@Composable () -> Unit)? = null,
-    ): io.github.xingray.compose.nexus.controls.NotificationHandle {
-        val entry = _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationEntry(
+    ): NotificationHandle {
+        val entry = NotificationEntry(
             title = title,
             message = message,
             type = type,
@@ -105,25 +105,25 @@ class NotificationState {
             closeIcon = closeIcon,
         )
         notifications.add(entry)
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationHandle { close(entry) }
+        return NotificationHandle { close(entry) }
     }
 
     fun primary(title: String, message: String = "", duration: Long = 4500L) =
-        show(title, message, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary, duration)
+        show(title, message, NexusType.Primary, duration)
 
     fun success(title: String, message: String = "", duration: Long = 4500L) =
-        show(title, message, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success, duration)
+        show(title, message, NexusType.Success, duration)
 
     fun warning(title: String, message: String = "", duration: Long = 4500L) =
-        show(title, message, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning, duration)
+        show(title, message, NexusType.Warning, duration)
 
     fun error(title: String, message: String = "", duration: Long = 4500L) =
-        show(title, message, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger, duration)
+        show(title, message, NexusType.Danger, duration)
 
     fun info(title: String, message: String = "", duration: Long = 4500L) =
-        show(title, message, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info, duration)
+        show(title, message, NexusType.Info, duration)
 
-    fun close(entry: io.github.xingray.compose.nexus.controls.NotificationEntry) {
+    fun close(entry: NotificationEntry) {
         if (!entry.visible) {
             remove(entry)
             return
@@ -136,7 +136,7 @@ class NotificationState {
         snapshot.forEach { close(it) }
     }
 
-    internal fun remove(entry: io.github.xingray.compose.nexus.controls.NotificationEntry) {
+    internal fun remove(entry: NotificationEntry) {
         if (notifications.remove(entry)) {
             entry.onClose?.invoke()
         }
@@ -144,26 +144,26 @@ class NotificationState {
 }
 
 @Composable
-fun rememberNotificationState(): io.github.xingray.compose.nexus.controls.NotificationState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationState() }
+fun rememberNotificationState(): NotificationState = remember { NotificationState() }
 
 @Composable
 fun NexusNotificationHost(
-    state: io.github.xingray.compose.nexus.controls.NotificationState,
+    state: NotificationState,
     modifier: Modifier = Modifier,
 ) {
     if (state.notifications.isEmpty()) return
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.entries.forEach { position ->
+    NotificationPosition.entries.forEach { position ->
         val entries = state.notifications.filter { it.position == position }
         if (entries.isEmpty()) return@forEach
 
         val alignment = when (position) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight -> Alignment.TopEnd
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopLeft -> Alignment.TopStart
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomRight -> Alignment.BottomEnd
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomLeft -> Alignment.BottomStart
+            NotificationPosition.TopRight -> Alignment.TopEnd
+            NotificationPosition.TopLeft -> Alignment.TopStart
+            NotificationPosition.BottomRight -> Alignment.BottomEnd
+            NotificationPosition.BottomLeft -> Alignment.BottomStart
         }
-        val slideFromRight = position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomRight
+        val slideFromRight = position == NotificationPosition.TopRight || position == NotificationPosition.BottomRight
 
         Popup(
             alignment = alignment,
@@ -171,17 +171,17 @@ fun NexusNotificationHost(
         ) {
             Column(
                 modifier = modifier.padding(
-                    top = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopLeft) entries.first().offset else 0.dp,
-                    bottom = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomRight || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomLeft) entries.first().offset else 0.dp,
-                    start = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopLeft || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomLeft) 16.dp else 0.dp,
-                    end = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopRight || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomRight) 16.dp else 0.dp,
+                    top = if (position == NotificationPosition.TopRight || position == NotificationPosition.TopLeft) entries.first().offset else 0.dp,
+                    bottom = if (position == NotificationPosition.BottomRight || position == NotificationPosition.BottomLeft) entries.first().offset else 0.dp,
+                    start = if (position == NotificationPosition.TopLeft || position == NotificationPosition.BottomLeft) 16.dp else 0.dp,
+                    end = if (position == NotificationPosition.TopRight || position == NotificationPosition.BottomRight) 16.dp else 0.dp,
                 ),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalAlignment = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.TopLeft || position == _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationPosition.BottomLeft) Alignment.Start else Alignment.End,
+                horizontalAlignment = if (position == NotificationPosition.TopLeft || position == NotificationPosition.BottomLeft) Alignment.Start else Alignment.End,
             ) {
                 entries.forEach { entry ->
                     key(entry.id) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NotificationItem(
+                        NotificationItem(
                             entry = entry,
                             slideFromRight = slideFromRight,
                             onDismiss = { state.remove(entry) },
@@ -195,23 +195,23 @@ fun NexusNotificationHost(
 
 @Composable
 private fun NotificationItem(
-    entry: io.github.xingray.compose.nexus.controls.NotificationEntry,
+    entry: NotificationEntry,
     slideFromRight: Boolean,
     onDismiss: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
     val tc = colorScheme.typeColor(entry.type)
 
     val iconText = when (entry.type) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary -> "P"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success -> "✓"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning -> "!"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger -> "✕"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info -> "i"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> null
+        NexusType.Primary -> "P"
+        NexusType.Success -> "✓"
+        NexusType.Warning -> "!"
+        NexusType.Danger -> "✕"
+        NexusType.Info -> "i"
+        NexusType.Default -> null
     }
 
     LaunchedEffect(entry.id) {
@@ -246,7 +246,7 @@ private fun NotificationItem(
                         entry.icon.invoke()
                     }
                 } else if (iconText != null && tc != null) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = iconText,
                         color = tc.base,
                         style = typography.large,
@@ -255,14 +255,14 @@ private fun NotificationItem(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = entry.title,
                         color = colorScheme.text.primary,
                         style = typography.base,
                     )
                     if (entry.message.isNotBlank()) {
                         Spacer(modifier = Modifier.padding(top = 6.dp))
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = entry.message,
                             color = colorScheme.text.regular,
                             style = typography.small,
@@ -285,7 +285,7 @@ private fun NotificationItem(
                         if (entry.closeIcon != null) {
                             entry.closeIcon.invoke()
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "✕",
                                 color = colorScheme.text.placeholder,
                                 style = typography.extraSmall,

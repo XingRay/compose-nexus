@@ -26,13 +26,13 @@ enum class MessageBoxAction {
     Close,
 }
 
-typealias MessageBoxBeforeClose = (action: io.github.xingray.compose.nexus.controls.MessageBoxAction, instance: io.github.xingray.compose.nexus.controls.MessageBoxRequest, done: () -> Unit) -> Unit
+typealias MessageBoxBeforeClose = (action: MessageBoxAction, instance: MessageBoxRequest, done: () -> Unit) -> Unit
 
 @Stable
 class MessageBoxRequest(
     val title: String = "",
     val message: String = "",
-    val type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+    val type: NexusType = NexusType.Info,
     val center: Boolean = false,
     val draggable: Boolean = false,
     val overflow: Boolean = false,
@@ -41,10 +41,10 @@ class MessageBoxRequest(
     val showConfirmButton: Boolean = true,
     val cancelButtonText: String = "Cancel",
     val confirmButtonText: String = "OK",
-    val cancelButtonType: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
-    val confirmButtonType: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+    val cancelButtonType: NexusType = NexusType.Info,
+    val confirmButtonType: NexusType = NexusType.Primary,
     val roundButton: Boolean = false,
-    val buttonSize: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    val buttonSize: ComponentSize = ComponentSize.Default,
     val closeOnClickModal: Boolean = true,
     val closeOnPressEscape: Boolean = true,
     val distinguishCancelAndClose: Boolean = false,
@@ -55,34 +55,34 @@ class MessageBoxRequest(
     val inputValidator: ((String) -> String?)? = null,
     val inputErrorMessage: String = "Illegal input",
     val dangerouslyUseHTMLString: Boolean = false,
-    val beforeClose: io.github.xingray.compose.nexus.controls.MessageBoxBeforeClose? = null,
+    val beforeClose: MessageBoxBeforeClose? = null,
     val icon: (@Composable () -> Unit)? = null,
     val content: (@Composable () -> Unit)? = null,
-    val callback: ((action: io.github.xingray.compose.nexus.controls.MessageBoxAction, value: String?) -> Unit)? = null,
+    val callback: ((action: MessageBoxAction, value: String?) -> Unit)? = null,
 ) {
     var visible by mutableStateOf(true)
     var currentInput by mutableStateOf(inputValue)
     var currentInputError by mutableStateOf<String?>(null)
-    var pendingAction by mutableStateOf<io.github.xingray.compose.nexus.controls.MessageBoxAction?>(null)
+    var pendingAction by mutableStateOf<MessageBoxAction?>(null)
 }
 
 @Stable
 class MessageBoxState {
-    var request: io.github.xingray.compose.nexus.controls.MessageBoxRequest? by mutableStateOf(null)
+    var request: MessageBoxRequest? by mutableStateOf(null)
         private set
 
-    fun show(req: io.github.xingray.compose.nexus.controls.MessageBoxRequest) {
+    fun show(req: MessageBoxRequest) {
         request = req
     }
 
     fun alert(
         message: String,
         title: String = "Alert",
-        type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
-        callback: ((action: io.github.xingray.compose.nexus.controls.MessageBoxAction, value: String?) -> Unit)? = null,
+        type: NexusType = NexusType.Info,
+        callback: ((action: MessageBoxAction, value: String?) -> Unit)? = null,
     ) {
         show(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxRequest(
+            MessageBoxRequest(
                 title = title,
                 message = message,
                 type = type,
@@ -97,11 +97,11 @@ class MessageBoxState {
     fun confirm(
         message: String,
         title: String = "Confirm",
-        type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning,
-        callback: ((action: io.github.xingray.compose.nexus.controls.MessageBoxAction, value: String?) -> Unit)? = null,
+        type: NexusType = NexusType.Warning,
+        callback: ((action: MessageBoxAction, value: String?) -> Unit)? = null,
     ) {
         show(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxRequest(
+            MessageBoxRequest(
                 title = title,
                 message = message,
                 type = type,
@@ -118,13 +118,13 @@ class MessageBoxState {
         inputValue: String = "",
         inputPattern: Regex? = null,
         inputValidator: ((String) -> String?)? = null,
-        callback: ((action: io.github.xingray.compose.nexus.controls.MessageBoxAction, value: String?) -> Unit)? = null,
+        callback: ((action: MessageBoxAction, value: String?) -> Unit)? = null,
     ) {
         show(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxRequest(
+            MessageBoxRequest(
                 title = title,
                 message = message,
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+                type = NexusType.Info,
                 showCancelButton = true,
                 showInput = true,
                 inputPlaceholder = inputPlaceholder,
@@ -142,26 +142,26 @@ class MessageBoxState {
 }
 
 @Composable
-fun rememberMessageBoxState(): io.github.xingray.compose.nexus.controls.MessageBoxState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxState() }
+fun rememberMessageBoxState(): MessageBoxState = remember { MessageBoxState() }
 
 @Composable
 fun NexusMessageBoxHost(
-    state: io.github.xingray.compose.nexus.controls.MessageBoxState,
+    state: MessageBoxState,
     modifier: Modifier = Modifier,
 ) {
     val request = state.request ?: return
-    val dialogState = _root_ide_package_.io.github.xingray.compose.nexus.containers.rememberDialogState(initialVisible = request.visible)
+    val dialogState = rememberDialogState(initialVisible = request.visible)
 
     dialogState.visible = request.visible
 
-    fun doneClose(action: io.github.xingray.compose.nexus.controls.MessageBoxAction) {
+    fun doneClose(action: MessageBoxAction) {
         request.pendingAction = action
         request.visible = false
         dialogState.visible = false
     }
 
-    fun doAction(action: io.github.xingray.compose.nexus.controls.MessageBoxAction) {
-        if (action == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Confirm && request.showInput) {
+    fun doAction(action: MessageBoxAction) {
+        if (action == MessageBoxAction.Confirm && request.showInput) {
             val value = request.currentInput
             val patternError = if (request.inputPattern != null && !request.inputPattern.matches(value)) {
                 request.inputErrorMessage
@@ -182,7 +182,7 @@ fun NexusMessageBoxHost(
         }
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusDialog(
+    NexusDialog(
         state = dialogState,
         modifier = modifier,
         title = request.title,
@@ -193,15 +193,15 @@ fun NexusMessageBoxHost(
         draggable = request.draggable,
         overflow = request.overflow,
         beforeClose = { done ->
-            doAction(_root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Close)
+            doAction(MessageBoxAction.Close)
             if (!request.visible) done()
         },
         onClosed = {
-            val action = request.pendingAction ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Close
+            val action = request.pendingAction ?: MessageBoxAction.Close
             val callbackAction = if (request.distinguishCancelAndClose) {
                 action
-            } else if (action == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Close) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Cancel
+            } else if (action == MessageBoxAction.Close) {
+                MessageBoxAction.Cancel
             } else {
                 action
             }
@@ -211,9 +211,9 @@ fun NexusMessageBoxHost(
         footer = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (request.showCancelButton) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = request.cancelButtonText,
-                        onClick = { doAction(_root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Cancel) },
+                        onClick = { doAction(MessageBoxAction.Cancel) },
                         type = request.cancelButtonType,
                         size = request.buttonSize,
                         round = request.roundButton,
@@ -221,9 +221,9 @@ fun NexusMessageBoxHost(
                     )
                 }
                 if (request.showConfirmButton) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = request.confirmButtonText,
-                        onClick = { doAction(_root_ide_package_.io.github.xingray.compose.nexus.controls.MessageBoxAction.Confirm) },
+                        onClick = { doAction(MessageBoxAction.Confirm) },
                         type = request.confirmButtonType,
                         size = request.buttonSize,
                         round = request.roundButton,
@@ -233,11 +233,11 @@ fun NexusMessageBoxHost(
         },
     ) {
         val iconColor = when (request.type) {
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.success.base
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.warning.base
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.danger.base
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.info.base
+            NexusType.Primary -> NexusTheme.colorScheme.primary.base
+            NexusType.Success -> NexusTheme.colorScheme.success.base
+            NexusType.Warning -> NexusTheme.colorScheme.warning.base
+            NexusType.Danger -> NexusTheme.colorScheme.danger.base
+            NexusType.Info, NexusType.Default -> NexusTheme.colorScheme.info.base
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -245,14 +245,14 @@ fun NexusMessageBoxHost(
                 request.icon.invoke()
             } else {
                 val iconText = when (request.type) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success -> "✓"
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning -> "!"
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger -> "✕"
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> "i"
+                    NexusType.Success -> "✓"
+                    NexusType.Warning -> "!"
+                    NexusType.Danger -> "✕"
+                    NexusType.Info, NexusType.Primary, NexusType.Default -> "i"
                 }
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = iconText,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large,
+                    style = NexusTheme.typography.large,
                     color = iconColor,
                 )
             }
@@ -260,14 +260,14 @@ fun NexusMessageBoxHost(
                 if (request.content != null) {
                     request.content.invoke()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = request.message,
-                        color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        color = NexusTheme.colorScheme.text.regular,
+                        style = NexusTheme.typography.base,
                     )
                 }
                 if (request.showInput) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+                    NexusInput(
                         value = request.currentInput,
                         onValueChange = {
                             request.currentInput = it
@@ -277,10 +277,10 @@ fun NexusMessageBoxHost(
                     )
                     if (!request.currentInputError.isNullOrBlank()) {
                         Spacer(modifier = Modifier.height(2.dp))
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = request.currentInputError.orEmpty(),
-                            color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.danger.base,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                            color = NexusTheme.colorScheme.danger.base,
+                            style = NexusTheme.typography.extraSmall,
                         )
                     }
                 }

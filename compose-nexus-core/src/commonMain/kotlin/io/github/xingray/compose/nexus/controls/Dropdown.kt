@@ -82,7 +82,7 @@ class DropdownState {
 }
 
 @Composable
-fun rememberDropdownState(): io.github.xingray.compose.nexus.controls.DropdownState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownState() }
+fun rememberDropdownState(): DropdownState = remember { DropdownState() }
 
 private data class DropdownMenuContext(
     val hideOnClick: Boolean,
@@ -90,20 +90,20 @@ private data class DropdownMenuContext(
     val closeMenu: () -> Unit,
 )
 
-private val LocalDropdownMenuContext = staticCompositionLocalOf<io.github.xingray.compose.nexus.controls.DropdownMenuContext?> { null }
+private val LocalDropdownMenuContext = staticCompositionLocalOf<DropdownMenuContext?> { null }
 
 @Composable
 fun NexusDropdown(
-    state: io.github.xingray.compose.nexus.controls.DropdownState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberDropdownState(),
+    state: DropdownState = rememberDropdownState(),
     modifier: Modifier = Modifier,
     splitButton: Boolean = false,
     buttonText: String = "Dropdown",
     disabled: Boolean = false,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
-    placement: io.github.xingray.compose.nexus.controls.DropdownPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.BottomStart,
-    triggerMode: io.github.xingray.compose.nexus.controls.DropdownTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.Hover,
-    effect: io.github.xingray.compose.nexus.controls.DropdownEffect = _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownEffect.Light,
+    type: NexusType = NexusType.Default,
+    size: ComponentSize = ComponentSize.Default,
+    placement: DropdownPlacement = DropdownPlacement.BottomStart,
+    triggerMode: DropdownTrigger = DropdownTrigger.Hover,
+    effect: DropdownEffect = DropdownEffect.Light,
     hideOnClick: Boolean = true,
     maxHeight: Dp? = null,
     showTimeout: Long = 150L,
@@ -114,15 +114,15 @@ fun NexusDropdown(
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     val triggerInteraction = remember { MutableInteractionSource() }
     val isHovered by triggerInteraction.collectIsHoveredAsState()
 
     LaunchedEffect(isHovered, triggerMode, disabled) {
-        if (disabled || triggerMode != _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.Hover) return@LaunchedEffect
+        if (disabled || triggerMode != DropdownTrigger.Hover) return@LaunchedEffect
         if (isHovered) {
             delay(showTimeout.coerceAtLeast(0L))
             state.open()
@@ -137,17 +137,17 @@ fun NexusDropdown(
     }
 
     val (menuAlignment, menuPaddingModifier) = when (placement) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.Bottom -> Alignment.BottomCenter to Modifier.padding(top = 4.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.BottomStart -> Alignment.BottomStart to Modifier.padding(top = 4.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.BottomEnd -> Alignment.BottomEnd to Modifier.padding(top = 4.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.Top -> Alignment.TopCenter to Modifier.padding(bottom = 4.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.TopStart -> Alignment.TopStart to Modifier.padding(bottom = 4.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.TopEnd -> Alignment.TopEnd to Modifier.padding(bottom = 4.dp)
+        DropdownPlacement.Bottom -> Alignment.BottomCenter to Modifier.padding(top = 4.dp)
+        DropdownPlacement.BottomStart -> Alignment.BottomStart to Modifier.padding(top = 4.dp)
+        DropdownPlacement.BottomEnd -> Alignment.BottomEnd to Modifier.padding(top = 4.dp)
+        DropdownPlacement.Top -> Alignment.TopCenter to Modifier.padding(bottom = 4.dp)
+        DropdownPlacement.TopStart -> Alignment.TopStart to Modifier.padding(bottom = 4.dp)
+        DropdownPlacement.TopEnd -> Alignment.TopEnd to Modifier.padding(bottom = 4.dp)
     }
 
-    val menuBackground = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownEffect.Dark) colorScheme.text.primary else colorScheme.fill.blank
-    val menuBorder = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownEffect.Dark) Color.Transparent else colorScheme.border.lighter
-    val menuTextColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownEffect.Dark) colorScheme.white else colorScheme.text.regular
+    val menuBackground = if (effect == DropdownEffect.Dark) colorScheme.text.primary else colorScheme.fill.blank
+    val menuBorder = if (effect == DropdownEffect.Dark) Color.Transparent else colorScheme.border.lighter
+    val menuTextColor = if (effect == DropdownEffect.Dark) colorScheme.white else colorScheme.text.regular
 
     Box(
         modifier = modifier,
@@ -156,7 +156,7 @@ fun NexusDropdown(
             modifier = Modifier
                 .hoverable(triggerInteraction)
                 .then(
-                    if (!disabled && (triggerMode == _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.Click || triggerMode == _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.ContextMenu)) {
+                    if (!disabled && (triggerMode == DropdownTrigger.Click || triggerMode == DropdownTrigger.ContextMenu)) {
                         Modifier
                             .clickable(
                                 interactionSource = triggerInteraction,
@@ -172,14 +172,14 @@ fun NexusDropdown(
         ) {
             if (splitButton) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = buttonText,
                         onClick = { onClick?.invoke() },
                         type = type,
                         size = size,
                         disabled = disabled,
                     )
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = "▾",
                         onClick = { state.toggle() },
                         type = type,
@@ -204,15 +204,15 @@ fun NexusDropdown(
                     .border(1.dp, menuBorder, shapes.base)
                     .padding(vertical = 6.dp),
             ) {
-                val menuContext = _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownMenuContext(
+                val menuContext = DropdownMenuContext(
                     hideOnClick = hideOnClick,
                     onCommand = onCommand,
                     closeMenu = { state.close() },
                 )
-                CompositionLocalProvider(_root_ide_package_.io.github.xingray.compose.nexus.controls.LocalDropdownMenuContext provides menuContext) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                CompositionLocalProvider(LocalDropdownMenuContext provides menuContext) {
+                    ProvideContentColorTextStyle(
                         contentColor = menuTextColor,
-                        textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        textStyle = NexusTheme.typography.base,
                     ) {
                         val menuScrollState = rememberScrollState()
                         Column(
@@ -245,14 +245,14 @@ fun NexusDropdownItem(
     icon: (@Composable () -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
-    val context = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalDropdownMenuContext.current
+    val context = LocalDropdownMenuContext.current
 
     if (divided) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider(
+        NexusDivider(
             color = colorScheme.border.lighter,
             modifier = Modifier.padding(vertical = 6.dp),
         )
@@ -300,7 +300,7 @@ fun NexusDropdownItem(
         if (content != null) {
             content()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = text,
                 color = textColor,
                 style = typography.base,

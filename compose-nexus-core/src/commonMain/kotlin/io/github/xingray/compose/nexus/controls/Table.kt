@@ -57,12 +57,12 @@ class TableState(
 @Composable
 fun rememberTableState(
     initialCurrentRowIndex: Int? = null,
-): io.github.xingray.compose.nexus.controls.TableState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TableState(initialCurrentRowIndex) }
+): TableState = remember { TableState(initialCurrentRowIndex) }
 
 @Composable
 fun <T> NexusTable(
     data: List<T>,
-    columns: List<io.github.xingray.compose.nexus.controls.NexusTableColumn<T>>,
+    columns: List<NexusTableColumn<T>>,
     modifier: Modifier = Modifier,
     stripe: Boolean = false,
     border: Boolean = true,
@@ -73,14 +73,14 @@ fun <T> NexusTable(
     highlightCurrentRow: Boolean = false,
     showOverflowTooltip: Boolean = false,
     currentRowIndex: Int? = null,
-    state: io.github.xingray.compose.nexus.controls.TableState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTableState(initialCurrentRowIndex = currentRowIndex),
-    rowClassName: ((index: Int, row: T) -> io.github.xingray.compose.nexus.theme.NexusType?)? = null,
+    state: TableState = rememberTableState(initialCurrentRowIndex = currentRowIndex),
+    rowClassName: ((index: Int, row: T) -> NexusType?)? = null,
     onCurrentChange: ((currentRow: T?, oldCurrentRow: T?) -> Unit)? = null,
     onRowClick: ((index: Int, row: T) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
     val borderColor = colorScheme.border.lighter
     val headerBg = colorScheme.fill.light
     val rowBg = colorScheme.fill.blank
@@ -94,7 +94,7 @@ fun <T> NexusTable(
         }
     }
 
-    fun rowStatusColor(type: io.github.xingray.compose.nexus.theme.NexusType?): androidx.compose.ui.graphics.Color? {
+    fun rowStatusColor(type: NexusType?): androidx.compose.ui.graphics.Color? {
         if (type == null) return null
         return colorScheme.typeColor(type)?.light9
     }
@@ -119,7 +119,7 @@ fun <T> NexusTable(
                         weight = column.weight,
                         alignment = column.headerAlignment,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = column.header,
                             color = colorScheme.text.primary,
                             style = typography.small,
@@ -147,7 +147,7 @@ fun <T> NexusTable(
                         .padding(vertical = 40.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = emptyText,
                         color = colorScheme.text.secondary,
                         style = typography.base,
@@ -201,7 +201,7 @@ fun <T> NexusTable(
                                 val enableTooltip = showOverflowTooltip || column.showOverflowTooltip
                                 val tooltip = if (enableTooltip) column.tooltipText?.invoke(item) else null
                                 if (enableTooltip && !tooltip.isNullOrBlank()) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTooltip(text = tooltip) {
+                                    NexusTooltip(text = tooltip) {
                                         column.content(item)
                                     }
                                 } else {

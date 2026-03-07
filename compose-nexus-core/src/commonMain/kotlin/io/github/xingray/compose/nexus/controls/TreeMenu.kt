@@ -36,12 +36,12 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
  */
 @Composable
 fun NexusTreeMenu(
-    items: List<io.github.xingray.compose.nexus.controls.MenuItem>,
-    state: io.github.xingray.compose.nexus.controls.MenuState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberMenuState(),
+    items: List<MenuItem>,
+    state: MenuState = rememberMenuState(),
     modifier: Modifier = Modifier,
     onSelect: ((String) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
 
     Column(
         modifier = modifier
@@ -49,7 +49,7 @@ fun NexusTreeMenu(
             .background(colorScheme.fill.blank),
     ) {
         items.forEach { item ->
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeMenuItem(
+            TreeMenuItem(
                 item = item,
                 state = state,
                 depth = 0,
@@ -61,13 +61,13 @@ fun NexusTreeMenu(
 
 @Composable
 private fun TreeMenuItem(
-    item: io.github.xingray.compose.nexus.controls.MenuItem,
-    state: io.github.xingray.compose.nexus.controls.MenuState,
+    item: MenuItem,
+    state: MenuState,
     depth: Int,
     onSelect: ((String) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val hasChildren = item.children.isNotEmpty()
     val isOpen = state.isOpen(item.key)
     val isActive = state.activeKey == item.key
@@ -116,7 +116,7 @@ private fun TreeMenuItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (hasChildren) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = if (isOpen) "▾" else "▸",
                 color = colorScheme.text.placeholder,
                 style = typography.extraSmall,
@@ -124,7 +124,7 @@ private fun TreeMenuItem(
             )
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = item.label,
             color = textColor,
             style = typography.base,

@@ -65,65 +65,64 @@ class MentionState(
 @Composable
 fun rememberMentionState(
     initialValue: String = "",
-): io.github.xingray.compose.nexus.controls.MentionState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.MentionState(initialValue) }
+): MentionState = remember { MentionState(initialValue) }
 
 @Composable
 fun NexusMention(
-    state: io.github.xingray.compose.nexus.controls.MentionState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberMentionState(),
-    options: List<io.github.xingray.compose.nexus.controls.MentionOption> = emptyList(),
+    state: MentionState = rememberMentionState(),
+    options: List<MentionOption> = emptyList(),
     modifier: Modifier = Modifier,
     placeholder: String = "",
-    type: io.github.xingray.compose.nexus.controls.NexusInputType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputType.Text,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
-    props: io.github.xingray.compose.nexus.controls.MentionOptionProps = _root_ide_package_.io.github.xingray.compose.nexus.controls.MentionOptionProps(),
+    type: NexusInputType = NexusInputType.Text,
+    size: ComponentSize = ComponentSize.Default,
+    props: MentionOptionProps = MentionOptionProps(),
     prefix: List<String>? = null,
     trigger: Char = '@',
     split: Char = ' ',
-    filterOption: ((pattern: String, option: io.github.xingray.compose.nexus.controls.MentionOption) -> Boolean)? = null,
-    placement: io.github.xingray.compose.nexus.controls.NexusMentionPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusMentionPlacement.Bottom,
+    filterOption: ((pattern: String, option: MentionOption) -> Boolean)? = null,
+    placement: NexusMentionPlacement = NexusMentionPlacement.Bottom,
     whole: Boolean = false,
     checkIsWhole: ((pattern: String, prefix: String) -> Boolean)? = null,
     loading: Boolean = false,
     disabled: Boolean = false,
     readonly: Boolean = false,
     onSearch: ((pattern: String, prefix: String) -> Unit)? = null,
-    onSelect: ((option: io.github.xingray.compose.nexus.controls.MentionOption, prefix: String) -> Unit)? = null,
+    onSelect: ((option: MentionOption, prefix: String) -> Unit)? = null,
     onWholeRemove: ((pattern: String, prefix: String) -> Unit)? = null,
     onInput: ((String) -> Unit)? = null,
     onChange: ((String) -> Unit)? = null,
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
-    labelContent: (@Composable (item: io.github.xingray.compose.nexus.controls.MentionOption, index: Int) -> Unit)? = null,
+    labelContent: (@Composable (item: MentionOption, index: Int) -> Unit)? = null,
     loadingContent: (@Composable () -> Unit)? = null,
     header: (@Composable () -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
     val prefixes = (prefix ?: listOf(trigger.toString())).filter { it.length == 1 }.ifEmpty { listOf("@") }
 
-    fun optionValue(option: io.github.xingray.compose.nexus.controls.MentionOption): String {
+    fun optionValue(option: MentionOption): String {
         val payloadValue = option.payload[props.value]?.toString()
         return payloadValue ?: option.value.orEmpty()
     }
 
-    fun optionLabel(option: io.github.xingray.compose.nexus.controls.MentionOption): String {
+    fun optionLabel(option: MentionOption): String {
         val payloadLabel = option.payload[props.label]?.toString()
         return payloadLabel ?: option.label ?: optionValue(option)
     }
 
-    fun optionDisabled(option: io.github.xingray.compose.nexus.controls.MentionOption): Boolean {
-        val payloadDisabled = option.payload[props.disabled]
-        return when (payloadDisabled) {
+    fun optionDisabled(option: MentionOption): Boolean {
+        return when (val payloadDisabled = option.payload[props.disabled]) {
             is Boolean -> payloadDisabled
             is String -> payloadDisabled.equals("true", ignoreCase = true)
             else -> option.disabled
         }
     }
 
-    fun detectMentionHit(text: String): io.github.xingray.compose.nexus.controls.MentionHit? {
+    fun detectMentionHit(text: String): MentionHit? {
         var bestStart = -1
         var bestPrefix = ""
         prefixes.forEach { p ->
@@ -136,7 +135,7 @@ fun NexusMention(
         if (bestStart < 0) return null
         val tail = text.substring(bestStart + 1)
         if (tail.contains(split)) return null
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.MentionHit(
+        return MentionHit(
             start = bestStart,
             prefix = bestPrefix,
             pattern = tail,
@@ -169,7 +168,7 @@ fun NexusMention(
         lastSearchKey = ""
     }
 
-    fun replaceCurrentMention(option: io.github.xingray.compose.nexus.controls.MentionOption) {
+    fun replaceCurrentMention(option: MentionOption) {
         val hit = mentionHit ?: return
         val before = state.value.substring(0, hit.start)
         val inserted = "${hit.prefix}${optionValue(option)}$split"
@@ -181,7 +180,7 @@ fun NexusMention(
     }
 
     Column(modifier = modifier) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = state.value,
             onValueChange = { newValue ->
                 if (whole && newValue.length + 1 == state.value.length && state.value.startsWith(newValue)) {
@@ -214,7 +213,7 @@ fun NexusMention(
 
         if (state.isOpen) {
             Popup(
-                alignment = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusMentionPlacement.Bottom) Alignment.TopStart else Alignment.BottomStart,
+                alignment = if (placement == NexusMentionPlacement.Bottom) Alignment.TopStart else Alignment.BottomStart,
                 properties = PopupProperties(focusable = false),
             ) {
                 Column(
@@ -240,7 +239,7 @@ fun NexusMention(
                             if (loadingContent != null) {
                                 loadingContent()
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "Loading...",
                                     color = colorScheme.text.secondary,
                                     style = typography.small,
@@ -268,7 +267,7 @@ fun NexusMention(
                                     if (labelContent != null) {
                                         labelContent(option, index)
                                     } else {
-                                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                        NexusText(
                                             text = optionLabel(option),
                                             color = if (disabledOption) colorScheme.text.disabled else colorScheme.text.regular,
                                             style = typography.base,

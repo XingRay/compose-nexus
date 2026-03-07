@@ -110,10 +110,10 @@ class TreeState<T> {
 }
 
 @Composable
-fun <T> rememberTreeState(): io.github.xingray.compose.nexus.controls.TreeState<T> = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeState() }
+fun <T> rememberTreeState(): TreeState<T> = remember { TreeState() }
 
 private data class TreeRelations<T>(
-    val nodeByKey: Map<T, io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    val nodeByKey: Map<T, TreeNode<T>>,
     val parentByKey: Map<T, T?>,
     val childrenByKey: Map<T, List<T>>,
     val rootKeys: List<T>,
@@ -124,9 +124,9 @@ private data class TreeRelations<T>(
  */
 @Composable
 fun <T> NexusTree(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T> = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTreeState(),
+    state: TreeState<T> = rememberTreeState(),
     emptyText: String = "No Data",
     defaultExpandAll: Boolean = false,
     defaultExpandedKeys: List<T> = emptyList(),
@@ -139,20 +139,20 @@ fun <T> NexusTree(
     checkStrictly: Boolean = false,
     defaultCheckedKeys: List<T> = emptyList(),
     currentNodeKey: T? = null,
-    filterNodeMethod: ((String, io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)? = null,
+    filterNodeMethod: ((String, TreeNode<T>) -> Boolean)? = null,
     accordion: Boolean = false,
     indent: Int = 18,
     icon: (@Composable (expanded: Boolean, hasChildren: Boolean) -> Unit)? = null,
-    onNodeClick: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    onCheckChange: ((node: io.github.xingray.compose.nexus.controls.TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)? = null,
-    onCurrentChange: ((currentNode: io.github.xingray.compose.nexus.controls.TreeNode<T>?) -> Unit)? = null,
-    onNodeExpand: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    onNodeCollapse: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    nodeClassName: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> io.github.xingray.compose.nexus.theme.NexusType?)? = null,
-    nodeContent: (@Composable (io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
+    onNodeClick: ((TreeNode<T>) -> Unit)? = null,
+    onCheckChange: ((node: TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)? = null,
+    onCurrentChange: ((currentNode: TreeNode<T>?) -> Unit)? = null,
+    onNodeExpand: ((TreeNode<T>) -> Unit)? = null,
+    onNodeCollapse: ((TreeNode<T>) -> Unit)? = null,
+    nodeClassName: ((TreeNode<T>) -> NexusType?)? = null,
+    nodeContent: (@Composable (TreeNode<T>) -> Unit)? = null,
     empty: (@Composable () -> Unit)? = null,
 ) {
-    val relations = remember(nodes) { _root_ide_package_.io.github.xingray.compose.nexus.controls.buildTreeRelations(nodes) }
+    val relations = remember(nodes) { buildTreeRelations(nodes) }
 
     // Apply default state when input data/defaults change.
     remember(nodes, defaultExpandAll, defaultExpandedKeys, defaultCheckedKeys, currentNodeKey, checkStrictly) {
@@ -165,7 +165,7 @@ fun <T> NexusTree(
             state.clearChecked()
             defaultCheckedKeys.forEach { key ->
                 if (relations.nodeByKey.containsKey(key)) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.setCheckedWithCascade(
+                    setCheckedWithCascade(
                         key = key,
                         checked = true,
                         state = state,
@@ -186,10 +186,10 @@ fun <T> NexusTree(
         if (empty != null) {
             empty()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = emptyText,
-                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary,
-                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                color = NexusTheme.colorScheme.text.secondary,
+                style = NexusTheme.typography.small,
                 modifier = modifier.padding(8.dp),
             )
         }
@@ -199,12 +199,12 @@ fun <T> NexusTree(
     val keyword = state.filterKeyword.trim()
     val filtering = keyword.isNotEmpty()
     val visibleMap = remember(nodes, keyword, filterNodeMethod) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.buildVisibleMap(nodes, keyword, filterNodeMethod)
+        buildVisibleMap(nodes, keyword, filterNodeMethod)
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
         nodes.forEach { node ->
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeNodeItem(
+            TreeNodeItem(
                 node = node,
                 state = state,
                 relations = relations,
@@ -233,13 +233,13 @@ fun <T> NexusTree(
     }
 }
 
-private fun <T> buildTreeRelations(nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>): io.github.xingray.compose.nexus.controls.TreeRelations<T> {
-    val nodeByKey = LinkedHashMap<T, io.github.xingray.compose.nexus.controls.TreeNode<T>>()
+private fun <T> buildTreeRelations(nodes: List<TreeNode<T>>): TreeRelations<T> {
+    val nodeByKey = LinkedHashMap<T, TreeNode<T>>()
     val parentByKey = LinkedHashMap<T, T?>()
     val childrenByKey = LinkedHashMap<T, List<T>>()
     val rootKeys = nodes.map { it.key }
 
-    fun walk(node: io.github.xingray.compose.nexus.controls.TreeNode<T>, parent: T?) {
+    fun walk(node: TreeNode<T>, parent: T?) {
         nodeByKey[node.key] = node
         parentByKey[node.key] = parent
         childrenByKey[node.key] = node.children.map { it.key }
@@ -247,7 +247,7 @@ private fun <T> buildTreeRelations(nodes: List<io.github.xingray.compose.nexus.c
     }
     nodes.forEach { walk(it, null) }
 
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeRelations(
+    return TreeRelations(
         nodeByKey = nodeByKey,
         parentByKey = parentByKey,
         childrenByKey = childrenByKey,
@@ -256,14 +256,14 @@ private fun <T> buildTreeRelations(nodes: List<io.github.xingray.compose.nexus.c
 }
 
 private fun <T> buildVisibleMap(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     keyword: String,
-    filterNodeMethod: ((String, io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)?,
+    filterNodeMethod: ((String, TreeNode<T>) -> Boolean)?,
 ): Map<T, Boolean> {
     val visible = mutableMapOf<T, Boolean>()
 
     if (keyword.isBlank()) {
-        fun markAll(list: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>) {
+        fun markAll(list: List<TreeNode<T>>) {
             list.forEach { node ->
                 visible[node.key] = true
                 markAll(node.children)
@@ -273,11 +273,11 @@ private fun <T> buildVisibleMap(
         return visible
     }
 
-    fun matches(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    fun matches(node: TreeNode<T>): Boolean {
         return filterNodeMethod?.invoke(keyword, node) ?: node.label.contains(keyword, ignoreCase = true)
     }
 
-    fun walk(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    fun walk(node: TreeNode<T>): Boolean {
         val selfMatch = matches(node)
         val childMatch = node.children.any { walk(it) }
         val isVisible = selfMatch || childMatch
@@ -291,9 +291,9 @@ private fun <T> buildVisibleMap(
 
 @Composable
 private fun <T> TreeNodeItem(
-    node: io.github.xingray.compose.nexus.controls.TreeNode<T>,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-    relations: io.github.xingray.compose.nexus.controls.TreeRelations<T>,
+    node: TreeNode<T>,
+    state: TreeState<T>,
+    relations: TreeRelations<T>,
     visibleMap: Map<T, Boolean>,
     depth: Int,
     filtering: Boolean,
@@ -307,18 +307,18 @@ private fun <T> TreeNodeItem(
     accordion: Boolean,
     indent: Int,
     icon: (@Composable (expanded: Boolean, hasChildren: Boolean) -> Unit)?,
-    onNodeClick: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)?,
-    onCheckChange: ((node: io.github.xingray.compose.nexus.controls.TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)?,
-    onCurrentChange: ((currentNode: io.github.xingray.compose.nexus.controls.TreeNode<T>?) -> Unit)?,
-    onNodeExpand: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)?,
-    onNodeCollapse: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)?,
-    nodeClassName: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> io.github.xingray.compose.nexus.theme.NexusType?)?,
-    nodeContent: (@Composable (io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)?,
+    onNodeClick: ((TreeNode<T>) -> Unit)?,
+    onCheckChange: ((node: TreeNode<T>, checked: Boolean, indeterminate: Boolean) -> Unit)?,
+    onCurrentChange: ((currentNode: TreeNode<T>?) -> Unit)?,
+    onNodeExpand: ((TreeNode<T>) -> Unit)?,
+    onNodeCollapse: ((TreeNode<T>) -> Unit)?,
+    nodeClassName: ((TreeNode<T>) -> NexusType?)?,
+    nodeContent: (@Composable (TreeNode<T>) -> Unit)?,
 ) {
     if (visibleMap[node.key] != true) return
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val hasChildren = node.children.isNotEmpty()
     val isExpanded = state.isExpanded(node.key)
@@ -354,7 +354,7 @@ private fun <T> TreeNodeItem(
     }
 
     fun toggleCheckedByInput(next: Boolean) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.setCheckedWithCascade(
+        setCheckedWithCascade(
             key = node.key,
             checked = next,
             state = state,
@@ -389,7 +389,7 @@ private fun <T> TreeNodeItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(rowBackground, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .background(rowBackground, NexusTheme.shapes.base)
             .then(
                 if (!node.disabled) {
                     Modifier
@@ -423,7 +423,7 @@ private fun <T> TreeNodeItem(
             if (icon != null) {
                 icon(isExpanded, hasChildren)
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = when {
                         !hasChildren -> "  "
                         isExpanded -> "▾"
@@ -436,19 +436,19 @@ private fun <T> TreeNodeItem(
         }
 
         if (showCheckbox) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+            NexusCheckbox(
                 checked = isChecked,
                 onCheckedChange = { checked -> toggleCheckedByInput(checked) },
                 indeterminate = !checkStrictly && isHalfChecked,
                 disabled = node.disabled,
-                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
             )
         }
 
         if (nodeContent != null) {
             nodeContent(node)
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = node.label,
                 color = textColor,
                 style = typography.base,
@@ -499,8 +499,8 @@ private fun <T> TreeNodeItem(
 private fun <T> setCheckedWithCascade(
     key: T,
     checked: Boolean,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-    relations: io.github.xingray.compose.nexus.controls.TreeRelations<T>,
+    state: TreeState<T>,
+    relations: TreeRelations<T>,
     checkStrictly: Boolean,
 ) {
     if (checkStrictly) {
@@ -518,13 +518,13 @@ private fun <T> setCheckedWithCascade(
     }
 
     setDescendants(key, checked)
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.updateAncestors(key, state, relations)
+    updateAncestors(key, state, relations)
 }
 
 private fun <T> updateAncestors(
     key: T,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-    relations: io.github.xingray.compose.nexus.controls.TreeRelations<T>,
+    state: TreeState<T>,
+    relations: TreeRelations<T>,
 ) {
     var parent = relations.parentByKey[key]
     while (parent != null) {

@@ -214,7 +214,7 @@ fun App(modifier: Modifier = Modifier) {
     var isDarkMode by remember { mutableStateOf(false) }
     val colorScheme = if (isDarkMode) _root_ide_package_.io.github.xingray.compose.nexus.theme.darkColorScheme() else _root_ide_package_.io.github.xingray.compose.nexus.theme.lightColorScheme()
 
-    _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme(colorScheme = colorScheme) {
+    NexusTheme(colorScheme = colorScheme) {
         val colors = NexusTheme.colorScheme
         var currentRoute by remember { mutableStateOf(DemoRoute.Overview) }
 

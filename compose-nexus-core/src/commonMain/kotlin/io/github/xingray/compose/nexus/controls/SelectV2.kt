@@ -5,24 +5,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import io.github.xingray.compose.nexus.theme.ComponentSize
 
-typealias SelectV2State<T> = io.github.xingray.compose.nexus.controls.SelectState<T>
+typealias SelectV2State<T> = SelectState<T>
 
 @Composable
 fun <T> rememberSelectV2State(
     initialSelected: T? = null,
     initialSelectedValues: List<T> = emptyList(),
-): io.github.xingray.compose.nexus.controls.SelectV2State<T> = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSelectState(
+): SelectV2State<T> = rememberSelectState(
     initialSelected = initialSelected,
     initialSelectedValues = initialSelectedValues,
 )
 
 @Composable
 fun <T> NexusSelectV2(
-    state: io.github.xingray.compose.nexus.controls.SelectV2State<T>,
-    options: List<io.github.xingray.compose.nexus.controls.SelectOption<T>>,
+    state: SelectV2State<T>,
+    options: List<SelectOption<T>>,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     placeholder: String = "Please select",
     disabled: Boolean = false,
     clearable: Boolean = false,
@@ -33,9 +33,9 @@ fun <T> NexusSelectV2(
     collapseTagsTooltip: Boolean = false,
     maxCollapseTags: Int = 1,
     filterable: Boolean = false,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.SelectOption<T>) -> Boolean)? = null,
+    filterMethod: ((String, SelectOption<T>) -> Boolean)? = null,
     remote: Boolean = false,
-    remoteMethod: ((String) -> List<io.github.xingray.compose.nexus.controls.SelectOption<T>>)? = null,
+    remoteMethod: ((String) -> List<SelectOption<T>>)? = null,
     allowCreate: Boolean = false,
     defaultFirstOption: Boolean = false,
     reserveKeyword: Boolean = true,
@@ -43,7 +43,7 @@ fun <T> NexusSelectV2(
     loadingText: String = "Loading",
     noMatchText: String = "No matching data",
     noDataText: String = "No data",
-    props: io.github.xingray.compose.nexus.controls.SelectOptionProps = _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOptionProps(),
+    props: SelectOptionProps = SelectOptionProps(),
     valueKey: ((T) -> Any?)? = null,
     height: Int = 274,
     itemHeight: Int = 34,
@@ -56,10 +56,10 @@ fun <T> NexusSelectV2(
     prefix: (@Composable () -> Unit)? = null,
     empty: (@Composable () -> Unit)? = null,
     loadingContent: (@Composable () -> Unit)? = null,
-    optionContent: (@Composable (io.github.xingray.compose.nexus.controls.SelectOption<T>, Boolean) -> Unit)? = null,
-    tagContent: (@Composable (io.github.xingray.compose.nexus.controls.SelectOption<T>, Boolean, () -> Unit) -> Unit)? = null,
+    optionContent: (@Composable (SelectOption<T>, Boolean) -> Unit)? = null,
+    tagContent: (@Composable (SelectOption<T>, Boolean, () -> Unit) -> Unit)? = null,
     labelContent: (@Composable (index: Int, label: String, value: T) -> Unit)? = null,
-    createOption: ((String) -> io.github.xingray.compose.nexus.controls.SelectOption<T>)? = null,
+    createOption: ((String) -> SelectOption<T>)? = null,
     onChange: ((Any?) -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
     onRemoveTag: ((T) -> Unit)? = null,
@@ -67,7 +67,7 @@ fun <T> NexusSelectV2(
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSelect(
+    NexusSelect(
         state = state,
         options = options,
         onSelect = onSelect,

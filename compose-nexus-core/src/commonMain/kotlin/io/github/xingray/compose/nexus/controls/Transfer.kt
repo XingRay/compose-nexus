@@ -54,13 +54,13 @@ enum class TransferTargetOrder { Original, Push, Unshift }
 
 @Stable
 class TransferState<T>(
-    sourceItems: List<io.github.xingray.compose.nexus.controls.TransferItem<T>>,
-    targetItems: List<io.github.xingray.compose.nexus.controls.TransferItem<T>> = emptyList(),
+    sourceItems: List<TransferItem<T>>,
+    targetItems: List<TransferItem<T>> = emptyList(),
     leftDefaultChecked: List<T> = emptyList(),
     rightDefaultChecked: List<T> = emptyList(),
 ) {
-    val sourceList = mutableStateListOf<io.github.xingray.compose.nexus.controls.TransferItem<T>>().apply { addAll(sourceItems) }
-    val targetList = mutableStateListOf<io.github.xingray.compose.nexus.controls.TransferItem<T>>().apply { addAll(targetItems) }
+    val sourceList = mutableStateListOf<TransferItem<T>>().apply { addAll(sourceItems) }
+    val targetList = mutableStateListOf<TransferItem<T>>().apply { addAll(targetItems) }
     val sourceChecked = mutableStateListOf<T>().apply { addAll(leftDefaultChecked) }
     val targetChecked = mutableStateListOf<T>().apply { addAll(rightDefaultChecked) }
 
@@ -68,7 +68,7 @@ class TransferState<T>(
         item.key to index
     }.toMap()
 
-    fun moveToTarget(order: io.github.xingray.compose.nexus.controls.TransferTargetOrder): List<T> {
+    fun moveToTarget(order: TransferTargetOrder): List<T> {
         val toMove = sourceList.filter { it.key in sourceChecked && !it.disabled }
         if (toMove.isEmpty()) {
             sourceChecked.clear()
@@ -76,9 +76,9 @@ class TransferState<T>(
         }
         sourceList.removeAll(toMove.toSet())
         when (order) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Push -> targetList.addAll(toMove)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Unshift -> targetList.addAll(0, toMove)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Original -> {
+            TransferTargetOrder.Push -> targetList.addAll(toMove)
+            TransferTargetOrder.Unshift -> targetList.addAll(0, toMove)
+            TransferTargetOrder.Original -> {
                 targetList.addAll(toMove)
                 val sorted = targetList.sortedBy { originalOrder[it.key] ?: Int.MAX_VALUE }
                 targetList.clear()
@@ -90,7 +90,7 @@ class TransferState<T>(
         return moved
     }
 
-    fun moveToSource(order: io.github.xingray.compose.nexus.controls.TransferTargetOrder): List<T> {
+    fun moveToSource(order: TransferTargetOrder): List<T> {
         val toMove = targetList.filter { it.key in targetChecked && !it.disabled }
         if (toMove.isEmpty()) {
             targetChecked.clear()
@@ -98,9 +98,9 @@ class TransferState<T>(
         }
         targetList.removeAll(toMove.toSet())
         when (order) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Push -> sourceList.addAll(toMove)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Unshift -> sourceList.addAll(0, toMove)
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Original -> {
+            TransferTargetOrder.Push -> sourceList.addAll(toMove)
+            TransferTargetOrder.Unshift -> sourceList.addAll(0, toMove)
+            TransferTargetOrder.Original -> {
                 sourceList.addAll(toMove)
                 val sorted = sourceList.sortedBy { originalOrder[it.key] ?: Int.MAX_VALUE }
                 sourceList.clear()
@@ -129,12 +129,12 @@ class TransferState<T>(
 
 @Composable
 fun <T> rememberTransferState(
-    sourceItems: List<io.github.xingray.compose.nexus.controls.TransferItem<T>>,
-    targetItems: List<io.github.xingray.compose.nexus.controls.TransferItem<T>> = emptyList(),
+    sourceItems: List<TransferItem<T>>,
+    targetItems: List<TransferItem<T>> = emptyList(),
     leftDefaultChecked: List<T> = emptyList(),
     rightDefaultChecked: List<T> = emptyList(),
-): io.github.xingray.compose.nexus.controls.TransferState<T> = remember {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferState(
+): TransferState<T> = remember {
+    TransferState(
         sourceItems = sourceItems,
         targetItems = targetItems,
         leftDefaultChecked = leftDefaultChecked,
@@ -144,24 +144,24 @@ fun <T> rememberTransferState(
 
 @Composable
 fun <T> NexusTransfer(
-    state: io.github.xingray.compose.nexus.controls.TransferState<T>,
+    state: TransferState<T>,
     modifier: Modifier = Modifier,
     sourceTitle: String = "Source",
     targetTitle: String = "Target",
     filterable: Boolean = false,
     filterPlaceholder: String = "Filter keyword",
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.TransferItem<T>) -> Boolean)? = null,
-    targetOrder: io.github.xingray.compose.nexus.controls.TransferTargetOrder = _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferTargetOrder.Original,
+    filterMethod: ((String, TransferItem<T>) -> Boolean)? = null,
+    targetOrder: TransferTargetOrder = TransferTargetOrder.Original,
     titles: Pair<String, String>? = null,
     buttonTexts: Pair<String, String>? = null,
-    format: io.github.xingray.compose.nexus.controls.TransferFormat = _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferFormat(),
-    props: io.github.xingray.compose.nexus.controls.TransferPropsAlias = _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferPropsAlias(),
-    renderContent: (@Composable (io.github.xingray.compose.nexus.controls.TransferItem<T>) -> Unit)? = null,
+    format: TransferFormat = TransferFormat(),
+    props: TransferPropsAlias = TransferPropsAlias(),
+    renderContent: (@Composable (TransferItem<T>) -> Unit)? = null,
     leftFooter: (@Composable () -> Unit)? = null,
     rightFooter: (@Composable () -> Unit)? = null,
     leftEmpty: (@Composable () -> Unit)? = null,
     rightEmpty: (@Composable () -> Unit)? = null,
-    onChange: ((value: List<T>, direction: io.github.xingray.compose.nexus.controls.TransferDirection, movedKeys: List<T>) -> Unit)? = null,
+    onChange: ((value: List<T>, direction: TransferDirection, movedKeys: List<T>) -> Unit)? = null,
     onLeftCheckChange: ((value: List<T>, movedKeys: List<T>) -> Unit)? = null,
     onRightCheckChange: ((value: List<T>, movedKeys: List<T>) -> Unit)? = null,
 ) {
@@ -173,7 +173,7 @@ fun <T> NexusTransfer(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferPanel(
+        TransferPanel(
             title = finalTitles.first,
             items = state.sourceList,
             checkedKeys = state.sourceChecked,
@@ -186,7 +186,7 @@ fun <T> NexusTransfer(
             footer = leftFooter,
             empty = leftEmpty,
             onToggle = { item ->
-                val checked = state.toggleSourceCheck(item.key, _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveDisabled(item, props))
+                val checked = state.toggleSourceCheck(item.key, resolveDisabled(item, props))
                 onLeftCheckChange?.invoke(checked, listOf(item.key))
             },
             modifier = Modifier.weight(1f),
@@ -197,35 +197,35 @@ fun <T> NexusTransfer(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = {
                     val moved = state.moveToTarget(targetOrder)
                     if (moved.isNotEmpty()) {
-                        onChange?.invoke(state.targetKeys(), _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferDirection.Right, moved)
+                        onChange?.invoke(state.targetKeys(), TransferDirection.Right, moved)
                     }
                 },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
                 disabled = state.sourceChecked.isEmpty(),
-                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                size = ComponentSize.Small,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = finalButtonTexts.first)
+                NexusText(text = finalButtonTexts.first)
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = {
                     val moved = state.moveToSource(targetOrder)
                     if (moved.isNotEmpty()) {
-                        onChange?.invoke(state.targetKeys(), _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferDirection.Left, moved)
+                        onChange?.invoke(state.targetKeys(), TransferDirection.Left, moved)
                     }
                 },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
                 disabled = state.targetChecked.isEmpty(),
-                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                size = ComponentSize.Small,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = finalButtonTexts.second)
+                NexusText(text = finalButtonTexts.second)
             }
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TransferPanel(
+        TransferPanel(
             title = finalTitles.second,
             items = state.targetList,
             checkedKeys = state.targetChecked,
@@ -238,7 +238,7 @@ fun <T> NexusTransfer(
             footer = rightFooter,
             empty = rightEmpty,
             onToggle = { item ->
-                val checked = state.toggleTargetCheck(item.key, _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveDisabled(item, props))
+                val checked = state.toggleTargetCheck(item.key, resolveDisabled(item, props))
                 onRightCheckChange?.invoke(checked, listOf(item.key))
             },
             modifier = Modifier.weight(1f),
@@ -249,28 +249,28 @@ fun <T> NexusTransfer(
 @Composable
 private fun <T> TransferPanel(
     title: String,
-    items: List<io.github.xingray.compose.nexus.controls.TransferItem<T>>,
+    items: List<TransferItem<T>>,
     checkedKeys: List<T>,
     filterable: Boolean,
     filterPlaceholder: String,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.TransferItem<T>) -> Boolean)?,
-    format: io.github.xingray.compose.nexus.controls.TransferFormat,
-    props: io.github.xingray.compose.nexus.controls.TransferPropsAlias,
-    renderContent: (@Composable (io.github.xingray.compose.nexus.controls.TransferItem<T>) -> Unit)?,
+    filterMethod: ((String, TransferItem<T>) -> Boolean)?,
+    format: TransferFormat,
+    props: TransferPropsAlias,
+    renderContent: (@Composable (TransferItem<T>) -> Unit)?,
     footer: (@Composable () -> Unit)?,
     empty: (@Composable () -> Unit)?,
-    onToggle: (io.github.xingray.compose.nexus.controls.TransferItem<T>) -> Unit,
+    onToggle: (TransferItem<T>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     var filterText by remember { mutableStateOf("") }
     val filteredItems = if (filterText.isNotEmpty()) {
         items.filter { item ->
             filterMethod?.invoke(filterText, item)
-                ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveLabel(item, props).contains(filterText, ignoreCase = true)
+                ?: resolveLabel(item, props).contains(filterText, ignoreCase = true)
         }
     } else {
         items
@@ -294,13 +294,13 @@ private fun <T> TransferPanel(
                 .padding(horizontal = 12.dp, vertical = 10.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = title,
                     color = colorScheme.text.primary,
                     style = typography.base,
                     modifier = Modifier.weight(1f),
                 )
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = statusText,
                     color = colorScheme.text.secondary,
                     style = typography.extraSmall,
@@ -309,7 +309,7 @@ private fun <T> TransferPanel(
         }
 
         if (filterable) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = filterText,
                 onValueChange = { filterText = it },
                 placeholder = filterPlaceholder,
@@ -317,7 +317,7 @@ private fun <T> TransferPanel(
                     .fillMaxWidth()
                     .padding(8.dp),
                 clearable = true,
-                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                size = ComponentSize.Small,
             )
         }
 
@@ -337,7 +337,7 @@ private fun <T> TransferPanel(
                     if (empty != null) {
                         empty()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "No Data",
                             color = colorScheme.text.placeholder,
                             style = typography.small,
@@ -346,7 +346,7 @@ private fun <T> TransferPanel(
                 }
             } else {
                 filteredItems.forEach { item ->
-                    val disabled = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveDisabled(item, props)
+                    val disabled = resolveDisabled(item, props)
                     val isChecked = item.key in checkedKeys
                     Row(
                         modifier = Modifier
@@ -364,7 +364,7 @@ private fun <T> TransferPanel(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+                        NexusCheckbox(
                             checked = isChecked,
                             onCheckedChange = { if (!disabled) onToggle(item) },
                             disabled = disabled,
@@ -373,8 +373,8 @@ private fun <T> TransferPanel(
                             if (renderContent != null) {
                                 renderContent(item)
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                                    text = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveLabel(item, props),
+                                NexusText(
+                                    text = resolveLabel(item, props),
                                     color = if (disabled) colorScheme.text.disabled else colorScheme.text.regular,
                                     style = typography.base,
                                 )
@@ -397,11 +397,11 @@ private fun <T> TransferPanel(
     }
 }
 
-private fun <T> resolveLabel(item: io.github.xingray.compose.nexus.controls.TransferItem<T>, props: io.github.xingray.compose.nexus.controls.TransferPropsAlias): String {
+private fun <T> resolveLabel(item: TransferItem<T>, props: TransferPropsAlias): String {
     return item.payload[props.label]?.toString() ?: item.label
 }
 
-private fun <T> resolveDisabled(item: io.github.xingray.compose.nexus.controls.TransferItem<T>, props: io.github.xingray.compose.nexus.controls.TransferPropsAlias): Boolean {
+private fun <T> resolveDisabled(item: TransferItem<T>, props: TransferPropsAlias): Boolean {
     return when (val value = item.payload[props.disabled]) {
         is Boolean -> value
         is String -> value.equals("true", ignoreCase = true)

@@ -34,9 +34,9 @@ class InfiniteScrollState(
 }
 
 @Composable
-fun rememberInfiniteScrollState(): io.github.xingray.compose.nexus.controls.InfiniteScrollState {
+fun rememberInfiniteScrollState(): InfiniteScrollState {
     val listState = rememberLazyListState()
-    return remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.InfiniteScrollState(listState) }
+    return remember { InfiniteScrollState(listState) }
 }
 
 /**
@@ -55,7 +55,7 @@ fun rememberInfiniteScrollState(): io.github.xingray.compose.nexus.controls.Infi
 @Composable
 fun <T> NexusInfiniteScroll(
     items: List<T>,
-    state: io.github.xingray.compose.nexus.controls.InfiniteScrollState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberInfiniteScrollState(),
+    state: InfiniteScrollState = rememberInfiniteScrollState(),
     modifier: Modifier = Modifier,
     threshold: Int = 3,
     infiniteScrollDisabled: Boolean = false,
@@ -67,8 +67,8 @@ fun <T> NexusInfiniteScroll(
     noMoreContent: (@Composable () -> Unit)? = null,
     itemContent: @Composable (index: Int, item: T) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     state.disabled = infiniteScrollDisabled
 
@@ -153,7 +153,7 @@ fun <T> NexusInfiniteScroll(
                     if (loadingContent != null) {
                         loadingContent()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLoading(
+                        NexusLoading(
                             loading = true,
                             text = "Loading...",
                             spinnerSize = 24.dp,
@@ -175,7 +175,7 @@ fun <T> NexusInfiniteScroll(
                     if (noMoreContent != null) {
                         noMoreContent()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "No more data",
                             color = colorScheme.text.placeholder,
                             style = typography.small,

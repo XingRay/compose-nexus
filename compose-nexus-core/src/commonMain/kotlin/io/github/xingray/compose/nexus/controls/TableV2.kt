@@ -39,7 +39,7 @@ class NexusVirtualizedTableColumn<T>(
 @Composable
 fun <T> NexusVirtualizedTable(
     data: List<T>,
-    columns: List<io.github.xingray.compose.nexus.controls.NexusVirtualizedTableColumn<T>>,
+    columns: List<NexusVirtualizedTableColumn<T>>,
     modifier: Modifier = Modifier,
     width: Dp? = null,
     height: Dp = 420.dp,
@@ -48,7 +48,7 @@ fun <T> NexusVirtualizedTable(
     stripe: Boolean = false,
     border: Boolean = true,
     fixedData: List<T> = emptyList(),
-    rowClassName: ((rowIndex: Int, row: T) -> io.github.xingray.compose.nexus.theme.NexusType?)? = null,
+    rowClassName: ((rowIndex: Int, row: T) -> NexusType?)? = null,
     listState: LazyListState = rememberLazyListState(),
     onEndReached: ((remainDistance: Int) -> Unit)? = null,
     onScroll: ((scrollTop: Int) -> Unit)? = null,
@@ -56,7 +56,7 @@ fun <T> NexusVirtualizedTable(
     footer: (@Composable () -> Unit)? = null,
     overlay: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val borderColor = colorScheme.border.lighter
     val baseModifier = Modifier.then(if (width != null) Modifier.width(width) else Modifier.fillMaxWidth())
     val shouldNotifyEnd by remember(data.size, listState) {
@@ -85,7 +85,7 @@ fun <T> NexusVirtualizedTable(
         modifier = modifier
             .then(baseModifier)
             .height(height)
-            .then(if (border) Modifier.border(1.dp, borderColor, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base) else Modifier),
+            .then(if (border) Modifier.border(1.dp, borderColor, NexusTheme.shapes.base) else Modifier),
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             // Header
@@ -103,9 +103,9 @@ fun <T> NexusVirtualizedTable(
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         contentAlignment = column.headerAlignment,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = column.title,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                            style = NexusTheme.typography.small,
                             color = colorScheme.text.primary,
                         )
                     }
@@ -114,7 +114,7 @@ fun <T> NexusVirtualizedTable(
 
             // Fixed rows below header.
             if (fixedData.isNotEmpty()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.ColumnRows(
+                ColumnRows(
                     rows = fixedData,
                     columns = columns,
                     rowHeight = rowHeight,
@@ -138,7 +138,7 @@ fun <T> NexusVirtualizedTable(
                     if (empty != null) {
                         empty()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "No Data", color = colorScheme.text.secondary)
+                        NexusText(text = "No Data", color = colorScheme.text.secondary)
                     }
                 }
             } else {
@@ -205,13 +205,13 @@ fun <T> NexusVirtualizedTable(
 @Composable
 private fun <T> ColumnRows(
     rows: List<T>,
-    columns: List<io.github.xingray.compose.nexus.controls.NexusVirtualizedTableColumn<T>>,
+    columns: List<NexusVirtualizedTableColumn<T>>,
     rowHeight: Dp,
     startY: Dp,
     stripe: Boolean,
-    rowClassName: ((rowIndex: Int, row: T) -> io.github.xingray.compose.nexus.theme.NexusType?)?,
+    rowClassName: ((rowIndex: Int, row: T) -> NexusType?)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     Box(modifier = Modifier.padding(top = startY)) {
         rows.forEachIndexed { rowIndex, row ->
             val status = rowClassName?.invoke(rowIndex, row)

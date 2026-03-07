@@ -61,9 +61,9 @@ enum class DrawerDirection {
 
 @Composable
 fun NexusDrawer(
-    state: io.github.xingray.compose.nexus.containers.DialogState,
+    state: DialogState,
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.containers.DrawerDirection = _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right,
+    direction: DrawerDirection = DrawerDirection.Right,
     size: Dp = 320.dp,
     title: String? = null,
     withHeader: Boolean = true,
@@ -92,7 +92,7 @@ fun NexusDrawer(
     closeIcon: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val openCloseDuration = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion.durationFast.toLong()
+    val openCloseDuration = NexusTheme.motion.durationFast.toLong()
     var lastVisible by remember { mutableStateOf(state.visible) }
     LaunchedEffect(state.visible) {
         if (state.visible && !lastVisible) {
@@ -111,9 +111,9 @@ fun NexusDrawer(
 
     if (!state.visible) return
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
-    val motion = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion
+    val colorScheme = NexusTheme.colorScheme
+    val shadows = NexusTheme.shadows
+    val motion = NexusTheme.motion
     val density = LocalDensity.current
     var currentSize by remember(direction) { mutableStateOf(size) }
 
@@ -127,22 +127,22 @@ fun NexusDrawer(
     val enterTransition: EnterTransition
     val exitTransition: ExitTransition
     when (direction) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left -> {
+        DrawerDirection.Left -> {
             enterTransition = fadeIn(motion.tweenFade()) + slideInHorizontally(initialOffsetX = { -it }, animationSpec = motion.tweenFast())
             exitTransition = fadeOut(motion.tweenFadeLinear()) + slideOutHorizontally(targetOffsetX = { -it }, animationSpec = motion.tweenFast())
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> {
+        DrawerDirection.Right -> {
             enterTransition = fadeIn(motion.tweenFade()) + slideInHorizontally(initialOffsetX = { it }, animationSpec = motion.tweenFast())
             exitTransition = fadeOut(motion.tweenFadeLinear()) + slideOutHorizontally(targetOffsetX = { it }, animationSpec = motion.tweenFast())
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top -> {
+        DrawerDirection.Top -> {
             enterTransition = fadeIn(motion.tweenFade()) + slideInVertically(initialOffsetY = { -it }, animationSpec = motion.tweenFast())
             exitTransition = fadeOut(motion.tweenFadeLinear()) + slideOutVertically(targetOffsetY = { -it }, animationSpec = motion.tweenFast())
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> {
+        DrawerDirection.Bottom -> {
             enterTransition = fadeIn(motion.tweenFade()) + slideInVertically(initialOffsetY = { it }, animationSpec = motion.tweenFast())
             exitTransition = fadeOut(motion.tweenFadeLinear()) + slideOutVertically(targetOffsetY = { it }, animationSpec = motion.tweenFast())
         }
@@ -193,16 +193,16 @@ fun NexusDrawer(
             }
 
             val panelAlignment = when (direction) {
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left -> Alignment.CenterStart
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> Alignment.CenterEnd
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top -> Alignment.TopCenter
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> Alignment.BottomCenter
+                DrawerDirection.Left -> Alignment.CenterStart
+                DrawerDirection.Right -> Alignment.CenterEnd
+                DrawerDirection.Top -> Alignment.TopCenter
+                DrawerDirection.Bottom -> Alignment.BottomCenter
             }
 
             val minSize = 220.dp
             val maxSize = when (direction) {
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left, _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> (maxWidth * 0.95f).coerceAtLeast(minSize)
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top, _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> (maxHeight * 0.95f).coerceAtLeast(minSize)
+                DrawerDirection.Left, DrawerDirection.Right -> (maxWidth * 0.95f).coerceAtLeast(minSize)
+                DrawerDirection.Top, DrawerDirection.Bottom -> (maxHeight * 0.95f).coerceAtLeast(minSize)
             }
             currentSize = currentSize.coerceIn(minSize, maxSize)
 
@@ -216,8 +216,8 @@ fun NexusDrawer(
                         .align(panelAlignment)
                         .then(
                             when (direction) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left, _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> Modifier.width(currentSize).fillMaxHeight()
-                                _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top, _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> Modifier.height(currentSize).fillMaxWidth()
+                                DrawerDirection.Left, DrawerDirection.Right -> Modifier.width(currentSize).fillMaxHeight()
+                                DrawerDirection.Top, DrawerDirection.Bottom -> Modifier.height(currentSize).fillMaxWidth()
                             }
                         )
                         .shadow(shadows.dark.elevation)
@@ -239,10 +239,10 @@ fun NexusDrawer(
                                 if (header != null) {
                                     header()
                                 } else if (title != null) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = title,
                                         color = colorScheme.text.primary,
-                                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large,
+                                        style = NexusTheme.typography.large,
                                     )
                                 }
                             }
@@ -258,21 +258,21 @@ fun NexusDrawer(
                                     if (closeIcon != null) {
                                         closeIcon()
                                     } else {
-                                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                        NexusText(
                                             text = "✕",
                                             color = colorScheme.text.placeholder,
-                                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.medium,
+                                            style = NexusTheme.typography.medium,
                                         )
                                     }
                                 }
                             }
                         }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider(color = colorScheme.border.lighter)
+                        NexusDivider(color = colorScheme.border.lighter)
                     }
 
-                    _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                    ProvideContentColorTextStyle(
                         contentColor = colorScheme.text.regular,
-                        textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        textStyle = NexusTheme.typography.base,
                     ) {
                         Box(
                             modifier = Modifier
@@ -289,7 +289,7 @@ fun NexusDrawer(
                     }
 
                     if (footer != null) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider(color = colorScheme.border.lighter)
+                        NexusDivider(color = colorScheme.border.lighter)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -304,19 +304,19 @@ fun NexusDrawer(
 
             if (resizable) {
                 val handleModifier = when (direction) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left -> Modifier
+                    DrawerDirection.Left -> Modifier
                         .align(Alignment.CenterStart)
                         .fillMaxHeight()
                         .width(6.dp)
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> Modifier
+                    DrawerDirection.Right -> Modifier
                         .align(Alignment.CenterEnd)
                         .fillMaxHeight()
                         .width(6.dp)
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top -> Modifier
+                    DrawerDirection.Top -> Modifier
                         .align(Alignment.TopCenter)
                         .fillMaxWidth()
                         .height(6.dp)
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> Modifier
+                    DrawerDirection.Bottom -> Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .height(6.dp)
@@ -333,10 +333,10 @@ fun NexusDrawer(
                             ) { change, dragAmount ->
                                 change.consume()
                                 val deltaPx = when (direction) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Left -> dragAmount.x
-                                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Right -> -dragAmount.x
-                                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Top -> dragAmount.y
-                                    _root_ide_package_.io.github.xingray.compose.nexus.containers.DrawerDirection.Bottom -> -dragAmount.y
+                                    DrawerDirection.Left -> dragAmount.x
+                                    DrawerDirection.Right -> -dragAmount.x
+                                    DrawerDirection.Top -> dragAmount.y
+                                    DrawerDirection.Bottom -> -dragAmount.y
                                 }
                                 val delta = with(density) { deltaPx.toDp() }
                                 currentSize = (currentSize + delta).coerceIn(minSize, maxSize)

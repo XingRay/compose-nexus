@@ -50,13 +50,13 @@ data class SearchSelectItem<T>(
  */
 @Stable
 class SearchSelectPageState<T>(
-    allItems: List<io.github.xingray.compose.nexus.templates.SearchSelectItem<T>>,
+    allItems: List<SearchSelectItem<T>>,
 ) {
     val allItems = allItems.toList()
     var query by mutableStateOf("")
     val selectedKeys = mutableStateListOf<T>()
 
-    val filteredItems: List<io.github.xingray.compose.nexus.templates.SearchSelectItem<T>>
+    val filteredItems: List<SearchSelectItem<T>>
         get() = if (query.isBlank()) allItems
         else allItems.filter { it.label.contains(query, ignoreCase = true) }
 
@@ -75,14 +75,14 @@ class SearchSelectPageState<T>(
         selectedKeys.clear()
     }
 
-    fun selectedItems(): List<io.github.xingray.compose.nexus.templates.SearchSelectItem<T>> =
+    fun selectedItems(): List<SearchSelectItem<T>> =
         allItems.filter { it.key in selectedKeys }
 }
 
 @Composable
 fun <T> rememberSearchSelectPageState(
-    allItems: List<io.github.xingray.compose.nexus.templates.SearchSelectItem<T>>,
-): io.github.xingray.compose.nexus.templates.SearchSelectPageState<T> = remember(allItems) { _root_ide_package_.io.github.xingray.compose.nexus.templates.SearchSelectPageState(allItems) }
+    allItems: List<SearchSelectItem<T>>,
+): SearchSelectPageState<T> = remember(allItems) { SearchSelectPageState(allItems) }
 
 /**
  * SearchSelectPage — a full-page template for searching, selecting, and confirming items.
@@ -98,15 +98,15 @@ fun <T> rememberSearchSelectPageState(
  */
 @Composable
 fun <T> NexusSearchSelectPage(
-    state: io.github.xingray.compose.nexus.templates.SearchSelectPageState<T>,
+    state: SearchSelectPageState<T>,
     modifier: Modifier = Modifier,
     title: String = "Search & Select",
     onConfirm: ((List<T>) -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -115,7 +115,7 @@ fun <T> NexusSearchSelectPage(
             .padding(20.dp),
     ) {
         // Title
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
@@ -124,7 +124,7 @@ fun <T> NexusSearchSelectPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Search input
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = state.query,
             onValueChange = { state.query = it },
             placeholder = "Search...",
@@ -152,7 +152,7 @@ fun <T> NexusSearchSelectPage(
                         .padding(40.dp),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "No results found",
                         color = colorScheme.text.placeholder,
                         style = typography.base,
@@ -173,7 +173,7 @@ fun <T> NexusSearchSelectPage(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = item.label,
                             color = if (selected) colorScheme.primary.base
                             else colorScheme.text.regular,
@@ -181,7 +181,7 @@ fun <T> NexusSearchSelectPage(
                             modifier = Modifier.weight(1f),
                         )
                         if (selected) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "✓",
                                 color = colorScheme.primary.base,
                                 style = typography.base,
@@ -196,7 +196,7 @@ fun <T> NexusSearchSelectPage(
 
         // Selected tags
         if (state.selectedKeys.isNotEmpty()) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = "Selected (${state.selectedKeys.size})",
                 color = colorScheme.text.secondary,
                 style = typography.small,
@@ -207,14 +207,14 @@ fun <T> NexusSearchSelectPage(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 state.selectedItems().take(10).forEach { item ->
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+                    NexusTag(
                         text = item.label,
                         closable = true,
                         onClose = { state.removeSelected(item.key) },
                     )
                 }
                 if (state.selectedKeys.size > 10) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "+${state.selectedKeys.size - 10}",
                         color = colorScheme.text.secondary,
                         style = typography.extraSmall,
@@ -225,21 +225,21 @@ fun <T> NexusSearchSelectPage(
         }
 
         // Action buttons
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+        NexusDivider()
         Spacer(modifier = Modifier.height(12.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = { onCancel?.invoke() }) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Cancel")
+            NexusButton(onClick = { onCancel?.invoke() }) {
+                NexusText(text = "Cancel")
             }
             Spacer(modifier = Modifier.width(8.dp))
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = { onConfirm?.invoke(state.selectedKeys.toList()) },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Confirm")
+                NexusText(text = "Confirm")
             }
         }
     }

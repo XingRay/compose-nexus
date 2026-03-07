@@ -23,23 +23,23 @@ import io.github.xingray.compose.nexus.theme.NexusType
 import io.github.xingray.compose.nexus.theme.typeColor
 
 private data class VirtualizedTreeFlatNode<T>(
-    val node: io.github.xingray.compose.nexus.controls.TreeNode<T>,
+    val node: TreeNode<T>,
     val depth: Int,
     val hasChildren: Boolean,
     val expanded: Boolean,
 )
 
 private data class VirtualizedTreeRelations<T>(
-    val nodeByKey: Map<T, io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    val nodeByKey: Map<T, TreeNode<T>>,
     val parentByKey: Map<T, T?>,
     val childrenByKey: Map<T, List<T>>,
 )
 
 @Composable
 fun <T> NexusVirtualizedTree(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T> = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTreeState(),
+    state: TreeState<T> = rememberTreeState(),
     emptyText: String = "No Data",
     height: Dp = 200.dp,
     itemSize: Dp = 26.dp,
@@ -53,23 +53,23 @@ fun <T> NexusVirtualizedTree(
     defaultExpandedKeys: List<T> = emptyList(),
     defaultCheckedKeys: List<T> = emptyList(),
     currentNodeKey: T? = null,
-    filterMethod: ((query: String, node: io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)? = null,
+    filterMethod: ((query: String, node: TreeNode<T>) -> Boolean)? = null,
     indent: Int = 16,
     icon: (@Composable (expanded: Boolean, isLeaf: Boolean) -> Unit)? = null,
-    nodeClassName: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> io.github.xingray.compose.nexus.theme.NexusType?)? = null,
-    nodeContent: (@Composable (io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    onNodeClick: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    onCheckChange: ((io.github.xingray.compose.nexus.controls.TreeNode<T>, Boolean) -> Unit)? = null,
-    onCurrentChange: ((io.github.xingray.compose.nexus.controls.TreeNode<T>?) -> Unit)? = null,
-    onNodeExpand: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
-    onNodeCollapse: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
+    nodeClassName: ((TreeNode<T>) -> NexusType?)? = null,
+    nodeContent: (@Composable (TreeNode<T>) -> Unit)? = null,
+    onNodeClick: ((TreeNode<T>) -> Unit)? = null,
+    onCheckChange: ((TreeNode<T>, Boolean) -> Unit)? = null,
+    onCurrentChange: ((TreeNode<T>?) -> Unit)? = null,
+    onNodeExpand: ((TreeNode<T>) -> Unit)? = null,
+    onNodeCollapse: ((TreeNode<T>) -> Unit)? = null,
     empty: (@Composable () -> Unit)? = null,
 ) {
     // Keep API parity. Current implementation does not force a scrollbar style.
     @Suppress("UNUSED_VARIABLE")
     val _unusedScrollbarAlwaysOn = scrollbarAlwaysOn
 
-    val relations = remember(nodes) { _root_ide_package_.io.github.xingray.compose.nexus.controls.buildVirtualizedTreeRelations(nodes) }
+    val relations = remember(nodes) { buildVirtualizedTreeRelations(nodes) }
 
     remember(nodes, defaultExpandedKeys, defaultCheckedKeys, currentNodeKey, checkStrictly) {
         defaultExpandedKeys.forEach { state.expand(it) }
@@ -77,7 +77,7 @@ fun <T> NexusVirtualizedTree(
             state.clearChecked()
             defaultCheckedKeys.forEach { key ->
                 if (relations.nodeByKey.containsKey(key)) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.setVirtualizedCheckedWithCascade(
+                    setVirtualizedCheckedWithCascade(
                         key = key,
                         checked = true,
                         state = state,
@@ -97,10 +97,10 @@ fun <T> NexusVirtualizedTree(
         if (empty != null) {
             empty()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = emptyText,
-                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary,
-                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                color = NexusTheme.colorScheme.text.secondary,
+                style = NexusTheme.typography.small,
                 modifier = modifier.padding(8.dp),
             )
         }
@@ -110,11 +110,11 @@ fun <T> NexusVirtualizedTree(
     val keyword = state.filterKeyword.trim()
     val filtering = keyword.isNotEmpty()
     val visibleMap = remember(nodes, keyword, filterMethod) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.buildVirtualizedVisibleMap(nodes, keyword, filterMethod)
+        buildVirtualizedVisibleMap(nodes, keyword, filterMethod)
     }
 
     val flatNodes = remember(nodes, visibleMap, filtering, state.expandedKeyMap.toMap()) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.flattenVirtualizedTree(
+        flattenVirtualizedTree(
             nodes = nodes,
             visibleMap = visibleMap,
             filtering = filtering,
@@ -126,10 +126,10 @@ fun <T> NexusVirtualizedTree(
         if (empty != null) {
             empty()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = emptyText,
-                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary,
-                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                color = NexusTheme.colorScheme.text.secondary,
+                style = NexusTheme.typography.small,
                 modifier = modifier.padding(8.dp),
             )
         }
@@ -151,17 +151,17 @@ fun <T> NexusVirtualizedTree(
             val isCurrent = state.isSelected(node.key)
             val isChecked = state.isChecked(node.key)
             val isHalfChecked = state.isHalfChecked(node.key)
-            val classColor = nodeClassName?.invoke(node)?.let { type -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.typeColor(type)?.base }
+            val classColor = nodeClassName?.invoke(node)?.let { type -> NexusTheme.colorScheme.typeColor(type)?.base }
 
             val rowBackground = when {
-                highlightCurrent && isCurrent -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.light9
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.fill.blank
+                highlightCurrent && isCurrent -> NexusTheme.colorScheme.primary.light9
+                else -> NexusTheme.colorScheme.fill.blank
             }
             val textColor = when {
-                node.disabled -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.disabled
-                isCurrent -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base
+                node.disabled -> NexusTheme.colorScheme.text.disabled
+                isCurrent -> NexusTheme.colorScheme.primary.base
                 classColor != null -> classColor
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular
+                else -> NexusTheme.colorScheme.text.regular
             }
 
             fun toggleExpand() {
@@ -176,7 +176,7 @@ fun <T> NexusVirtualizedTree(
             }
 
             fun toggleChecked(next: Boolean) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.setVirtualizedCheckedWithCascade(
+                setVirtualizedCheckedWithCascade(
                     key = node.key,
                     checked = next,
                     state = state,
@@ -206,7 +206,7 @@ fun <T> NexusVirtualizedTree(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(itemSize)
-                    .background(rowBackground, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+                    .background(rowBackground, NexusTheme.shapes.base)
                     .then(
                         if (!node.disabled) {
                             Modifier
@@ -235,35 +235,35 @@ fun <T> NexusVirtualizedTree(
                     if (icon != null) {
                         icon(isExpanded, !hasChildren)
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = when {
                                 !hasChildren -> "  "
                                 isExpanded -> "▾"
                                 else -> "▸"
                             },
-                            color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.placeholder,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                            color = NexusTheme.colorScheme.text.placeholder,
+                            style = NexusTheme.typography.extraSmall,
                         )
                     }
                 }
 
                 if (showCheckbox) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+                    NexusCheckbox(
                         checked = isChecked,
                         onCheckedChange = { checked -> toggleChecked(checked) },
                         indeterminate = !checkStrictly && isHalfChecked,
                         disabled = node.disabled,
-                        size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                        size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
                     )
                 }
 
                 if (nodeContent != null) {
                     nodeContent(node)
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = node.label,
                         color = textColor,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                        style = NexusTheme.typography.base,
                     )
                 }
             }
@@ -272,19 +272,19 @@ fun <T> NexusVirtualizedTree(
 }
 
 private fun <T> flattenVirtualizedTree(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     visibleMap: Map<T, Boolean>,
     filtering: Boolean,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-): List<io.github.xingray.compose.nexus.controls.VirtualizedTreeFlatNode<T>> {
-    val list = mutableListOf<io.github.xingray.compose.nexus.controls.VirtualizedTreeFlatNode<T>>()
+    state: TreeState<T>,
+): List<VirtualizedTreeFlatNode<T>> {
+    val list = mutableListOf<VirtualizedTreeFlatNode<T>>()
 
-    fun walk(node: io.github.xingray.compose.nexus.controls.TreeNode<T>, depth: Int) {
+    fun walk(node: TreeNode<T>, depth: Int) {
         if (visibleMap[node.key] != true) return
 
         val hasChildren = node.children.isNotEmpty()
         val expanded = state.isExpanded(node.key)
-        list += _root_ide_package_.io.github.xingray.compose.nexus.controls.VirtualizedTreeFlatNode(
+        list += VirtualizedTreeFlatNode(
             node = node,
             depth = depth,
             hasChildren = hasChildren,
@@ -302,12 +302,12 @@ private fun <T> flattenVirtualizedTree(
     return list
 }
 
-private fun <T> buildVirtualizedTreeRelations(nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>): io.github.xingray.compose.nexus.controls.VirtualizedTreeRelations<T> {
-    val nodeByKey = LinkedHashMap<T, io.github.xingray.compose.nexus.controls.TreeNode<T>>()
+private fun <T> buildVirtualizedTreeRelations(nodes: List<TreeNode<T>>): VirtualizedTreeRelations<T> {
+    val nodeByKey = LinkedHashMap<T, TreeNode<T>>()
     val parentByKey = LinkedHashMap<T, T?>()
     val childrenByKey = LinkedHashMap<T, List<T>>()
 
-    fun walk(node: io.github.xingray.compose.nexus.controls.TreeNode<T>, parent: T?) {
+    fun walk(node: TreeNode<T>, parent: T?) {
         nodeByKey[node.key] = node
         parentByKey[node.key] = parent
         childrenByKey[node.key] = node.children.map { it.key }
@@ -315,7 +315,7 @@ private fun <T> buildVirtualizedTreeRelations(nodes: List<io.github.xingray.comp
     }
     nodes.forEach { walk(it, null) }
 
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.VirtualizedTreeRelations(
+    return VirtualizedTreeRelations(
         nodeByKey = nodeByKey,
         parentByKey = parentByKey,
         childrenByKey = childrenByKey,
@@ -325,8 +325,8 @@ private fun <T> buildVirtualizedTreeRelations(nodes: List<io.github.xingray.comp
 private fun <T> setVirtualizedCheckedWithCascade(
     key: T,
     checked: Boolean,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-    relations: io.github.xingray.compose.nexus.controls.VirtualizedTreeRelations<T>,
+    state: TreeState<T>,
+    relations: VirtualizedTreeRelations<T>,
     checkStrictly: Boolean,
 ) {
     if (checkStrictly) {
@@ -344,13 +344,13 @@ private fun <T> setVirtualizedCheckedWithCascade(
     }
 
     setDescendants(key, checked)
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.updateVirtualizedAncestors(key, state, relations)
+    updateVirtualizedAncestors(key, state, relations)
 }
 
 private fun <T> updateVirtualizedAncestors(
     key: T,
-    state: io.github.xingray.compose.nexus.controls.TreeState<T>,
-    relations: io.github.xingray.compose.nexus.controls.VirtualizedTreeRelations<T>,
+    state: TreeState<T>,
+    relations: VirtualizedTreeRelations<T>,
 ) {
     var parent = relations.parentByKey[key]
     while (parent != null) {
@@ -377,14 +377,14 @@ private fun <T> updateVirtualizedAncestors(
 }
 
 private fun <T> buildVirtualizedVisibleMap(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     keyword: String,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)?,
+    filterMethod: ((String, TreeNode<T>) -> Boolean)?,
 ): Map<T, Boolean> {
     val visible = mutableMapOf<T, Boolean>()
 
     if (keyword.isBlank()) {
-        fun markAll(list: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>) {
+        fun markAll(list: List<TreeNode<T>>) {
             list.forEach { node ->
                 visible[node.key] = true
                 markAll(node.children)
@@ -394,11 +394,11 @@ private fun <T> buildVirtualizedVisibleMap(
         return visible
     }
 
-    fun matches(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    fun matches(node: TreeNode<T>): Boolean {
         return filterMethod?.invoke(keyword, node) ?: node.label.contains(keyword, ignoreCase = true)
     }
 
-    fun walk(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    fun walk(node: TreeNode<T>): Boolean {
         val selfMatch = matches(node)
         val childMatch = node.children.any { walk(it) }
         val isVisible = selfMatch || childMatch

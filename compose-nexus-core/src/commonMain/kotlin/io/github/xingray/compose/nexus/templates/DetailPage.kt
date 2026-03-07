@@ -46,14 +46,14 @@ data class DetailField(
 fun NexusDetailPage(
     modifier: Modifier = Modifier,
     title: String = "Detail",
-    fields: List<io.github.xingray.compose.nexus.templates.DetailField> = emptyList(),
+    fields: List<DetailField> = emptyList(),
     onBack: (() -> Unit)? = null,
     headerExtra: (@Composable () -> Unit)? = null,
     sections: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -68,12 +68,12 @@ fun NexusDetailPage(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (onBack != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = onBack) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "← Back")
+                NexusButton(onClick = onBack) {
+                    NexusText(text = "← Back")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
                 color = colorScheme.text.primary,
                 style = typography.extraLarge,
@@ -101,13 +101,13 @@ fun NexusDetailPage(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = field.label,
                             color = colorScheme.text.secondary,
                             style = typography.base,
                             modifier = Modifier.width(120.dp),
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = field.value,
                             color = colorScheme.text.primary,
                             style = typography.base,
@@ -115,7 +115,7 @@ fun NexusDetailPage(
                         )
                     }
                     if (index < fields.lastIndex) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+                        NexusDivider()
                     }
                 }
             }

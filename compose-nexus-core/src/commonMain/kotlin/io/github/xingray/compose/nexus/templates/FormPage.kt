@@ -45,9 +45,9 @@ fun NexusFormPage(
     resetText: String = "Reset",
     formContent: @Composable () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -56,14 +56,14 @@ fun NexusFormPage(
             .padding(20.dp),
     ) {
         // Header
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
         )
         if (subtitle != null) {
             Spacer(modifier = Modifier.height(4.dp))
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = subtitle,
                 color = colorScheme.text.secondary,
                 style = typography.base,
@@ -88,23 +88,23 @@ fun NexusFormPage(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Action buttons
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+        NexusDivider()
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
         ) {
             if (onReset != null) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(onClick = onReset) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = resetText)
+                NexusButton(onClick = onReset) {
+                    NexusText(text = resetText)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = { onSubmit?.invoke() },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = submitText)
+                NexusText(text = submitText)
             }
         }
     }

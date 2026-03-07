@@ -31,24 +31,24 @@ class PopconfirmState(initialVisible: Boolean = false) {
 }
 
 @Composable
-fun rememberPopconfirmState(initialVisible: Boolean = false): io.github.xingray.compose.nexus.controls.PopconfirmState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.PopconfirmState(initialVisible) }
+fun rememberPopconfirmState(initialVisible: Boolean = false): PopconfirmState =
+    remember { PopconfirmState(initialVisible) }
 
 @Composable
 fun NexusPopconfirm(
     title: String,
-    state: io.github.xingray.compose.nexus.controls.PopconfirmState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberPopconfirmState(),
+    state: PopconfirmState = rememberPopconfirmState(),
     modifier: Modifier = Modifier,
-    placement: io.github.xingray.compose.nexus.controls.PopoverPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Top,
-    trigger: io.github.xingray.compose.nexus.controls.PopoverTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.Click,
-    effect: io.github.xingray.compose.nexus.controls.TooltipTheme = _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Light,
+    placement: PopoverPlacement = PopoverPlacement.Top,
+    trigger: PopoverTrigger = PopoverTrigger.Click,
+    effect: TooltipTheme = TooltipTheme.Light,
     confirmButtonText: String = "OK",
     cancelButtonText: String = "Cancel",
-    confirmButtonType: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-    cancelButtonType: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+    confirmButtonType: NexusType = NexusType.Primary,
+    cancelButtonType: NexusType = NexusType.Info,
     width: Dp = 180.dp,
     hideIcon: Boolean = false,
-    iconColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.warning.base,
+    iconColor: Color = NexusTheme.colorScheme.warning.base,
     icon: (@Composable () -> Unit)? = null,
     actions: (@Composable (confirm: () -> Unit, cancel: () -> Unit) -> Unit)? = null,
     onConfirm: (() -> Unit)? = null,
@@ -66,8 +66,8 @@ fun NexusPopconfirm(
         Unit
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusPopover(
-        state = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberPopoverState(initialVisible = state.visible),
+    NexusPopover(
+        state = rememberPopoverState(initialVisible = state.visible),
         modifier = modifier,
         width = width,
         placement = placement,
@@ -81,17 +81,17 @@ fun NexusPopconfirm(
                         if (icon != null) {
                             icon()
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "!",
                                 color = iconColor,
-                                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+                                style = NexusTheme.typography.base,
                             )
                         }
                     }
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = title,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
-                        color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
+                        style = NexusTheme.typography.small,
+                        color = NexusTheme.colorScheme.text.regular,
                     )
                 }
                 if (actions != null) {
@@ -100,18 +100,18 @@ fun NexusPopconfirm(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                        NexusButton(
                             text = cancelButtonText,
                             onClick = cancelAction,
                             type = cancelButtonType,
-                            size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                            size = ComponentSize.Small,
                             textButton = true,
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                        NexusButton(
                             text = confirmButtonText,
                             onClick = confirmAction,
                             type = confirmButtonType,
-                            size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                            size = ComponentSize.Small,
                         )
                     }
                 }

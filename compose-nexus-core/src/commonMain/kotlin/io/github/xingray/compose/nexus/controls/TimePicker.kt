@@ -41,8 +41,8 @@ data class NexusTime(
 
 @Stable
 class TimePickerState(
-    initialTime: io.github.xingray.compose.nexus.controls.NexusTime? = null,
-    initialRange: Pair<io.github.xingray.compose.nexus.controls.NexusTime, io.github.xingray.compose.nexus.controls.NexusTime>? = null,
+    initialTime: NexusTime? = null,
+    initialRange: Pair<NexusTime, NexusTime>? = null,
 ) {
     var selectedTime by mutableStateOf(initialTime)
     var selectedRangeStart by mutableStateOf(initialRange?.first)
@@ -58,12 +58,12 @@ class TimePickerState(
         isOpen = false
     }
 
-    fun select(time: io.github.xingray.compose.nexus.controls.NexusTime) {
+    fun select(time: NexusTime) {
         selectedTime = time
         close()
     }
 
-    fun selectRange(start: io.github.xingray.compose.nexus.controls.NexusTime, end: io.github.xingray.compose.nexus.controls.NexusTime) {
+    fun selectRange(start: NexusTime, end: NexusTime) {
         selectedRangeStart = start
         selectedRangeEnd = end
         close()
@@ -81,19 +81,19 @@ class TimePickerState(
 
 @Composable
 fun rememberTimePickerState(
-    initialTime: io.github.xingray.compose.nexus.controls.NexusTime? = null,
-    initialRange: Pair<io.github.xingray.compose.nexus.controls.NexusTime, io.github.xingray.compose.nexus.controls.NexusTime>? = null,
-): io.github.xingray.compose.nexus.controls.TimePickerState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TimePickerState(initialTime, initialRange) }
+    initialTime: NexusTime? = null,
+    initialRange: Pair<NexusTime, NexusTime>? = null,
+): TimePickerState = remember { TimePickerState(initialTime, initialRange) }
 
 @Composable
 fun NexusTimePicker(
-    state: io.github.xingray.compose.nexus.controls.TimePickerState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTimePickerState(),
+    state: TimePickerState = rememberTimePickerState(),
     modifier: Modifier = Modifier,
     placeholder: String = "Select time",
     startPlaceholder: String = "Start time",
     endPlaceholder: String = "End time",
     showSeconds: Boolean = false,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     readonly: Boolean = false,
     disabled: Boolean = false,
     editable: Boolean = true,
@@ -110,15 +110,15 @@ fun NexusTimePicker(
     disabledSeconds: ((hour: Int, minute: Int, role: String) -> List<Int>)? = null,
     emptyValues: Set<Any?> = setOf(null),
     valueOnClear: Any? = null,
-    onTimeChange: ((io.github.xingray.compose.nexus.controls.NexusTime) -> Unit)? = null,
-    onRangeChange: ((io.github.xingray.compose.nexus.controls.NexusTime, io.github.xingray.compose.nexus.controls.NexusTime) -> Unit)? = null,
+    onTimeChange: ((NexusTime) -> Unit)? = null,
+    onRangeChange: ((NexusTime, NexusTime) -> Unit)? = null,
     onChange: ((Any?) -> Unit)? = null,
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
     onClear: (() -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
 ) {
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val typography = NexusTheme.typography
     val hasValue = if (isRange) {
         val start = state.selectedRangeStart
         val end = state.selectedRangeEnd
@@ -134,7 +134,7 @@ fun NexusTimePicker(
         }
     }
 
-    fun displayTime(time: io.github.xingray.compose.nexus.controls.NexusTime): String = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatTime(
+    fun displayTime(time: NexusTime): String = formatTime(
         time = time,
         showSeconds = showSeconds,
         pattern = format,
@@ -156,7 +156,7 @@ fun NexusTimePicker(
     val placeholderText = if (isRange) "$startPlaceholder$rangeSeparator$endPlaceholder" else placeholder
 
     Column(modifier = modifier) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = displayText,
             onValueChange = {},
             placeholder = placeholderText,
@@ -169,7 +169,7 @@ fun NexusTimePicker(
                 .clickable(enabled = !disabled) {
                     setVisible(!state.isOpen)
                 },
-            prefix = prefixIcon ?: { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "🕐", style = typography.extraSmall) },
+            prefix = prefixIcon ?: { NexusText(text = "🕐", style = typography.extraSmall) },
             suffix = {
                 if (clearable && hasValue && !disabled) {
                     Box(
@@ -188,17 +188,17 @@ fun NexusTimePicker(
                         if (clearIcon != null) {
                             clearIcon()
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "✕",
-                                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.placeholder,
+                                color = NexusTheme.colorScheme.text.placeholder,
                                 style = typography.extraSmall,
                             )
                         }
                     }
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = if (state.isOpen) "▲" else "▼",
-                        color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.placeholder,
+                        color = NexusTheme.colorScheme.text.placeholder,
                         style = typography.extraSmall,
                     )
                 }
@@ -213,7 +213,7 @@ fun NexusTimePicker(
                 properties = PopupProperties(focusable = true),
                 onDismissRequest = { setVisible(false) },
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimePickerPanel(
+                TimePickerPanel(
                     state = state,
                     isRange = isRange,
                     showSeconds = showSeconds,
@@ -235,7 +235,7 @@ fun NexusTimePicker(
 
 @Composable
 private fun TimePickerPanel(
-    state: io.github.xingray.compose.nexus.controls.TimePickerState,
+    state: TimePickerState,
     isRange: Boolean,
     showSeconds: Boolean,
     arrowControl: Boolean,
@@ -244,13 +244,13 @@ private fun TimePickerPanel(
     disabledSeconds: ((hour: Int, minute: Int, role: String) -> List<Int>)?,
     format: String?,
     valueFormat: String?,
-    onTimeChange: ((io.github.xingray.compose.nexus.controls.NexusTime) -> Unit)?,
-    onRangeChange: ((io.github.xingray.compose.nexus.controls.NexusTime, io.github.xingray.compose.nexus.controls.NexusTime) -> Unit)?,
+    onTimeChange: ((NexusTime) -> Unit)?,
+    onRangeChange: ((NexusTime, NexusTime) -> Unit)?,
     onChange: ((Any?) -> Unit)?,
     onClose: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = Modifier
@@ -268,7 +268,7 @@ private fun TimePickerPanel(
             var endSecond by remember(state.selectedRangeEnd) { mutableStateOf(state.selectedRangeEnd?.second ?: 59) }
 
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeSelectionColumns(
+                TimeSelectionColumns(
                     title = "Start",
                     role = "start",
                     showSeconds = showSeconds,
@@ -283,7 +283,7 @@ private fun TimePickerPanel(
                     onMinuteChange = { startMinute = it },
                     onSecondChange = { startSecond = it },
                 )
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeSelectionColumns(
+                TimeSelectionColumns(
                     title = "End",
                     role = "end",
                     showSeconds = showSeconds,
@@ -306,17 +306,17 @@ private fun TimePickerPanel(
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                NexusButton(
                     onClick = {
-                        val start = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(startHour, startMinute, startSecond)
-                        val end = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(endHour, endMinute, endSecond)
+                        val start = NexusTime(startHour, startMinute, startSecond)
+                        val end = NexusTime(endHour, endMinute, endSecond)
                         state.selectRange(start, end)
                         onRangeChange?.invoke(start, end)
 
                         val emitValue = if (valueFormat != null) {
                             listOf(
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.formatTime(start, showSeconds, valueFormat),
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.formatTime(end, showSeconds, valueFormat),
+                                formatTime(start, showSeconds, valueFormat),
+                                formatTime(end, showSeconds, valueFormat),
                             )
                         } else {
                             listOf(start, end)
@@ -324,10 +324,10 @@ private fun TimePickerPanel(
                         onChange?.invoke(emitValue)
                         onClose()
                     },
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-                    size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                    type = NexusType.Primary,
+                    size = ComponentSize.Small,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "OK")
+                    NexusText(text = "OK")
                 }
             }
         } else {
@@ -335,7 +335,7 @@ private fun TimePickerPanel(
             var selectedMinute by remember(state.selectedTime) { mutableStateOf(state.selectedTime?.minute ?: 0) }
             var selectedSecond by remember(state.selectedTime) { mutableStateOf(state.selectedTime?.second ?: 0) }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeSelectionColumns(
+            TimeSelectionColumns(
                 title = null,
                 role = "single",
                 showSeconds = showSeconds,
@@ -357,23 +357,23 @@ private fun TimePickerPanel(
                     .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.End,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                NexusButton(
                     onClick = {
-                        val time = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(selectedHour, selectedMinute, selectedSecond)
+                        val time = NexusTime(selectedHour, selectedMinute, selectedSecond)
                         state.select(time)
                         onTimeChange?.invoke(time)
                         val emitValue = if (valueFormat != null) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.formatTime(time, showSeconds, valueFormat)
+                            formatTime(time, showSeconds, valueFormat)
                         } else {
                             time
                         }
                         onChange?.invoke(emitValue)
                         onClose()
                     },
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-                    size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                    type = NexusType.Primary,
+                    size = ComponentSize.Small,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "OK")
+                    NexusText(text = "OK")
                 }
             }
         }
@@ -402,21 +402,21 @@ private fun TimeSelectionColumns(
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         if (title != null) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
-                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
-                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.secondary,
+                style = NexusTheme.typography.extraSmall,
+                color = NexusTheme.colorScheme.text.secondary,
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeColumn(
+            TimeColumn(
                 values = (0..23).toList(),
                 selected = hour,
                 disabledValues = disabledHourSet,
                 arrowControl = arrowControl,
                 onSelect = onHourChange,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeColumn(
+            TimeColumn(
                 values = (0..59).toList(),
                 selected = minute,
                 disabledValues = disabledMinuteSet,
@@ -424,7 +424,7 @@ private fun TimeSelectionColumns(
                 onSelect = onMinuteChange,
             )
             if (showSeconds) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.TimeColumn(
+                TimeColumn(
                     values = (0..59).toList(),
                     selected = second,
                     disabledValues = disabledSecondSet,
@@ -444,8 +444,8 @@ private fun TimeColumn(
     arrowControl: Boolean,
     onSelect: (Int) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     if (arrowControl) {
         fun findAvailable(current: Int, delta: Int): Int {
@@ -463,11 +463,11 @@ private fun TimeColumn(
             modifier = Modifier
                 .width(60.dp)
                 .height(120.dp)
-                .border(1.dp, colorScheme.border.lighter, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base),
+                .border(1.dp, colorScheme.border.lighter, NexusTheme.shapes.base),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = "▲",
                 color = colorScheme.text.secondary,
                 style = typography.extraSmall,
@@ -478,12 +478,12 @@ private fun TimeColumn(
                     }
                     .padding(vertical = 8.dp),
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = selected.toString().padStart(2, '0'),
                 color = if (disabledValues.contains(selected)) colorScheme.disabled.text else colorScheme.primary.base,
                 style = typography.base,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = "▼",
                 color = colorScheme.text.secondary,
                 style = typography.extraSmall,
@@ -528,7 +528,7 @@ private fun TimeColumn(
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = value.toString().padStart(2, '0'),
                         color = textColor,
                         style = typography.small,
@@ -540,7 +540,7 @@ private fun TimeColumn(
 }
 
 private fun formatTime(
-    time: io.github.xingray.compose.nexus.controls.NexusTime,
+    time: NexusTime,
     showSeconds: Boolean,
     pattern: String?,
 ): String {

@@ -40,8 +40,8 @@ data class NexusDescriptionsItem(
     val width: Dp? = null,
     val minWidth: Dp? = null,
     val labelWidth: Dp? = null,
-    val align: io.github.xingray.compose.nexus.controls.DescriptionsAlign = _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsAlign.Left,
-    val labelAlign: io.github.xingray.compose.nexus.controls.DescriptionsAlign? = null,
+    val align: DescriptionsAlign = DescriptionsAlign.Left,
+    val labelAlign: DescriptionsAlign? = null,
     val className: String? = null,
     val labelClassName: String? = null,
     val labelSlot: (@Composable () -> Unit)? = null,
@@ -50,7 +50,7 @@ data class NexusDescriptionsItem(
 
 @Stable
 class DescriptionsScope internal constructor() {
-    internal val items = mutableListOf<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>()
+    internal val items = mutableListOf<NexusDescriptionsItem>()
 
     fun item(
         label: String = "",
@@ -59,14 +59,14 @@ class DescriptionsScope internal constructor() {
         width: Dp? = null,
         minWidth: Dp? = null,
         labelWidth: Dp? = null,
-        align: io.github.xingray.compose.nexus.controls.DescriptionsAlign = _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsAlign.Left,
-        labelAlign: io.github.xingray.compose.nexus.controls.DescriptionsAlign? = null,
+        align: DescriptionsAlign = DescriptionsAlign.Left,
+        labelAlign: DescriptionsAlign? = null,
         className: String? = null,
         labelClassName: String? = null,
         labelSlot: (@Composable () -> Unit)? = null,
         content: @Composable () -> Unit,
     ) {
-        items += _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDescriptionsItem(
+        items += NexusDescriptionsItem(
             label = label,
             span = span,
             rowspan = rowspan,
@@ -88,40 +88,40 @@ fun NexusDescriptions(
     modifier: Modifier = Modifier,
     border: Boolean = false,
     column: Int = 3,
-    direction: io.github.xingray.compose.nexus.controls.DescriptionsDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsDirection.Horizontal,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    direction: DescriptionsDirection = DescriptionsDirection.Horizontal,
+    size: ComponentSize = ComponentSize.Default,
     title: String = "",
     extra: String = "",
     labelWidth: Dp? = null,
     titleSlot: (@Composable () -> Unit)? = null,
     extraSlot: (@Composable () -> Unit)? = null,
-    content: io.github.xingray.compose.nexus.controls.DescriptionsScope.() -> Unit,
+    content: DescriptionsScope.() -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val headerStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.large
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.small
+        ComponentSize.Large -> typography.large
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.small
     }
     val labelStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.small
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.small
+        ComponentSize.Small -> typography.extraSmall
     }
     val valueStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.small
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.small
     }
     val rowHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 48.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 42.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 36.dp
+        ComponentSize.Large -> 48.dp
+        ComponentSize.Default -> 42.dp
+        ComponentSize.Small -> 36.dp
     }
 
-    val scope = _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsScope().also(content)
-    val rows = _root_ide_package_.io.github.xingray.compose.nexus.controls.buildDescriptionRows(scope.items, column.coerceAtLeast(1))
+    val scope = DescriptionsScope().also(content)
+    val rows = buildDescriptionRows(scope.items, column.coerceAtLeast(1))
 
     Column(modifier = modifier.fillMaxWidth()) {
         if (titleSlot != null || extraSlot != null || title.isNotBlank() || extra.isNotBlank()) {
@@ -135,7 +135,7 @@ fun NexusDescriptions(
                 if (titleSlot != null) {
                     titleSlot()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = title,
                         style = headerStyle,
                         color = colorScheme.text.primary,
@@ -144,7 +144,7 @@ fun NexusDescriptions(
                 if (extraSlot != null) {
                     extraSlot()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = extra,
                         style = labelStyle,
                         color = colorScheme.text.secondary,
@@ -157,9 +157,9 @@ fun NexusDescriptions(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .border(1.dp, colorScheme.border.lighter, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base),
+                    .border(1.dp, colorScheme.border.lighter, NexusTheme.shapes.base),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.renderRows(
+                renderRows(
                     rows = rows,
                     direction = direction,
                     border = true,
@@ -170,7 +170,7 @@ fun NexusDescriptions(
                 )
             }
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.renderRows(
+            renderRows(
                 rows = rows,
                 direction = direction,
                 border = false,
@@ -185,19 +185,19 @@ fun NexusDescriptions(
 
 @Composable
 private fun renderRows(
-    rows: List<List<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>>,
-    direction: io.github.xingray.compose.nexus.controls.DescriptionsDirection,
+    rows: List<List<NexusDescriptionsItem>>,
+    direction: DescriptionsDirection,
     border: Boolean,
     rowHeight: Dp,
     defaultLabelWidth: Dp?,
     labelStyle: androidx.compose.ui.text.TextStyle,
     valueStyle: androidx.compose.ui.text.TextStyle,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
 
     rows.forEach { rowItems ->
         when (direction) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsDirection.Horizontal -> {
+            DescriptionsDirection.Horizontal -> {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     rowItems.forEach { item ->
                         val span = item.span.coerceAtLeast(1).toFloat()
@@ -222,9 +222,9 @@ private fun renderRows(
                                         .background(colorScheme.fill.light)
                                         .border(1.dp, colorScheme.border.lighter)
                                         .padding(horizontal = 10.dp, vertical = 8.dp),
-                                    contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.labelAlign ?: item.align),
+                                    contentAlignment = alignToContent(item.labelAlign ?: item.align),
                                 ) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionLabel(item, labelStyle)
+                                    DescriptionLabel(item, labelStyle)
                                 }
                                 Box(
                                     modifier = Modifier
@@ -232,9 +232,9 @@ private fun renderRows(
                                         .fillMaxHeight()
                                         .border(1.dp, colorScheme.border.lighter)
                                         .padding(horizontal = 10.dp, vertical = 8.dp),
-                                    contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.align),
+                                    contentAlignment = alignToContent(item.align),
                                 ) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                                    ProvideContentColorTextStyle(
                                         contentColor = colorScheme.text.regular,
                                         textStyle = valueStyle,
                                     ) {
@@ -251,17 +251,17 @@ private fun renderRows(
                             ) {
                                 Box(
                                     modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.labelAlign ?: item.align),
+                                    contentAlignment = alignToContent(item.labelAlign ?: item.align),
                                 ) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionLabel(item, labelStyle)
+                                    DescriptionLabel(item, labelStyle)
                                 }
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 4.dp),
-                                    contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.align),
+                                    contentAlignment = alignToContent(item.align),
                                 ) {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                                    ProvideContentColorTextStyle(
                                         contentColor = colorScheme.text.regular,
                                         textStyle = valueStyle,
                                     ) {
@@ -274,7 +274,7 @@ private fun renderRows(
                 }
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsDirection.Vertical -> {
+            DescriptionsDirection.Vertical -> {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     rowItems.forEach { item ->
                         val span = item.span.coerceAtLeast(1).toFloat()
@@ -302,9 +302,9 @@ private fun renderRows(
                                         },
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp),
-                                contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.labelAlign ?: item.align),
+                                contentAlignment = alignToContent(item.labelAlign ?: item.align),
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionLabel(item, labelStyle)
+                                DescriptionLabel(item, labelStyle)
                             }
                             Box(
                                 modifier = Modifier
@@ -317,9 +317,9 @@ private fun renderRows(
                                         },
                                     )
                                     .padding(horizontal = 10.dp, vertical = 8.dp),
-                                contentAlignment = _root_ide_package_.io.github.xingray.compose.nexus.controls.alignToContent(item.align),
+                                contentAlignment = alignToContent(item.align),
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+                                ProvideContentColorTextStyle(
                                     contentColor = colorScheme.text.regular,
                                     textStyle = valueStyle,
                                 ) {
@@ -336,14 +336,14 @@ private fun renderRows(
 
 @Composable
 private fun DescriptionLabel(
-    item: io.github.xingray.compose.nexus.controls.NexusDescriptionsItem,
+    item: NexusDescriptionsItem,
     labelStyle: androidx.compose.ui.text.TextStyle,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     if (item.labelSlot != null) {
         item.labelSlot.invoke()
     } else {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = item.label,
             style = labelStyle,
             color = colorScheme.text.secondary,
@@ -351,22 +351,22 @@ private fun DescriptionLabel(
     }
 }
 
-private fun alignToContent(align: io.github.xingray.compose.nexus.controls.DescriptionsAlign): Alignment {
+private fun alignToContent(align: DescriptionsAlign): Alignment {
     return when (align) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsAlign.Left -> Alignment.CenterStart
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsAlign.Center -> Alignment.Center
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DescriptionsAlign.Right -> Alignment.CenterEnd
+        DescriptionsAlign.Left -> Alignment.CenterStart
+        DescriptionsAlign.Center -> Alignment.Center
+        DescriptionsAlign.Right -> Alignment.CenterEnd
     }
 }
 
 private fun buildDescriptionRows(
-    items: List<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>,
+    items: List<NexusDescriptionsItem>,
     column: Int,
-): List<List<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>> {
+): List<List<NexusDescriptionsItem>> {
     if (items.isEmpty()) return emptyList()
 
-    val rows = mutableListOf<List<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>>()
-    var current = mutableListOf<io.github.xingray.compose.nexus.controls.NexusDescriptionsItem>()
+    val rows = mutableListOf<List<NexusDescriptionsItem>>()
+    var current = mutableListOf<NexusDescriptionsItem>()
     var used = 0
 
     items.forEach { item ->

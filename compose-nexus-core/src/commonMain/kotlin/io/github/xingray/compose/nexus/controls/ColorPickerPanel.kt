@@ -77,28 +77,28 @@ fun NexusColorPickerPanel(
     border: Boolean = true,
     disabled: Boolean = false,
     showAlpha: Boolean = false,
-    colorFormat: io.github.xingray.compose.nexus.controls.NexusColorFormat? = null,
+    colorFormat: NexusColorFormat? = null,
     predefine: List<String> = emptyList(),
     validateEvent: Boolean = true,
     footer: (@Composable () -> Unit)? = null,
 ) {
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shape = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base
+    val colors = NexusTheme.colorScheme
+    val shape = NexusTheme.shapes.base
     val density = LocalDensity.current
     @Suppress("UNUSED_VARIABLE")
     val triggerValidateEvent = validateEvent
 
-    val resolvedFormat = colorFormat ?: if (showAlpha) _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Rgb else _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex
-    val parsedColor = remember(value) { _root_ide_package_.io.github.xingray.compose.nexus.controls.parseColor(value) ?: Color(0xFF409EFF) }
+    val resolvedFormat = colorFormat ?: if (showAlpha) NexusColorFormat.Rgb else NexusColorFormat.Hex
+    val parsedColor = remember(value) { parseColor(value) ?: Color(0xFF409EFF) }
 
-    var hsv by remember { mutableStateOf(_root_ide_package_.io.github.xingray.compose.nexus.controls.colorToHsv(parsedColor)) }
+    var hsv by remember { mutableStateOf(colorToHsv(parsedColor)) }
     LaunchedEffect(parsedColor) {
-        hsv = _root_ide_package_.io.github.xingray.compose.nexus.controls.colorToHsv(parsedColor)
+        hsv = colorToHsv(parsedColor)
     }
 
-    fun emit(hsvColor: io.github.xingray.compose.nexus.controls.HsvColor) {
+    fun emit(hsvColor: HsvColor) {
         val output =
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.formatColor(_root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(hsvColor), resolvedFormat, showAlpha)
+            formatColor(hsvToColor(hsvColor), resolvedFormat, showAlpha)
         if (output != value) {
             onValueChange(output)
         }
@@ -116,12 +116,12 @@ fun NexusColorPickerPanel(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(180.dp)
-                .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small),
+                .clip(NexusTheme.shapes.small),
         ) {
             val widthPx = with(density) { maxWidth.toPx() }
             val heightPx = with(density) { maxHeight.toPx() }
             val hueColor =
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(_root_ide_package_.io.github.xingray.compose.nexus.controls.HsvColor(h = hsv.h, s = 1f, v = 1f, a = 1f))
+                hsvToColor(HsvColor(h = hsv.h, s = 1f, v = 1f, a = 1f))
 
             fun updateFromPosition(position: Offset) {
                 if (disabled) return
@@ -180,7 +180,7 @@ fun NexusColorPickerPanel(
         }
 
         val sliderHeight = 14.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.ColorSlider(
+        ColorSlider(
             value = hsv.h / 360f,
             modifier = Modifier
                 .fillMaxWidth()
@@ -204,8 +204,8 @@ fun NexusColorPickerPanel(
         }
 
         if (showAlpha) {
-            val rgbOpaque = _root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(hsv.copy(a = 1f))
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.ColorSlider(
+            val rgbOpaque = hsvToColor(hsv.copy(a = 1f))
+            ColorSlider(
                 value = hsv.a,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -234,14 +234,14 @@ fun NexusColorPickerPanel(
                 modifier = Modifier
                     .width(30.dp)
                     .height(20.dp)
-                    .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+                    .clip(NexusTheme.shapes.small)
                     .drawCheckerboard()
-                    .background(_root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(hsv))
-                    .border(1.dp, colors.border.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small),
+                    .background(hsvToColor(hsv))
+                    .border(1.dp, colors.border.light, NexusTheme.shapes.small),
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                text = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatColor(_root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(hsv), resolvedFormat, showAlpha),
-                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+            NexusText(
+                text = formatColor(hsvToColor(hsv), resolvedFormat, showAlpha),
+                style = NexusTheme.typography.small,
                 color = colors.text.regular,
                 modifier = Modifier.fillMaxWidth(),
                 truncated = true,
@@ -254,27 +254,27 @@ fun NexusColorPickerPanel(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 predefine.forEach { colorStr ->
-                    val swatch = _root_ide_package_.io.github.xingray.compose.nexus.controls.parseColor(colorStr)
-                    val selected = swatch != null && _root_ide_package_.io.github.xingray.compose.nexus.controls.areColorsClose(
+                    val swatch = parseColor(colorStr)
+                    val selected = swatch != null && areColorsClose(
                         swatch,
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(hsv)
+                        hsvToColor(hsv)
                     )
                     Box(
                         modifier = Modifier
                             .size(20.dp)
-                            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+                            .clip(NexusTheme.shapes.small)
                             .drawCheckerboard()
                             .background(swatch ?: Color.Transparent)
                             .border(
                                 width = if (selected) 2.dp else 1.dp,
                                 color = if (selected) colors.primary.base else colors.border.light,
-                                shape = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small,
+                                shape = NexusTheme.shapes.small,
                             )
                             .then(
                                 if (!disabled && swatch != null) {
                                     Modifier
                                         .clickable { 
-                                            val next = _root_ide_package_.io.github.xingray.compose.nexus.controls.colorToHsv(swatch)
+                                            val next = colorToHsv(swatch)
                                             hsv = next
                                             emit(next)
                                         }
@@ -304,7 +304,7 @@ private fun ColorSlider(
     val density = LocalDensity.current
     BoxWithConstraints(
         modifier = modifier
-            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+            .clip(NexusTheme.shapes.small)
             .background(brush),
     ) {
         val widthPx = with(density) { maxWidth.toPx().coerceAtLeast(1f) }
@@ -329,7 +329,7 @@ private fun ColorSlider(
             modifier = Modifier
                 .offset { IntOffset((value.coerceIn(0f, 1f) * widthPx).roundToInt() - 6, -2) }
                 .size(12.dp, maxHeight + 4.dp)
-                .border(2.dp, Color.White, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small),
+                .border(2.dp, Color.White, NexusTheme.shapes.small),
         )
     }
 }
@@ -361,11 +361,11 @@ private fun parseColor(raw: String): Color? {
     val text = raw.trim().lowercase()
     if (text.isEmpty()) return null
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.parseHex(text)?.let { return it }
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.parseRgb(text)?.let { return it }
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.parseHsl(text)?.let { return it }
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.parseHsv(text)?.let { return it }
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.namedColor(text)?.let { return it }
+    parseHex(text)?.let { return it }
+    parseRgb(text)?.let { return it }
+    parseHsl(text)?.let { return it }
+    parseHsv(text)?.let { return it }
+    namedColor(text)?.let { return it }
     return null
 }
 
@@ -409,7 +409,7 @@ private fun parseRgb(text: String): Color? {
     val body = normalized.substringAfter("(").substringBeforeLast(")")
     val parts = body.split(",")
     if (parts.size !in 3..4) return null
-    val channels = parts.take(3).map { _root_ide_package_.io.github.xingray.compose.nexus.controls.parseChannel(it) ?: return null }
+    val channels = parts.take(3).map { parseChannel(it) ?: return null }
     val alpha = parts.getOrNull(3)?.toFloatOrNull()?.coerceIn(0f, 1f) ?: 1f
     return Color(channels[0], channels[1], channels[2], alpha)
 }
@@ -421,10 +421,10 @@ private fun parseHsl(text: String): Color? {
     val parts = body.split(",")
     if (parts.size !in 3..4) return null
     val h = parts[0].toFloatOrNull() ?: return null
-    val s = _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePercent(parts[1]) ?: return null
-    val l = _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePercent(parts[2]) ?: return null
+    val s = parsePercent(parts[1]) ?: return null
+    val l = parsePercent(parts[2]) ?: return null
     val alpha = parts.getOrNull(3)?.toFloatOrNull()?.coerceIn(0f, 1f) ?: 1f
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.hslToColor(h, s, l, alpha)
+    return hslToColor(h, s, l, alpha)
 }
 
 private fun parseHsv(text: String): Color? {
@@ -434,15 +434,15 @@ private fun parseHsv(text: String): Color? {
     val parts = body.split(",")
     if (parts.size !in 3..4) return null
     val h = parts[0].toFloatOrNull() ?: return null
-    val s = _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePercent(parts[1]) ?: return null
-    val v = _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePercent(parts[2]) ?: return null
+    val s = parsePercent(parts[1]) ?: return null
+    val v = parsePercent(parts[2]) ?: return null
     val alpha = parts.getOrNull(3)?.toFloatOrNull()?.coerceIn(0f, 1f) ?: 1f
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.hsvToColor(_root_ide_package_.io.github.xingray.compose.nexus.controls.HsvColor(h = h, s = s, v = v, a = alpha))
+    return hsvToColor(HsvColor(h = h, s = s, v = v, a = alpha))
 }
 
 private fun parseChannel(input: String): Float? {
     return if (input.endsWith("%")) {
-        val p = _root_ide_package_.io.github.xingray.compose.nexus.controls.parsePercent(input) ?: return null
+        val p = parsePercent(input) ?: return null
         p.coerceIn(0f, 1f)
     } else {
         (input.toFloatOrNull() ?: return null).coerceIn(0f, 255f) / 255f
@@ -467,7 +467,7 @@ private fun namedColor(name: String): Color? = when (name) {
     else -> null
 }
 
-private fun colorToHsv(color: Color): io.github.xingray.compose.nexus.controls.HsvColor {
+private fun colorToHsv(color: Color): HsvColor {
     val r = color.red
     val g = color.green
     val b = color.blue
@@ -483,10 +483,10 @@ private fun colorToHsv(color: Color): io.github.xingray.compose.nexus.controls.H
     }
     val s = if (max == 0f) 0f else delta / max
     val v = max
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.HsvColor(h = h, s = s, v = v, a = color.alpha)
+    return HsvColor(h = h, s = s, v = v, a = color.alpha)
 }
 
-private fun hsvToColor(hsv: io.github.xingray.compose.nexus.controls.HsvColor): Color {
+private fun hsvToColor(hsv: HsvColor): Color {
     val h = ((hsv.h % 360f) + 360f) % 360f
     val s = hsv.s.coerceIn(0f, 1f)
     val v = hsv.v.coerceIn(0f, 1f)
@@ -526,44 +526,44 @@ private fun hslToColor(h: Float, s: Float, l: Float, alpha: Float): Color {
     return Color(r1 + m, g1 + m, b1 + m, alpha.coerceIn(0f, 1f))
 }
 
-private fun formatColor(color: Color, format: io.github.xingray.compose.nexus.controls.NexusColorFormat, showAlpha: Boolean): String {
+private fun formatColor(color: Color, format: NexusColorFormat, showAlpha: Boolean): String {
     val includeAlpha = showAlpha || color.alpha < 0.999f
     return when (format) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(
+        NexusColorFormat.Hex -> toHex(
             color,
             short = false,
             includeAlpha = includeAlpha
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex3 -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(
+        NexusColorFormat.Hex3 -> toHex(
             color,
             short = true,
             includeAlpha = false
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex4 -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(color, short = true, includeAlpha = true)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex6 -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(
+        NexusColorFormat.Hex4 -> toHex(color, short = true, includeAlpha = true)
+        NexusColorFormat.Hex6 -> toHex(
             color,
             short = false,
             includeAlpha = false
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hex8 -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(
+        NexusColorFormat.Hex8 -> toHex(
             color,
             short = false,
             includeAlpha = true
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Rgb -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toRgb(
+        NexusColorFormat.Rgb -> toRgb(
             color,
             percent = false,
             includeAlpha = includeAlpha
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Prgb -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toRgb(
+        NexusColorFormat.Prgb -> toRgb(
             color,
             percent = true,
             includeAlpha = includeAlpha
         )
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hsl -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHsl(color, includeAlpha = includeAlpha)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Hsv -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toHsv(color, includeAlpha = includeAlpha)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusColorFormat.Name -> _root_ide_package_.io.github.xingray.compose.nexus.controls.toName(color)
-            ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(color, short = false, includeAlpha = false)
+        NexusColorFormat.Hsl -> toHsl(color, includeAlpha = includeAlpha)
+        NexusColorFormat.Hsv -> toHsv(color, includeAlpha = includeAlpha)
+        NexusColorFormat.Name -> toName(color)
+            ?: toHex(color, short = false, includeAlpha = false)
     }
 }
 
@@ -574,14 +574,14 @@ private fun toHex(color: Color, short: Boolean, includeAlpha: Boolean): String {
     val a = (color.alpha * 255f).roundToInt().coerceIn(0, 255)
 
     val long = if (includeAlpha) {
-        "#${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(r)}${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(g)}${
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(
+        "#${hex2(r)}${hex2(g)}${
+            hex2(
                 b
             )
-        }${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(a)}"
+        }${hex2(a)}"
     } else {
-        "#${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(r)}${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(g)}${
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.hex2(
+        "#${hex2(r)}${hex2(g)}${
+            hex2(
                 b
             )
         }"
@@ -589,14 +589,14 @@ private fun toHex(color: Color, short: Boolean, includeAlpha: Boolean): String {
     if (!short) return long
 
     val compact = if (includeAlpha) {
-        "#${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(r)}${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(g)}${
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(
+        "#${hex1IfPossible(r)}${hex1IfPossible(g)}${
+            hex1IfPossible(
                 b
             )
-        }${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(a)}"
+        }${hex1IfPossible(a)}"
     } else {
-        "#${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(r)}${_root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(g)}${
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.hex1IfPossible(
+        "#${hex1IfPossible(r)}${hex1IfPossible(g)}${
+            hex1IfPossible(
                 b
             )
         }"
@@ -621,13 +621,13 @@ private fun toRgb(color: Color, percent: Boolean, includeAlpha: Boolean): String
         val gp = ((g / 255f) * 100f).roundToInt()
         val bp = ((b / 255f) * 100f).roundToInt()
         if (includeAlpha) {
-            "rgba(${rp}%, ${gp}%, ${bp}%, ${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatFloat2(color.alpha)})"
+            "rgba(${rp}%, ${gp}%, ${bp}%, ${formatFloat2(color.alpha)})"
         } else {
             "rgb(${rp}%, ${gp}%, ${bp}%)"
         }
     } else {
         if (includeAlpha) {
-            "rgba($r, $g, $b, ${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatFloat2(color.alpha)})"
+            "rgba($r, $g, $b, ${formatFloat2(color.alpha)})"
         } else {
             "rgb($r, $g, $b)"
         }
@@ -653,26 +653,26 @@ private fun toHsl(color: Color, includeAlpha: Boolean): String {
     val ss = (s * 100f).roundToInt()
     val ls = (l * 100f).roundToInt()
     return if (includeAlpha) {
-        "hsla($hs, ${ss}%, ${ls}%, ${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatFloat2(color.alpha)})"
+        "hsla($hs, ${ss}%, ${ls}%, ${formatFloat2(color.alpha)})"
     } else {
         "hsl($hs, ${ss}%, ${ls}%)"
     }
 }
 
 private fun toHsv(color: Color, includeAlpha: Boolean): String {
-    val hsv = _root_ide_package_.io.github.xingray.compose.nexus.controls.colorToHsv(color)
+    val hsv = colorToHsv(color)
     val h = hsv.h.roundToInt()
     val s = (hsv.s * 100f).roundToInt()
     val v = (hsv.v * 100f).roundToInt()
     return if (includeAlpha) {
-        "hsva($h, ${s}%, ${v}%, ${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatFloat2(hsv.a)})"
+        "hsva($h, ${s}%, ${v}%, ${formatFloat2(hsv.a)})"
     } else {
         "hsv($h, ${s}%, ${v}%)"
     }
 }
 
 private fun toName(color: Color): String? {
-    val c = _root_ide_package_.io.github.xingray.compose.nexus.controls.toHex(color.copy(alpha = 1f), short = false, includeAlpha = false).lowercase()
+    val c = toHex(color.copy(alpha = 1f), short = false, includeAlpha = false).lowercase()
     return when (c) {
         "#ff0000" -> "red"
         "#00ff00" -> "green"

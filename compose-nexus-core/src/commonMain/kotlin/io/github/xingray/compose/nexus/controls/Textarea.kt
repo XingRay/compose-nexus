@@ -53,9 +53,9 @@ fun NexusTextarea(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val typography = NexusTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -104,7 +104,7 @@ fun NexusTextarea(
             decorationBox = { innerTextField ->
                 Box(contentAlignment = Alignment.TopStart) {
                     if (value.isEmpty() && placeholder.isNotEmpty()) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = placeholder,
                             color = colorScheme.text.placeholder,
                             style = typography.base,
@@ -123,7 +123,7 @@ fun NexusTextarea(
                     .padding(top = 2.dp),
                 contentAlignment = Alignment.CenterEnd,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "${value.length} / $maxLength",
                     color = colorScheme.text.placeholder,
                     style = typography.extraSmall,

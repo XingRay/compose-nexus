@@ -23,7 +23,7 @@ data class ShadowLayer(
  */
 @Immutable
 data class NexusShadow(
-    val layers: List<io.github.xingray.compose.nexus.theme.ShadowLayer>,
+    val layers: List<ShadowLayer>,
     val elevation: Dp,
 )
 
@@ -39,39 +39,39 @@ data class NexusShadow(
 @Immutable
 data class NexusShadows(
     /** No shadow */
-    val none: io.github.xingray.compose.nexus.theme.NexusShadow = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(layers = emptyList(), elevation = 0.dp),
+    val none: NexusShadow = NexusShadow(layers = emptyList(), elevation = 0.dp),
 
     /** Subtle shadow: 0px 0px 6px rgba(0,0,0,0.12) */
-    val lighter: io.github.xingray.compose.nexus.theme.NexusShadow = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+    val lighter: NexusShadow = NexusShadow(
         layers = listOf(
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 0.dp, 6.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
+            ShadowLayer(0.dp, 0.dp, 6.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
         ),
         elevation = 1.dp,
     ),
 
     /** Light shadow: 0px 0px 12px rgba(0,0,0,0.12) */
-    val light: io.github.xingray.compose.nexus.theme.NexusShadow = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+    val light: NexusShadow = NexusShadow(
         layers = listOf(
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 0.dp, 12.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
+            ShadowLayer(0.dp, 0.dp, 12.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
         ),
         elevation = 2.dp,
     ),
 
     /** Default shadow */
-    val default: io.github.xingray.compose.nexus.theme.NexusShadow = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+    val default: NexusShadow = NexusShadow(
         layers = listOf(
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 12.dp, 32.dp, 4.dp, Color.Black.copy(alpha = 0.04f)),
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 8.dp, 20.dp, 0.dp, Color.Black.copy(alpha = 0.08f)),
+            ShadowLayer(0.dp, 12.dp, 32.dp, 4.dp, Color.Black.copy(alpha = 0.04f)),
+            ShadowLayer(0.dp, 8.dp, 20.dp, 0.dp, Color.Black.copy(alpha = 0.08f)),
         ),
         elevation = 4.dp,
     ),
 
     /** Heavy shadow */
-    val dark: io.github.xingray.compose.nexus.theme.NexusShadow = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+    val dark: NexusShadow = NexusShadow(
         layers = listOf(
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 16.dp, 48.dp, 16.dp, Color.Black.copy(alpha = 0.08f)),
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 12.dp, 32.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
-            _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 8.dp, 16.dp, (-8).dp, Color.Black.copy(alpha = 0.16f)),
+            ShadowLayer(0.dp, 16.dp, 48.dp, 16.dp, Color.Black.copy(alpha = 0.08f)),
+            ShadowLayer(0.dp, 12.dp, 32.dp, 0.dp, Color.Black.copy(alpha = 0.12f)),
+            ShadowLayer(0.dp, 8.dp, 16.dp, (-8).dp, Color.Black.copy(alpha = 0.16f)),
         ),
         elevation = 8.dp,
     ),
@@ -82,30 +82,30 @@ data class NexusShadows(
 
         /** Dark mode shadows with stronger opacity */
         fun dark() = NexusShadows(
-            lighter = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+            lighter = NexusShadow(
                 layers = listOf(
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 0.dp, 6.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
+                    ShadowLayer(0.dp, 0.dp, 6.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
                 ),
                 elevation = 1.dp,
             ),
-            light = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+            light = NexusShadow(
                 layers = listOf(
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 0.dp, 12.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
+                    ShadowLayer(0.dp, 0.dp, 12.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
                 ),
                 elevation = 2.dp,
             ),
-            default = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+            default = NexusShadow(
                 layers = listOf(
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 12.dp, 32.dp, 4.dp, Color.Black.copy(alpha = 0.36f)),
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 8.dp, 20.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
+                    ShadowLayer(0.dp, 12.dp, 32.dp, 4.dp, Color.Black.copy(alpha = 0.36f)),
+                    ShadowLayer(0.dp, 8.dp, 20.dp, 0.dp, Color.Black.copy(alpha = 0.72f)),
                 ),
                 elevation = 4.dp,
             ),
-            dark = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusShadow(
+            dark = NexusShadow(
                 layers = listOf(
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 16.dp, 48.dp, 16.dp, Color.Black.copy(alpha = 0.72f)),
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 12.dp, 32.dp, 0.dp, Color.Black),
-                    _root_ide_package_.io.github.xingray.compose.nexus.theme.ShadowLayer(0.dp, 8.dp, 16.dp, (-8).dp, Color.Black),
+                    ShadowLayer(0.dp, 16.dp, 48.dp, 16.dp, Color.Black.copy(alpha = 0.72f)),
+                    ShadowLayer(0.dp, 12.dp, 32.dp, 0.dp, Color.Black),
+                    ShadowLayer(0.dp, 8.dp, 16.dp, (-8).dp, Color.Black),
                 ),
                 elevation = 8.dp,
             ),

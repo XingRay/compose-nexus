@@ -32,7 +32,7 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
 
 @Stable
 class TreeSelectState<T>(
-    val nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    val nodes: List<TreeNode<T>>,
 ) {
     var selectedKey by mutableStateOf<T?>(null)
         internal set
@@ -40,7 +40,7 @@ class TreeSelectState<T>(
     var isOpen by mutableStateOf(false)
         internal set
     var query by mutableStateOf("")
-    val treeState = _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeState<T>()
+    val treeState = TreeState<T>()
 
     fun open() {
         isOpen = true
@@ -70,7 +70,7 @@ class TreeSelectState<T>(
 
     fun displayText(
         multiple: Boolean,
-        cacheData: List<io.github.xingray.compose.nexus.controls.TreeNode<T>> = emptyList(),
+        cacheData: List<TreeNode<T>> = emptyList(),
     ): String {
         return if (multiple) {
             selectedKeys.joinToString(", ") { key ->
@@ -82,7 +82,7 @@ class TreeSelectState<T>(
         }
     }
 
-    private fun findLabel(nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>, key: T): String? {
+    private fun findLabel(nodes: List<TreeNode<T>>, key: T): String? {
         for (node in nodes) {
             if (node.key == key) return node.label
             val found = findLabel(node.children, key)
@@ -94,12 +94,12 @@ class TreeSelectState<T>(
 
 @Composable
 fun <T> rememberTreeSelectState(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
-): io.github.xingray.compose.nexus.controls.TreeSelectState<T> = remember(nodes) { _root_ide_package_.io.github.xingray.compose.nexus.controls.TreeSelectState(nodes) }
+    nodes: List<TreeNode<T>>,
+): TreeSelectState<T> = remember(nodes) { TreeSelectState(nodes) }
 
 @Composable
 fun <T> NexusTreeSelect(
-    state: io.github.xingray.compose.nexus.controls.TreeSelectState<T>,
+    state: TreeSelectState<T>,
     modifier: Modifier = Modifier,
     placeholder: String = "Select",
     disabled: Boolean = false,
@@ -108,10 +108,10 @@ fun <T> NexusTreeSelect(
     showCheckbox: Boolean = false,
     checkStrictly: Boolean = false,
     filterable: Boolean = false,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)? = null,
+    filterMethod: ((String, TreeNode<T>) -> Boolean)? = null,
     defaultExpandAll: Boolean = false,
-    cacheData: List<io.github.xingray.compose.nexus.controls.TreeNode<T>> = emptyList(),
-    nodeContent: (@Composable (io.github.xingray.compose.nexus.controls.TreeNode<T>, Boolean) -> Unit)? = null,
+    cacheData: List<TreeNode<T>> = emptyList(),
+    nodeContent: (@Composable (TreeNode<T>, Boolean) -> Unit)? = null,
     onSelect: ((T) -> Unit)? = null,
     onChange: ((Any?) -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
@@ -119,10 +119,10 @@ fun <T> NexusTreeSelect(
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     fun setVisible(visible: Boolean) {
         if (state.isOpen != visible) {
@@ -137,7 +137,7 @@ fun <T> NexusTreeSelect(
     )
     val hasSelection = if (multiple || showCheckbox) state.selectedKeys.isNotEmpty() else state.selectedKey != null
     val filteredNodes = if (filterable && state.query.isNotEmpty()) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.filterTree(
+        filterTree(
             nodes = state.nodes,
             query = state.query,
             filterMethod = filterMethod,
@@ -146,12 +146,12 @@ fun <T> NexusTreeSelect(
         state.nodes
     }
 
-    fun canSelect(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    fun canSelect(node: TreeNode<T>): Boolean {
         if (node.disabled) return false
         return checkStrictly || node.children.isEmpty()
     }
 
-    fun selectNode(node: io.github.xingray.compose.nexus.controls.TreeNode<T>) {
+    fun selectNode(node: TreeNode<T>) {
         if (!canSelect(node)) return
         if (multiple || showCheckbox) {
             state.toggleMulti(node.key)
@@ -166,7 +166,7 @@ fun <T> NexusTreeSelect(
     }
 
     Column(modifier = modifier) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = displayText,
             onValueChange = {},
             placeholder = placeholder,
@@ -189,14 +189,14 @@ fun <T> NexusTreeSelect(
                             }
                             .pointerHoverIcon(PointerIcon.Hand),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = "✕",
                             color = colorScheme.text.placeholder,
                             style = typography.extraSmall,
                         )
                     }
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = if (state.isOpen) "▴" else "▾",
                         color = colorScheme.text.placeholder,
                         style = typography.extraSmall,
@@ -227,7 +227,7 @@ fun <T> NexusTreeSelect(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         if (filterable) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+                            NexusInput(
                                 value = state.query,
                                 onValueChange = { state.query = it },
                                 placeholder = "Filter node",
@@ -240,7 +240,7 @@ fun <T> NexusTreeSelect(
                                 .heightIn(max = 300.dp)
                                 .verticalScroll(rememberScrollState()),
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTree(
+                            NexusTree(
                                 nodes = filteredNodes,
                                 state = state.treeState,
                                 defaultExpandAll = defaultExpandAll,
@@ -258,7 +258,7 @@ fun <T> NexusTreeSelect(
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
-                                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+                                            NexusCheckbox(
                                                 checked = checked,
                                                 onCheckedChange = { selectNode(node) },
                                                 disabled = node.disabled,
@@ -266,7 +266,7 @@ fun <T> NexusTreeSelect(
                                             if (nodeContent != null) {
                                                 nodeContent(node, checked)
                                             } else {
-                                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                                NexusText(
                                                     text = node.label,
                                                     color = if (node.disabled) colorScheme.text.disabled else colorScheme.text.regular,
                                                 )
@@ -276,7 +276,7 @@ fun <T> NexusTreeSelect(
                                         if (nodeContent != null) {
                                             nodeContent(node, checked)
                                         } else {
-                                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                            NexusText(
                                                 text = node.label,
                                                 color = if (node.disabled) colorScheme.text.disabled else colorScheme.text.regular,
                                             )
@@ -293,11 +293,11 @@ fun <T> NexusTreeSelect(
 }
 
 private fun <T> filterTree(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     query: String,
-    filterMethod: ((String, io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Boolean)?,
-): List<io.github.xingray.compose.nexus.controls.TreeNode<T>> {
-    fun matches(node: io.github.xingray.compose.nexus.controls.TreeNode<T>): Boolean {
+    filterMethod: ((String, TreeNode<T>) -> Boolean)?,
+): List<TreeNode<T>> {
+    fun matches(node: TreeNode<T>): Boolean {
         return filterMethod?.invoke(query, node) ?: node.label.contains(query, ignoreCase = true)
     }
 

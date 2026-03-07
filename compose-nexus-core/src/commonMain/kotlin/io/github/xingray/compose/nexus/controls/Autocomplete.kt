@@ -64,17 +64,17 @@ class AutocompleteState(
 @Composable
 fun rememberAutocompleteState(
     initialValue: String = "",
-): io.github.xingray.compose.nexus.controls.AutocompleteState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.AutocompleteState(initialValue) }
+): AutocompleteState = remember { AutocompleteState(initialValue) }
 
 /**
  * Element Plus Autocomplete — input suggestions with custom item/header/footer/loading slots.
  */
 @Composable
 fun NexusAutocomplete(
-    state: io.github.xingray.compose.nexus.controls.AutocompleteState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberAutocompleteState(),
+    state: AutocompleteState = rememberAutocompleteState(),
     modifier: Modifier = Modifier,
     placeholder: String = "",
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     clearable: Boolean = true,
     disabled: Boolean = false,
     debounceMs: Long = 300L,
@@ -95,10 +95,10 @@ fun NexusAutocomplete(
     footer: (@Composable () -> Unit)? = null,
     loadingContent: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
     val density = LocalDensity.current
 
     var isFocused by remember { mutableStateOf(false) }
@@ -158,7 +158,7 @@ fun NexusAutocomplete(
                     inputWidthPx = coordinates.size.width
                 },
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = state.value,
                 onValueChange = { newValue ->
                     val hadValue = state.value.isNotEmpty()
@@ -241,7 +241,7 @@ fun NexusAutocomplete(
                             if (loadingContent != null) {
                                 loadingContent()
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "Loading...",
                                     color = colorScheme.text.secondary,
                                     style = typography.small,
@@ -270,7 +270,7 @@ fun NexusAutocomplete(
                                 if (itemContent != null) {
                                     itemContent(suggestion)
                                 } else {
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                    NexusText(
                                         text = suggestion,
                                         color = colorScheme.text.regular,
                                         style = typography.base,

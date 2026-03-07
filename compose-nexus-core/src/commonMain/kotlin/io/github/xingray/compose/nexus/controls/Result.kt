@@ -29,27 +29,27 @@ fun NexusResult(
     modifier: Modifier = Modifier,
     title: String = "",
     subTitle: String = "",
-    icon: io.github.xingray.compose.nexus.controls.NexusResultIcon = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Info,
+    icon: NexusResultIcon = NexusResultIcon.Info,
     iconSlot: (@Composable () -> Unit)? = null,
     titleSlot: (@Composable () -> Unit)? = null,
     subTitleSlot: (@Composable () -> Unit)? = null,
     extra: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val iconColor = when (icon) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Primary -> colorScheme.primary.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Success -> colorScheme.success.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Warning -> colorScheme.warning.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Info -> colorScheme.info.base
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Error -> colorScheme.danger.base
+        NexusResultIcon.Primary -> colorScheme.primary.base
+        NexusResultIcon.Success -> colorScheme.success.base
+        NexusResultIcon.Warning -> colorScheme.warning.base
+        NexusResultIcon.Info -> colorScheme.info.base
+        NexusResultIcon.Error -> colorScheme.danger.base
     }
     val iconText = when (icon) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Primary -> "P"
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Success -> "✓"
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Warning -> "!"
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Info -> "i"
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusResultIcon.Error -> "×"
+        NexusResultIcon.Primary -> "P"
+        NexusResultIcon.Success -> "✓"
+        NexusResultIcon.Warning -> "!"
+        NexusResultIcon.Info -> "i"
+        NexusResultIcon.Error -> "×"
     }
 
     Column(
@@ -68,7 +68,7 @@ fun NexusResult(
                     .background(iconColor.copy(alpha = 0.14f), CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = iconText,
                     color = iconColor,
                     style = typography.extraLarge,
@@ -81,7 +81,7 @@ fun NexusResult(
         if (titleSlot != null) {
             titleSlot()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
                 color = colorScheme.text.primary,
                 style = typography.large,
@@ -93,7 +93,7 @@ fun NexusResult(
             if (subTitleSlot != null) {
                 subTitleSlot()
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = subTitle,
                     color = colorScheme.text.secondary,
                     style = typography.small,

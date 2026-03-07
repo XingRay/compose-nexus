@@ -57,7 +57,7 @@ enum class CascaderExpandTrigger {
  */
 @Stable
 class CascaderState<T>(
-    val options: List<io.github.xingray.compose.nexus.controls.CascaderOption<T>>,
+    val options: List<CascaderOption<T>>,
 ) {
     var selectedPath = mutableStateListOf<T>()
         private set
@@ -108,7 +108,7 @@ class CascaderState<T>(
         expandedPath.add(value)
     }
 
-    internal fun optionsAtLevel(level: Int): List<io.github.xingray.compose.nexus.controls.CascaderOption<T>> {
+    internal fun optionsAtLevel(level: Int): List<CascaderOption<T>> {
         var current = options
         for (i in 0 until level) {
             val expanded = expandedPath.getOrNull(i) ?: return emptyList()
@@ -129,8 +129,8 @@ class CascaderState<T>(
 
 @Composable
 fun <T> rememberCascaderState(
-    options: List<io.github.xingray.compose.nexus.controls.CascaderOption<T>>,
-): io.github.xingray.compose.nexus.controls.CascaderState<T> = remember(options) { _root_ide_package_.io.github.xingray.compose.nexus.controls.CascaderState(options) }
+    options: List<CascaderOption<T>>,
+): CascaderState<T> = remember(options) { CascaderState(options) }
 
 /**
  * Element Plus Cascader — a multi-level cascading selector.
@@ -143,14 +143,14 @@ fun <T> rememberCascaderState(
  */
 @Composable
 fun <T> NexusCascader(
-    state: io.github.xingray.compose.nexus.controls.CascaderState<T>,
+    state: CascaderState<T>,
     modifier: Modifier = Modifier,
     placeholder: String = "Select",
     disabled: Boolean = false,
     clearable: Boolean = false,
     showAllLevels: Boolean = true,
     separator: String = " / ",
-    expandTrigger: io.github.xingray.compose.nexus.controls.CascaderExpandTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.CascaderExpandTrigger.Click,
+    expandTrigger: CascaderExpandTrigger = CascaderExpandTrigger.Click,
     header: (@Composable () -> Unit)? = null,
     footer: (@Composable () -> Unit)? = null,
     onClear: (() -> Unit)? = null,
@@ -160,14 +160,14 @@ fun <T> NexusCascader(
     onExpandChange: ((List<T>) -> Unit)? = null,
     onSelect: ((List<T>) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     Column(modifier = modifier) {
         // Trigger input
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = state.displayText(showAllLevels = showAllLevels, separator = separator),
             onValueChange = {
                 if (it.isEmpty()) {
@@ -186,7 +186,7 @@ fun <T> NexusCascader(
                     onVisibleChange?.invoke(state.isOpen)
                 },
             suffix = {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = if (state.isOpen) "▴" else "▾",
                     color = colorScheme.text.placeholder,
                     style = typography.extraSmall,
@@ -231,7 +231,7 @@ fun <T> NexusCascader(
                             val levelOptions = state.optionsAtLevel(level)
                             if (levelOptions.isEmpty()) break
 
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.CascaderColumn(
+                            CascaderColumn(
                                 options = levelOptions,
                                 expandedValue = state.expandedPath.getOrNull(level),
                                 selectedPath = state.selectedPath,
@@ -270,16 +270,16 @@ fun <T> NexusCascader(
 
 @Composable
 private fun <T> CascaderColumn(
-    options: List<io.github.xingray.compose.nexus.controls.CascaderOption<T>>,
+    options: List<CascaderOption<T>>,
     expandedValue: T?,
     selectedPath: List<T>,
     level: Int,
-    expandTrigger: io.github.xingray.compose.nexus.controls.CascaderExpandTrigger,
+    expandTrigger: CascaderExpandTrigger,
     onExpand: (T) -> Unit,
     onSelect: (T) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     Column(
         modifier = Modifier
@@ -311,9 +311,9 @@ private fun <T> CascaderColumn(
                         if (!option.disabled) {
                             Modifier
                                 .clickable {
-                                    if (hasChildren && expandTrigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.CascaderExpandTrigger.Click) {
+                                    if (hasChildren && expandTrigger == CascaderExpandTrigger.Click) {
                                         onExpand(option.value)
-                                    } else if (hasChildren && expandTrigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.CascaderExpandTrigger.Hover) {
+                                    } else if (hasChildren && expandTrigger == CascaderExpandTrigger.Hover) {
                                         onExpand(option.value)
                                     } else {
                                         onSelect(option.value)
@@ -326,13 +326,13 @@ private fun <T> CascaderColumn(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = option.label,
                     color = textColor,
                     style = typography.base,
                 )
                 if (hasChildren) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "›",
                         color = colorScheme.text.placeholder,
                         style = typography.small,

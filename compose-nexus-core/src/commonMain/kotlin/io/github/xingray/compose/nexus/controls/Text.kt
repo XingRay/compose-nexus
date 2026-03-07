@@ -30,8 +30,8 @@ import io.github.xingray.compose.nexus.theme.typeColor
 fun NexusText(
     text: String,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    type: NexusType = NexusType.Default,
+    size: ComponentSize = ComponentSize.Default,
     style: TextStyle = TextStyle.Default,
     color: Color = Color.Unspecified,
     truncated: Boolean = false,
@@ -45,14 +45,14 @@ fun NexusText(
 
     val resolvedColor = when {
         color.isSpecified -> color
-        type != _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.typeColor(type)?.base
-            ?: _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current
-        else -> _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current
+        type != NexusType.Default -> NexusTheme.colorScheme.typeColor(type)?.base
+            ?: LocalContentColor.current
+        else -> LocalContentColor.current
     }
     val sizeStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small
+        ComponentSize.Large -> NexusTheme.typography.large
+        ComponentSize.Default -> NexusTheme.typography.base
+        ComponentSize.Small -> NexusTheme.typography.small
     }
     val mergedStyle = sizeStyle.merge(style).merge(TextStyle(color = resolvedColor))
     val effectiveMaxLines = when {
@@ -86,8 +86,8 @@ fun NexusText(
 @Composable
 fun NexusText(
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    type: NexusType = NexusType.Default,
+    size: ComponentSize = ComponentSize.Default,
     style: TextStyle = TextStyle.Default,
     color: Color = Color.Unspecified,
     tag: String = "span",
@@ -98,19 +98,19 @@ fun NexusText(
 
     val resolvedColor = when {
         color.isSpecified -> color
-        type != _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.typeColor(type)?.base
-            ?: _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current
-        else -> _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor.current
+        type != NexusType.Default -> NexusTheme.colorScheme.typeColor(type)?.base
+            ?: LocalContentColor.current
+        else -> LocalContentColor.current
     }
     val sizeStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.large
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small
+        ComponentSize.Large -> NexusTheme.typography.large
+        ComponentSize.Default -> NexusTheme.typography.base
+        ComponentSize.Small -> NexusTheme.typography.small
     }
     val mergedStyle = sizeStyle.merge(style)
 
     androidx.compose.foundation.layout.Box(modifier = modifier) {
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
+        ProvideContentColorTextStyle(
             contentColor = resolvedColor,
             textStyle = mergedStyle,
         ) {

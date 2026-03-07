@@ -92,9 +92,9 @@ data class TourStep(
     val description: String = "",
     val target: String? = null,
     val showArrow: Boolean? = null,
-    val placement: io.github.xingray.compose.nexus.controls.TourPlacement? = null,
+    val placement: TourPlacement? = null,
     val mask: Boolean? = null,
-    val type: io.github.xingray.compose.nexus.controls.TourType? = null,
+    val type: TourType? = null,
     val showClose: Boolean? = null,
     val nextButtonText: String? = null,
     val prevButtonText: String? = null,
@@ -117,9 +117,9 @@ internal data class TourTargetBounds(
 
 @Stable
 class TourState(
-    val steps: List<io.github.xingray.compose.nexus.controls.TourStep>,
+    val steps: List<TourStep>,
 ) {
-    private val targetMap = mutableStateMapOf<String, io.github.xingray.compose.nexus.controls.TourTargetBounds>()
+    private val targetMap = mutableStateMapOf<String, TourTargetBounds>()
 
     var currentStep by mutableIntStateOf(0)
         private set
@@ -157,7 +157,7 @@ class TourState(
         currentStep = step.coerceIn(0, steps.lastIndex)
     }
 
-    internal fun registerTarget(target: String, bounds: io.github.xingray.compose.nexus.controls.TourTargetBounds) {
+    internal fun registerTarget(target: String, bounds: TourTargetBounds) {
         targetMap[target] = bounds
     }
 
@@ -165,7 +165,7 @@ class TourState(
         targetMap.remove(target)
     }
 
-    internal fun getTargetBounds(target: String?): io.github.xingray.compose.nexus.controls.TourTargetBounds? {
+    internal fun getTargetBounds(target: String?): TourTargetBounds? {
         if (target.isNullOrBlank()) return null
         return targetMap[target]
     }
@@ -173,15 +173,15 @@ class TourState(
 
 @Composable
 fun rememberTourState(
-    steps: List<io.github.xingray.compose.nexus.controls.TourStep>,
-): io.github.xingray.compose.nexus.controls.TourState = remember(steps) { _root_ide_package_.io.github.xingray.compose.nexus.controls.TourState(steps) }
+    steps: List<TourStep>,
+): TourState = remember(steps) { TourState(steps) }
 
 /**
  * Register a composable node as a tour target.
  */
 @Composable
 fun NexusTourTarget(
-    state: io.github.xingray.compose.nexus.controls.TourState,
+    state: TourState,
     target: String,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -192,7 +192,7 @@ fun NexusTourTarget(
             val size = coordinates.size
             state.registerTarget(
                 target = target,
-                bounds = _root_ide_package_.io.github.xingray.compose.nexus.controls.TourTargetBounds(
+                bounds = TourTargetBounds(
                     left = position.x.roundToInt(),
                     top = position.y.roundToInt(),
                     right = (position.x + size.width).roundToInt(),
@@ -210,14 +210,14 @@ fun NexusTourTarget(
  */
 @Composable
 fun NexusTour(
-    state: io.github.xingray.compose.nexus.controls.TourState,
+    state: TourState,
     modifier: Modifier = Modifier,
     showArrow: Boolean = true,
-    placement: io.github.xingray.compose.nexus.controls.TourPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Bottom,
+    placement: TourPlacement = TourPlacement.Bottom,
     mask: Boolean = true,
     maskColor: Color? = null,
-    gap: io.github.xingray.compose.nexus.controls.TourGap = _root_ide_package_.io.github.xingray.compose.nexus.controls.TourGap(),
-    type: io.github.xingray.compose.nexus.controls.TourType = _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Default,
+    gap: TourGap = TourGap(),
+    type: TourType = TourType.Default,
     showClose: Boolean = true,
     closeOnPressEscape: Boolean = true,
     targetAreaClickable: Boolean = true,
@@ -233,10 +233,10 @@ fun NexusTour(
         if (state.isActive) onChange?.invoke(state.currentStep)
     }
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     val effectivePlacement = step.placement ?: placement
     val effectiveShowArrow = step.showArrow ?: showArrow
@@ -244,10 +244,10 @@ fun NexusTour(
     val effectiveType = step.type ?: type
     val effectiveShowClose = step.showClose ?: showClose
 
-    val cardBackground = if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.primary.base else colorScheme.fill.blank
-    val titleColor = if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.white else colorScheme.text.primary
-    val bodyColor = if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.white.copy(alpha = 0.92f) else colorScheme.text.regular
-    val secondaryColor = if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.white.copy(alpha = 0.72f) else colorScheme.text.secondary
+    val cardBackground = if (effectiveType == TourType.Primary) colorScheme.primary.base else colorScheme.fill.blank
+    val titleColor = if (effectiveType == TourType.Primary) colorScheme.white else colorScheme.text.primary
+    val bodyColor = if (effectiveType == TourType.Primary) colorScheme.white.copy(alpha = 0.92f) else colorScheme.text.regular
+    val secondaryColor = if (effectiveType == TourType.Primary) colorScheme.white.copy(alpha = 0.72f) else colorScheme.text.secondary
     val overlayColor = maskColor ?: colorScheme.overlay.lighter
 
     Popup(
@@ -319,7 +319,7 @@ fun NexusTour(
                 marginPx,
                 gapPx,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.calculateTourCardOffset(
+                calculateTourCardOffset(
                     target = targetBounds,
                     placement = effectivePlacement,
                     cardWidth = cardWidthPx,
@@ -341,7 +341,7 @@ fun NexusTour(
                     .background(cardBackground),
             ) {
                 if (effectiveShowArrow && targetBounds != null) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.TourArrow(
+                    TourArrow(
                         placement = effectivePlacement,
                         color = cardBackground,
                     )
@@ -370,7 +370,7 @@ fun NexusTour(
                                     }
                                     .padding(horizontal = 6.dp, vertical = 2.dp),
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "x",
                                     color = secondaryColor,
                                     style = typography.small,
@@ -382,7 +382,7 @@ fun NexusTour(
                     if (step.header != null) {
                         step.header.invoke()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = step.title,
                             color = titleColor,
                             style = typography.large,
@@ -393,7 +393,7 @@ fun NexusTour(
                         Spacer(modifier = Modifier.height(8.dp))
                         step.content.invoke()
                     } else if (step.description.isNotEmpty()) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = step.description,
                             color = bodyColor,
                             style = typography.base,
@@ -417,10 +417,10 @@ fun NexusTour(
                                         .clip(CircleShape)
                                         .background(
                                             if (index == state.currentStep) {
-                                                if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.white
+                                                if (effectiveType == TourType.Primary) colorScheme.white
                                                 else colorScheme.primary.base
                                             } else {
-                                                if (effectiveType == _root_ide_package_.io.github.xingray.compose.nexus.controls.TourType.Primary) colorScheme.white.copy(alpha = 0.35f)
+                                                if (effectiveType == TourType.Primary) colorScheme.white.copy(alpha = 0.35f)
                                                 else colorScheme.fill.dark
                                             },
                                         ),
@@ -437,30 +437,30 @@ fun NexusTour(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (state.currentStep > 0) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                            NexusButton(
                                 text = step.prevButtonText ?: "Previous",
                                 onClick = { state.prev() },
-                                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                                size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                         }
 
                         if (state.currentStep < state.steps.lastIndex) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                            NexusButton(
                                 text = step.nextButtonText ?: "Next",
                                 onClick = { state.next() },
-                                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-                                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                                type = NexusType.Primary,
+                                size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
                             )
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                            NexusButton(
                                 text = step.finishButtonText ?: "Finish",
                                 onClick = {
                                     state.finish()
                                     onFinish?.invoke()
                                 },
-                                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-                                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                                type = NexusType.Primary,
+                                size = io.github.xingray.compose.nexus.theme.ComponentSize.Small,
                             )
                         }
                     }
@@ -472,58 +472,58 @@ fun NexusTour(
 
 @Composable
 private fun TourArrow(
-    placement: io.github.xingray.compose.nexus.controls.TourPlacement,
+    placement: TourPlacement,
     color: Color,
 ) {
     val alignment: Alignment
     val offset: IntOffset
 
     when (placement) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Top -> {
+        TourPlacement.Top -> {
             alignment = Alignment.BottomCenter
             offset = IntOffset(0, 5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.TopStart -> {
+        TourPlacement.TopStart -> {
             alignment = Alignment.BottomStart
             offset = IntOffset(30, 5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.TopEnd -> {
+        TourPlacement.TopEnd -> {
             alignment = Alignment.BottomEnd
             offset = IntOffset(-30, 5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Bottom -> {
+        TourPlacement.Bottom -> {
             alignment = Alignment.TopCenter
             offset = IntOffset(0, -5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.BottomStart -> {
+        TourPlacement.BottomStart -> {
             alignment = Alignment.TopStart
             offset = IntOffset(30, -5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.BottomEnd -> {
+        TourPlacement.BottomEnd -> {
             alignment = Alignment.TopEnd
             offset = IntOffset(-30, -5)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Left -> {
+        TourPlacement.Left -> {
             alignment = Alignment.CenterEnd
             offset = IntOffset(5, 0)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.LeftStart -> {
+        TourPlacement.LeftStart -> {
             alignment = Alignment.TopEnd
             offset = IntOffset(5, 24)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.LeftEnd -> {
+        TourPlacement.LeftEnd -> {
             alignment = Alignment.BottomEnd
             offset = IntOffset(5, -24)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Right -> {
+        TourPlacement.Right -> {
             alignment = Alignment.CenterStart
             offset = IntOffset(-5, 0)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.RightStart -> {
+        TourPlacement.RightStart -> {
             alignment = Alignment.TopStart
             offset = IntOffset(-5, 24)
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.RightEnd -> {
+        TourPlacement.RightEnd -> {
             alignment = Alignment.BottomStart
             offset = IntOffset(-5, -24)
         }
@@ -544,21 +544,21 @@ private fun TourArrow(
     }
 }
 
-private fun io.github.xingray.compose.nexus.controls.TourTargetBounds.inflate(
+private fun TourTargetBounds.inflate(
     offset: Int,
     viewportWidth: Int,
     viewportHeight: Int,
-): io.github.xingray.compose.nexus.controls.TourTargetBounds {
+): TourTargetBounds {
     val left = (this.left - offset).coerceIn(0, viewportWidth)
     val top = (this.top - offset).coerceIn(0, viewportHeight)
     val right = (this.right + offset).coerceIn(0, viewportWidth)
     val bottom = (this.bottom + offset).coerceIn(0, viewportHeight)
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.TourTargetBounds(left, top, right, bottom)
+    return TourTargetBounds(left, top, right, bottom)
 }
 
 private fun calculateTourCardOffset(
-    target: io.github.xingray.compose.nexus.controls.TourTargetBounds?,
-    placement: io.github.xingray.compose.nexus.controls.TourPlacement,
+    target: TourTargetBounds?,
+    placement: TourPlacement,
     cardWidth: Int,
     cardHeight: Int,
     viewportWidth: Int,
@@ -576,51 +576,51 @@ private fun calculateTourCardOffset(
     val rawX: Int
     val rawY: Int
     when (placement) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Top -> {
+        TourPlacement.Top -> {
             rawX = target.centerX - cardWidth / 2
             rawY = target.top - gap - cardHeight
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.TopStart -> {
+        TourPlacement.TopStart -> {
             rawX = target.left
             rawY = target.top - gap - cardHeight
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.TopEnd -> {
+        TourPlacement.TopEnd -> {
             rawX = target.right - cardWidth
             rawY = target.top - gap - cardHeight
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Bottom -> {
+        TourPlacement.Bottom -> {
             rawX = target.centerX - cardWidth / 2
             rawY = target.bottom + gap
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.BottomStart -> {
+        TourPlacement.BottomStart -> {
             rawX = target.left
             rawY = target.bottom + gap
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.BottomEnd -> {
+        TourPlacement.BottomEnd -> {
             rawX = target.right - cardWidth
             rawY = target.bottom + gap
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Left -> {
+        TourPlacement.Left -> {
             rawX = target.left - gap - cardWidth
             rawY = target.centerY - cardHeight / 2
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.LeftStart -> {
+        TourPlacement.LeftStart -> {
             rawX = target.left - gap - cardWidth
             rawY = target.top
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.LeftEnd -> {
+        TourPlacement.LeftEnd -> {
             rawX = target.left - gap - cardWidth
             rawY = target.bottom - cardHeight
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.Right -> {
+        TourPlacement.Right -> {
             rawX = target.right + gap
             rawY = target.centerY - cardHeight / 2
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.RightStart -> {
+        TourPlacement.RightStart -> {
             rawX = target.right + gap
             rawY = target.top
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.TourPlacement.RightEnd -> {
+        TourPlacement.RightEnd -> {
             rawX = target.right + gap
             rawY = target.bottom - cardHeight
         }

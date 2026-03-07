@@ -44,7 +44,7 @@ class SearchBarState(
 @Composable
 fun rememberSearchBarState(
     initialQuery: String = "",
-): io.github.xingray.compose.nexus.controls.SearchBarState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.SearchBarState(initialQuery) }
+): SearchBarState = remember { SearchBarState(initialQuery) }
 
 /**
  * SearchBar — a search input with button and optional suggestion dropdown.
@@ -59,18 +59,18 @@ fun rememberSearchBarState(
  */
 @Composable
 fun NexusSearchBar(
-    state: io.github.xingray.compose.nexus.controls.SearchBarState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSearchBarState(),
+    state: SearchBarState = rememberSearchBarState(),
     modifier: Modifier = Modifier,
     placeholder: String = "Search",
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     suggestions: List<String> = emptyList(),
     onSearch: ((String) -> Unit)? = null,
     onSuggestionSelect: ((String) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
+    val typography = NexusTheme.typography
 
     val filteredSuggestions = if (state.query.isNotEmpty()) {
         suggestions.filter { it.contains(state.query, ignoreCase = true) }
@@ -83,7 +83,7 @@ fun NexusSearchBar(
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = state.query,
                 onValueChange = {
                     state.query = it
@@ -94,15 +94,15 @@ fun NexusSearchBar(
                 size = size,
                 clearable = true,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = {
                     state.isDropdownOpen = false
                     onSearch?.invoke(state.query)
                 },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = io.github.xingray.compose.nexus.theme.NexusType.Primary,
                 size = size,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Search")
+                NexusText(text = "Search")
             }
         }
 
@@ -133,7 +133,7 @@ fun NexusSearchBar(
                                 .pointerHoverIcon(PointerIcon.Hand)
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = suggestion,
                                 color = colorScheme.text.regular,
                                 style = typography.base,

@@ -41,18 +41,18 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
  */
 @Composable
 fun NexusSettingsPage(
-    sections: List<io.github.xingray.compose.nexus.controls.MenuItem>,
+    sections: List<MenuItem>,
     modifier: Modifier = Modifier,
     title: String = "Settings",
-    menuState: io.github.xingray.compose.nexus.controls.MenuState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberMenuState(
+    menuState: MenuState = rememberMenuState(
         initialActiveKey = sections.firstOrNull()?.key ?: ""
     ),
     sidebarWidth: Dp = 220.dp,
     content: @Composable (activeKey: String) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -61,7 +61,7 @@ fun NexusSettingsPage(
             .padding(20.dp),
     ) {
         // Title
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
@@ -79,7 +79,7 @@ fun NexusSettingsPage(
                     .clip(shapes.base)
                     .background(colorScheme.fill.blank),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTreeMenu(
+                NexusTreeMenu(
                     items = sections,
                     state = menuState,
                 )

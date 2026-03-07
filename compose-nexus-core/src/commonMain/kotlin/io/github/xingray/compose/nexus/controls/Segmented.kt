@@ -42,28 +42,28 @@ data class NexusSegmentedOption<T>(
 fun <T> NexusSegmented(
     modelValue: T?,
     onValueChange: (T) -> Unit,
-    options: List<io.github.xingray.compose.nexus.controls.NexusSegmentedOption<T>>,
+    options: List<NexusSegmentedOption<T>>,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     block: Boolean = false,
     disabled: Boolean = false,
-    direction: io.github.xingray.compose.nexus.controls.SegmentedDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.SegmentedDirection.Horizontal,
+    direction: SegmentedDirection = SegmentedDirection.Horizontal,
     onChange: ((T) -> Unit)? = null,
-    optionContent: (@Composable (item: io.github.xingray.compose.nexus.controls.NexusSegmentedOption<T>, selected: Boolean) -> Unit)? = null,
+    optionContent: (@Composable (item: NexusSegmentedOption<T>, selected: Boolean) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val groupShape = RoundedCornerShape(10.dp)
     val itemShape = RoundedCornerShape(8.dp)
     val itemPadding = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> Pair(14.dp, 8.dp)
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> Pair(10.dp, 4.dp)
+        ComponentSize.Large -> Pair(14.dp, 8.dp)
+        ComponentSize.Small -> Pair(10.dp, 4.dp)
         else -> Pair(12.dp, 6.dp)
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.small
+        ComponentSize.Large -> typography.base
+        ComponentSize.Small -> typography.small
         else -> typography.base
     }
 
@@ -75,7 +75,7 @@ fun <T> NexusSegmented(
         .widthIn(min = 120.dp)
 
     @Composable
-    fun Item(item: io.github.xingray.compose.nexus.controls.NexusSegmentedOption<T>) {
+    fun Item(item: NexusSegmentedOption<T>) {
             val selected = modelValue == item.value
             val itemDisabled = disabled || item.disabled
             val background = when {
@@ -111,7 +111,7 @@ fun <T> NexusSegmented(
                 if (optionContent != null) {
                     optionContent(item, selected)
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = item.label,
                         color = textColor,
                         style = textStyle,
@@ -119,7 +119,7 @@ fun <T> NexusSegmented(
                 }
             }
         }
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.SegmentedDirection.Horizontal) {
+    if (direction == SegmentedDirection.Horizontal) {
         Row(
             modifier = baseModifier,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -144,17 +144,17 @@ fun NexusSegmented(
     onValueChange: (Any) -> Unit,
     options: List<Any>,
     modifier: Modifier = Modifier,
-    props: io.github.xingray.compose.nexus.controls.SegmentedProps = _root_ide_package_.io.github.xingray.compose.nexus.controls.SegmentedProps(),
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    props: SegmentedProps = SegmentedProps(),
+    size: ComponentSize = ComponentSize.Default,
     block: Boolean = false,
     disabled: Boolean = false,
-    direction: io.github.xingray.compose.nexus.controls.SegmentedDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.SegmentedDirection.Horizontal,
+    direction: SegmentedDirection = SegmentedDirection.Horizontal,
     onChange: ((Any) -> Unit)? = null,
-    optionContent: (@Composable (item: io.github.xingray.compose.nexus.controls.NexusSegmentedOption<Any>, selected: Boolean) -> Unit)? = null,
+    optionContent: (@Composable (item: NexusSegmentedOption<Any>, selected: Boolean) -> Unit)? = null,
 ) {
-    val normalized = options.map { _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeSegmentedOption(it, props) }
+    val normalized = options.map { normalizeSegmentedOption(it, props) }
     // Explicitly route to the generic overload to avoid recursive self-call.
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSegmented<Any>(
+    NexusSegmented<Any>(
         modelValue = modelValue,
         onValueChange = onValueChange,
         options = normalized,
@@ -170,11 +170,11 @@ fun NexusSegmented(
 
 private fun normalizeSegmentedOption(
     item: Any,
-    props: io.github.xingray.compose.nexus.controls.SegmentedProps,
-): io.github.xingray.compose.nexus.controls.NexusSegmentedOption<Any> {
+    props: SegmentedProps,
+): NexusSegmentedOption<Any> {
     return when (item) {
-        is io.github.xingray.compose.nexus.controls.NexusSegmentedOption<*> -> {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSegmentedOption(
+        is NexusSegmentedOption<*> -> {
+            NexusSegmentedOption(
                 value = item.value as Any,
                 label = item.label,
                 disabled = item.disabled,
@@ -182,7 +182,7 @@ private fun normalizeSegmentedOption(
             )
         }
         is String, is Number, is Boolean -> {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSegmentedOption(
+            NexusSegmentedOption(
                 value = item,
                 label = item.toString(),
                 disabled = false,
@@ -193,7 +193,7 @@ private fun normalizeSegmentedOption(
             val value = item[props.value] ?: item
             val label = (item[props.label] ?: value).toString()
             val disabled = item[props.disabled] as? Boolean ?: false
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSegmentedOption(
+            NexusSegmentedOption(
                 value = value,
                 label = label,
                 disabled = disabled,
@@ -201,7 +201,7 @@ private fun normalizeSegmentedOption(
             )
         }
         else -> {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSegmentedOption(
+            NexusSegmentedOption(
                 value = item,
                 label = item.toString(),
                 disabled = false,

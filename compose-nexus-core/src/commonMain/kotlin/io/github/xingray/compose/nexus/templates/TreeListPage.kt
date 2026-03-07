@@ -38,18 +38,18 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
  */
 @Composable
 fun <T> NexusTreeListPage(
-    nodes: List<io.github.xingray.compose.nexus.controls.TreeNode<T>>,
+    nodes: List<TreeNode<T>>,
     modifier: Modifier = Modifier,
     title: String = "Tree List",
-    treeState: io.github.xingray.compose.nexus.controls.TreeState<T> = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTreeState(),
+    treeState: TreeState<T> = rememberTreeState(),
     sidebarWidth: Dp = 260.dp,
     defaultExpandAll: Boolean = false,
-    onNodeSelect: ((io.github.xingray.compose.nexus.controls.TreeNode<T>) -> Unit)? = null,
+    onNodeSelect: ((TreeNode<T>) -> Unit)? = null,
     content: @Composable (selectedKey: T?) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     Column(
         modifier = modifier
@@ -58,7 +58,7 @@ fun <T> NexusTreeListPage(
             .padding(20.dp),
     ) {
         // Title
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             color = colorScheme.text.primary,
             style = typography.extraLarge,
@@ -78,7 +78,7 @@ fun <T> NexusTreeListPage(
                     .padding(8.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTree(
+                NexusTree(
                     nodes = nodes,
                     state = treeState,
                     defaultExpandAll = defaultExpandAll,

@@ -51,7 +51,7 @@ class CrudTablePageState<T>(
 @Composable
 fun <T> rememberCrudTablePageState(
     pageSize: Int = 10,
-): io.github.xingray.compose.nexus.templates.CrudTablePageState<T> = remember { _root_ide_package_.io.github.xingray.compose.nexus.templates.CrudTablePageState(pageSize) }
+): CrudTablePageState<T> = remember { CrudTablePageState(pageSize) }
 
 /**
  * CrudTablePage — a full CRUD table page template.
@@ -79,10 +79,10 @@ fun <T> rememberCrudTablePageState(
 @Composable
 fun <T> NexusCrudTablePage(
     data: List<T>,
-    columns: List<io.github.xingray.compose.nexus.controls.NexusTableColumn<T>>,
+    columns: List<NexusTableColumn<T>>,
     totalPages: Int,
-    paginationState: io.github.xingray.compose.nexus.controls.PaginationState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberPaginationState(pageCount = totalPages),
-    state: io.github.xingray.compose.nexus.templates.CrudTablePageState<T> = _root_ide_package_.io.github.xingray.compose.nexus.templates.rememberCrudTablePageState(),
+    paginationState: PaginationState = rememberPaginationState(pageCount = totalPages),
+    state: CrudTablePageState<T> = rememberCrudTablePageState(),
     modifier: Modifier = Modifier,
     title: String = "Data Management",
     searchPlaceholder: String = "Search...",
@@ -95,12 +95,12 @@ fun <T> NexusCrudTablePage(
     editDialogContent: (@Composable (T) -> Unit)? = null,
     deleteDialogContent: (@Composable (T) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
-    val createDialogState = _root_ide_package_.io.github.xingray.compose.nexus.containers.rememberDialogState(state.isCreateDialogOpen)
-    val editDialogState = _root_ide_package_.io.github.xingray.compose.nexus.containers.rememberDialogState(state.isEditDialogOpen)
-    val deleteDialogState = _root_ide_package_.io.github.xingray.compose.nexus.containers.rememberDialogState(state.isDeleteDialogOpen)
+    val createDialogState = rememberDialogState(state.isCreateDialogOpen)
+    val editDialogState = rememberDialogState(state.isEditDialogOpen)
+    val deleteDialogState = rememberDialogState(state.isDeleteDialogOpen)
 
     Column(
         modifier = modifier
@@ -114,7 +114,7 @@ fun <T> NexusCrudTablePage(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
                 color = colorScheme.text.primary,
                 style = typography.extraLarge,
@@ -128,15 +128,15 @@ fun <T> NexusCrudTablePage(
                     headerActions()
                 }
                 // Default create button
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                NexusButton(
                     onClick = {
                         state.isCreateDialogOpen = true
                         createDialogState.open()
                         onCreate?.invoke()
                     },
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                    type = NexusType.Primary,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "+ New")
+                    NexusText(text = "+ New")
                 }
             }
         }
@@ -153,25 +153,25 @@ fun <T> NexusCrudTablePage(
             if (filterActions != null) {
                 filterActions()
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = state.searchQuery,
                 onValueChange = { state.searchQuery = it },
                 placeholder = searchPlaceholder,
                 clearable = true,
                 modifier = Modifier.weight(1f),
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = { onSearch?.invoke(state.searchQuery) },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Search")
+                NexusText(text = "Search")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Table
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTable(
+        NexusTable(
             data = data,
             columns = columns,
             modifier = Modifier.weight(1f),
@@ -186,7 +186,7 @@ fun <T> NexusCrudTablePage(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusPagination(
+            NexusPagination(
                 state = paginationState,
                 onPageChange = onPageChange,
             )
@@ -195,7 +195,7 @@ fun <T> NexusCrudTablePage(
 
     // Create dialog
     if (createDialogContent != null) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusDialog(
+        NexusDialog(
             state = createDialogState,
             title = "Create",
         ) {
@@ -206,7 +206,7 @@ fun <T> NexusCrudTablePage(
     // Edit dialog
     val editItem = state.editingItem
     if (editDialogContent != null && editItem != null) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusDialog(
+        NexusDialog(
             state = editDialogState,
             title = "Edit",
         ) {
@@ -217,7 +217,7 @@ fun <T> NexusCrudTablePage(
     // Delete dialog
     val deleteItem = state.deletingItem
     if (deleteDialogContent != null && deleteItem != null) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.NexusDialog(
+        NexusDialog(
             state = deleteDialogState,
             title = "Confirm Delete",
             width = 400.dp,

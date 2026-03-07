@@ -57,11 +57,11 @@ data class NexusSizes(
 ) {
     companion object {
         /** Returns the component height for a given [io.github.xingray.compose.nexus.theme.ComponentSize]. */
-        fun componentHeight(size: io.github.xingray.compose.nexus.theme.ComponentSize, sizes: NexusSizes = NexusSizes()): Dp =
+        fun componentHeight(size: ComponentSize, sizes: NexusSizes = NexusSizes()): Dp =
             when (size) {
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> sizes.componentLarge
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> sizes.componentDefault
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> sizes.componentSmall
+                ComponentSize.Large -> sizes.componentLarge
+                ComponentSize.Default -> sizes.componentDefault
+                ComponentSize.Small -> sizes.componentSmall
             }
     }
 }

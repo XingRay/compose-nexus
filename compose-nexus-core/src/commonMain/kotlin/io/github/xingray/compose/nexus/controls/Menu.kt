@@ -88,8 +88,8 @@ class MenuState(
 fun rememberMenuState(
     initialActiveKey: String = "",
     defaultOpeneds: List<String> = emptyList(),
-): io.github.xingray.compose.nexus.controls.MenuState {
-    val state = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuState(initialActiveKey) }
+): MenuState {
+    val state = remember { MenuState(initialActiveKey) }
     remember(defaultOpeneds) {
         defaultOpeneds.forEach { state.open(it) }
         true
@@ -99,14 +99,14 @@ fun rememberMenuState(
 
 @Composable
 fun NexusMenu(
-    items: List<io.github.xingray.compose.nexus.controls.MenuItem>,
-    state: io.github.xingray.compose.nexus.controls.MenuState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberMenuState(),
+    items: List<MenuItem>,
+    state: MenuState = rememberMenuState(),
     modifier: Modifier = Modifier,
-    mode: io.github.xingray.compose.nexus.controls.MenuMode = _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuMode.Vertical,
+    mode: MenuMode = MenuMode.Vertical,
     collapse: Boolean = false,
     defaultOpeneds: List<String> = emptyList(),
     uniqueOpened: Boolean = false,
-    menuTrigger: io.github.xingray.compose.nexus.controls.MenuTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuTrigger.Hover,
+    menuTrigger: MenuTrigger = MenuTrigger.Hover,
     backgroundColor: Color? = null,
     textColor: Color? = null,
     activeTextColor: Color? = null,
@@ -114,7 +114,7 @@ fun NexusMenu(
     onOpen: ((index: String, indexPath: List<String>) -> Unit)? = null,
     onClose: ((index: String, indexPath: List<String>) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val menuBg = backgroundColor ?: colorScheme.fill.blank
     val siblings = items.map { it.key }
 
@@ -124,7 +124,7 @@ fun NexusMenu(
     }
 
     when (mode) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuMode.Horizontal -> {
+        MenuMode.Horizontal -> {
             Row(
                 modifier = modifier
                     .fillMaxWidth()
@@ -133,7 +133,7 @@ fun NexusMenu(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 items.forEach { item ->
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.HorizontalMenuItemComposable(
+                    HorizontalMenuItemComposable(
                         item = item,
                         state = state,
                         path = listOf(item.key),
@@ -145,14 +145,14 @@ fun NexusMenu(
                 }
             }
         }
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuMode.Vertical -> {
+        MenuMode.Vertical -> {
             Column(
                 modifier = modifier
                     .defaultMinSize(minWidth = if (collapse) 64.dp else 200.dp)
                     .background(menuBg),
             ) {
                 items.forEach { item ->
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.VerticalMenuItemComposable(
+                    VerticalMenuItemComposable(
                         item = item,
                         state = state,
                         depth = 0,
@@ -174,16 +174,16 @@ fun NexusMenu(
 
 @Composable
 private fun HorizontalMenuItemComposable(
-    item: io.github.xingray.compose.nexus.controls.MenuItem,
-    state: io.github.xingray.compose.nexus.controls.MenuState,
+    item: MenuItem,
+    state: MenuState,
     path: List<String>,
-    menuTrigger: io.github.xingray.compose.nexus.controls.MenuTrigger,
+    menuTrigger: MenuTrigger,
     textColor: Color?,
     activeTextColor: Color?,
     onSelect: ((String, List<String>) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isActive = state.activeKey == item.key
@@ -223,7 +223,7 @@ private fun HorizontalMenuItemComposable(
                 modifier = Modifier.defaultMinSize(minHeight = 56.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = item.label,
                     color = resolvedTextColor,
                     style = typography.base,
@@ -239,11 +239,11 @@ private fun HorizontalMenuItemComposable(
     }
 
     if (hasChildren && !item.disabled) {
-        val dropdownState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberDropdownState()
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDropdown(
+        val dropdownState = rememberDropdownState()
+        NexusDropdown(
             state = dropdownState,
-            triggerMode = if (menuTrigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.MenuTrigger.Hover) _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.Hover else _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownTrigger.Click,
-            placement = _root_ide_package_.io.github.xingray.compose.nexus.controls.DropdownPlacement.BottomStart,
+            triggerMode = if (menuTrigger == MenuTrigger.Hover) DropdownTrigger.Hover else DropdownTrigger.Click,
+            placement = DropdownPlacement.BottomStart,
             trigger = { TriggerContent() },
             onCommand = { command ->
                 val key = command?.toString() ?: return@NexusDropdown
@@ -253,7 +253,7 @@ private fun HorizontalMenuItemComposable(
             },
         ) {
             item.children.forEach { child ->
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDropdownItem(
+                NexusDropdownItem(
                     text = child.label,
                     command = child.key,
                     disabled = child.disabled,
@@ -267,8 +267,8 @@ private fun HorizontalMenuItemComposable(
 
 @Composable
 private fun VerticalMenuItemComposable(
-    item: io.github.xingray.compose.nexus.controls.MenuItem,
-    state: io.github.xingray.compose.nexus.controls.MenuState,
+    item: MenuItem,
+    state: MenuState,
     depth: Int,
     path: List<String>,
     siblingsAtLevel: List<String>,
@@ -282,8 +282,8 @@ private fun VerticalMenuItemComposable(
 ) {
     if (collapse && depth > 0) return
 
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val hasChildren = item.children.isNotEmpty()
     val isOpen = state.isOpen(item.key)
     val isActive = state.activeKey == item.key
@@ -347,14 +347,14 @@ private fun VerticalMenuItemComposable(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = if (collapse) item.label.take(1) else item.label,
             color = resolvedTextColor,
             style = typography.base,
             modifier = Modifier.weight(1f),
         )
         if (hasChildren && !collapse) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = if (isOpen) "▾" else "▸",
                 color = colorScheme.text.placeholder,
                 style = typography.extraSmall,

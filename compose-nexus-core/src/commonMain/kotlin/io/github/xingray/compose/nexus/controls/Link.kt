@@ -40,37 +40,37 @@ fun NexusLink(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
-    underline: io.github.xingray.compose.nexus.controls.NexusLinkUnderline = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkUnderline.Hover,
+    type: NexusType = NexusType.Default,
+    underline: NexusLinkUnderline = NexusLinkUnderline.Hover,
     disabled: Boolean = false,
     icon: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val config = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalNexusConfig.current.link
-    val resolvedType = if (type == _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default) config.type ?: type else type
-    val resolvedUnderline = if (underline == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkUnderline.Hover) config.underline ?: underline else underline
+    val colorScheme = NexusTheme.colorScheme
+    val config = LocalNexusConfig.current.link
+    val resolvedType = if (type == NexusType.Default) config.type ?: type else type
+    val resolvedUnderline = if (underline == NexusLinkUnderline.Hover) config.underline ?: underline else underline
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val baseColor = when {
         disabled -> colorScheme.text.disabled
-        resolvedType == _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> colorScheme.text.regular
+        resolvedType == NexusType.Default -> colorScheme.text.regular
         else -> colorScheme.typeColor(resolvedType)?.base ?: colorScheme.text.regular
     }
     val hoverColor = when {
         disabled -> colorScheme.text.disabled
-        resolvedType == _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> colorScheme.primary.base
+        resolvedType == NexusType.Default -> colorScheme.primary.base
         else -> colorScheme.typeColor(resolvedType)?.light3 ?: colorScheme.primary.base
     }
     val textColor = if (isHovered && !disabled) hoverColor else baseColor
     val decoration = when {
         disabled -> TextDecoration.None
-        resolvedUnderline == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkUnderline.Always -> TextDecoration.Underline
-        resolvedUnderline == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLinkUnderline.Hover && isHovered -> TextDecoration.Underline
+        resolvedUnderline == NexusLinkUnderline.Always -> TextDecoration.Underline
+        resolvedUnderline == NexusLinkUnderline.Hover && isHovered -> TextDecoration.Underline
         else -> TextDecoration.None
     }
 
-    val style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base.merge(
+    val style = NexusTheme.typography.base.merge(
         TextStyle(
             color = textColor,
             textDecoration = decoration,

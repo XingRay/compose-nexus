@@ -33,8 +33,8 @@ class TabsState(initialSelected: Int = 0) {
 }
 
 @Composable
-fun rememberTabsState(initialSelected: Int = 0): io.github.xingray.compose.nexus.controls.TabsState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsState(initialSelected) }
+fun rememberTabsState(initialSelected: Int = 0): TabsState =
+    remember { TabsState(initialSelected) }
 
 data class TabItem(
     val label: String,
@@ -63,11 +63,11 @@ enum class TabsEditAction {
 
 @Composable
 fun NexusTabs(
-    state: io.github.xingray.compose.nexus.controls.TabsState,
-    items: List<io.github.xingray.compose.nexus.controls.TabItem>,
+    state: TabsState,
+    items: List<TabItem>,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.controls.TabsType = _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsType.Default,
-    tabPosition: io.github.xingray.compose.nexus.controls.TabsPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Top,
+    type: TabsType = TabsType.Default,
+    tabPosition: TabsPosition = TabsPosition.Top,
     closable: Boolean = false,
     addable: Boolean = false,
     editable: Boolean = false,
@@ -77,13 +77,13 @@ fun NexusTabs(
     onTabChange: ((index: Int) -> Unit)? = null,
     onTabRemove: ((index: Int) -> Unit)? = null,
     onTabAdd: (() -> Unit)? = null,
-    onEdit: ((index: Int?, action: io.github.xingray.compose.nexus.controls.TabsEditAction) -> Unit)? = null,
+    onEdit: ((index: Int?, action: TabsEditAction) -> Unit)? = null,
     addIcon: (@Composable () -> Unit)? = null,
     content: @Composable (selectedIndex: Int) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val horizontal = tabPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Top || tabPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Bottom
+    val colorScheme = NexusTheme.colorScheme
+    val shapes = NexusTheme.shapes
+    val horizontal = tabPosition == TabsPosition.Top || tabPosition == TabsPosition.Bottom
 
     fun switchTo(index: Int) {
         if (index !in items.indices) return
@@ -106,8 +106,8 @@ fun NexusTabs(
             else -> Modifier.fillMaxHeight()
         }
         val containerModifier = when {
-            type == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsType.BorderCard -> barModifier.border(1.dp, colorScheme.border.light, shapes.base).clip(shapes.base)
-            type == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsType.Card -> barModifier.border(1.dp, colorScheme.border.light, shapes.base).clip(shapes.base)
+            type == TabsType.BorderCard -> barModifier.border(1.dp, colorScheme.border.light, shapes.base).clip(shapes.base)
+            type == TabsType.Card -> barModifier.border(1.dp, colorScheme.border.light, shapes.base).clip(shapes.base)
             else -> barModifier
         }
 
@@ -127,7 +127,7 @@ fun NexusTabs(
                         else -> colorScheme.text.regular
                     }
                     val background = when {
-                        type == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsType.Default -> colorScheme.fill.blank
+                        type == TabsType.Default -> colorScheme.fill.blank
                         selected -> colorScheme.fill.blank
                         else -> colorScheme.fill.light
                     }
@@ -151,21 +151,21 @@ fun NexusTabs(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = item.label,
                             color = textColor,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
+                            style = NexusTheme.typography.base
                         )
                         val canClose = (editable || closable || item.closable) && !item.disabled
                         if (canClose) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "×",
                                 color = colorScheme.text.placeholder,
-                                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+                                style = NexusTheme.typography.small,
                                 modifier = Modifier
                                     .clickable {
                                         onTabRemove?.invoke(index)
-                                        onEdit?.invoke(index, _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsEditAction.Remove)
+                                        onEdit?.invoke(index, TabsEditAction.Remove)
                                     }
                                     .pointerHoverIcon(PointerIcon.Hand),
                             )
@@ -178,12 +178,12 @@ fun NexusTabs(
                             .padding(horizontal = 10.dp, vertical = 8.dp)
                             .clickable {
                                 onTabAdd?.invoke()
-                                onEdit?.invoke(null, _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsEditAction.Add)
+                                onEdit?.invoke(null, TabsEditAction.Add)
                             }
                             .pointerHoverIcon(PointerIcon.Hand),
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (addIcon != null) addIcon() else _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "+", color = colorScheme.primary.base)
+                        if (addIcon != null) addIcon() else NexusText(text = "+", color = colorScheme.primary.base)
                     }
                 }
             }
@@ -221,10 +221,10 @@ fun NexusTabs(
                             .padding(horizontal = 12.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = item.label,
                             color = textColor,
-                            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
+                            style = NexusTheme.typography.base
                         )
                     }
                 }
@@ -238,12 +238,12 @@ fun NexusTabs(
             modifier = Modifier
                 .fillMaxWidth()
                 .then(
-                    if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsType.BorderCard) {
+                    if (type == TabsType.BorderCard) {
                         Modifier
                             .border(1.dp, colorScheme.border.light, shapes.base)
                             .padding(16.dp)
                     } else {
-                        Modifier.padding(top = if (horizontal && tabPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Top) 12.dp else 0.dp)
+                        Modifier.padding(top = if (horizontal && tabPosition == TabsPosition.Top) 12.dp else 0.dp)
                     }
                 ),
         ) {
@@ -255,7 +255,7 @@ fun NexusTabs(
 
     if (horizontal) {
         Column(modifier = modifier.fillMaxWidth()) {
-            if (tabPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Top) {
+            if (tabPosition == TabsPosition.Top) {
                 TabsBar()
                 TabsContent()
             } else {
@@ -265,7 +265,7 @@ fun NexusTabs(
         }
     } else {
         Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-            if (tabPosition == _root_ide_package_.io.github.xingray.compose.nexus.controls.TabsPosition.Left) {
+            if (tabPosition == TabsPosition.Left) {
                 Box(modifier = Modifier.width(180.dp)) { TabsBar() }
                 Box(modifier = Modifier.weight(1f).padding(start = 12.dp)) { TabsContent() }
             } else {

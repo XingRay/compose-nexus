@@ -42,21 +42,21 @@ enum class DividerBorderStyle {
 @Composable
 fun NexusDivider(
     modifier: Modifier = Modifier,
-    direction: io.github.xingray.compose.nexus.controls.DividerDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal,
-    contentPosition: io.github.xingray.compose.nexus.controls.DividerContentPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Center,
-    borderStyle: io.github.xingray.compose.nexus.controls.DividerBorderStyle = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Solid,
-    color: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.border.light,
+    direction: DividerDirection = DividerDirection.Horizontal,
+    contentPosition: DividerContentPosition = DividerContentPosition.Center,
+    borderStyle: DividerBorderStyle = DividerBorderStyle.Solid,
+    color: Color = NexusTheme.colorScheme.border.light,
     thickness: Dp = 1.dp,
     content: (@Composable () -> Unit)? = null,
 ) {
-    if (borderStyle == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.None || borderStyle == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Hidden) return
+    if (borderStyle == DividerBorderStyle.None || borderStyle == DividerBorderStyle.Hidden) return
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Vertical) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerLine(
+    if (direction == DividerDirection.Vertical) {
+        DividerLine(
             modifier = modifier
                 .fillMaxHeight()
                 .width(thickness),
-            direction = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Vertical,
+            direction = DividerDirection.Vertical,
             color = color,
             thickness = thickness,
             borderStyle = borderStyle,
@@ -65,11 +65,11 @@ fun NexusDivider(
     }
 
     if (content == null) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerLine(
+        DividerLine(
             modifier = modifier
                 .fillMaxWidth()
                 .height(thickness),
-            direction = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal,
+            direction = DividerDirection.Horizontal,
             color = color,
             thickness = thickness,
             borderStyle = borderStyle,
@@ -80,38 +80,38 @@ fun NexusDivider(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val leftWeight = when (contentPosition) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Left -> 0.12f
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Center -> 1f
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Right -> 1f
+                DividerContentPosition.Left -> 0.12f
+                DividerContentPosition.Center -> 1f
+                DividerContentPosition.Right -> 1f
             }
             val rightWeight = when (contentPosition) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Left -> 1f
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Center -> 1f
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerContentPosition.Right -> 0.12f
+                DividerContentPosition.Left -> 1f
+                DividerContentPosition.Center -> 1f
+                DividerContentPosition.Right -> 0.12f
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerLine(
+            DividerLine(
                 modifier = Modifier
                     .weight(leftWeight)
                     .height(thickness),
-                direction = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal,
+                direction = DividerDirection.Horizontal,
                 color = color,
                 thickness = thickness,
                 borderStyle = borderStyle,
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.foundation.ProvideContentColorTextStyle(
-                contentColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
-                textStyle = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
+            ProvideContentColorTextStyle(
+                contentColor = NexusTheme.colorScheme.text.regular,
+                textStyle = NexusTheme.typography.small,
             ) {
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     content()
                 }
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerLine(
+            DividerLine(
                 modifier = Modifier
                     .weight(rightWeight)
                     .height(thickness),
-                direction = _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal,
+                direction = DividerDirection.Horizontal,
                 color = color,
                 thickness = thickness,
                 borderStyle = borderStyle,
@@ -123,26 +123,26 @@ fun NexusDivider(
 @Composable
 private fun DividerLine(
     modifier: Modifier,
-    direction: io.github.xingray.compose.nexus.controls.DividerDirection,
+    direction: DividerDirection,
     color: Color,
     thickness: Dp,
-    borderStyle: io.github.xingray.compose.nexus.controls.DividerBorderStyle,
+    borderStyle: DividerBorderStyle,
 ) {
-    if (borderStyle == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Solid) {
+    if (borderStyle == DividerBorderStyle.Solid) {
         Box(modifier = modifier.background(color))
         return
     }
 
     Canvas(modifier = modifier) {
         val strokeWidth = thickness.toPx().coerceAtLeast(1f)
-        val (startX, startY, endX, endY) = if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal) {
+        val (startX, startY, endX, endY) = if (direction == DividerDirection.Horizontal) {
             listOf(0f, size.height / 2f, size.width, size.height / 2f)
         } else {
             listOf(size.width / 2f, 0f, size.width / 2f, size.height)
         }
 
         when (borderStyle) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Dashed -> {
+            DividerBorderStyle.Dashed -> {
                 drawLine(
                     color = color,
                     start = androidx.compose.ui.geometry.Offset(startX, startY),
@@ -152,7 +152,7 @@ private fun DividerLine(
                 )
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Dotted -> {
+            DividerBorderStyle.Dotted -> {
                 drawLine(
                     color = color,
                     start = androidx.compose.ui.geometry.Offset(startX, startY),
@@ -162,8 +162,8 @@ private fun DividerLine(
                 )
             }
 
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerBorderStyle.Double -> {
-                if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.DividerDirection.Horizontal) {
+            DividerBorderStyle.Double -> {
+                if (direction == DividerDirection.Horizontal) {
                     val y1 = size.height * 0.35f
                     val y2 = size.height * 0.65f
                     drawLine(

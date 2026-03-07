@@ -14,10 +14,10 @@ fun ProvideContentColorTextStyle(
     textStyle: TextStyle,
     content: @Composable () -> Unit,
 ) {
-    val mergedStyle = _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalTextStyle.current.merge(textStyle)
+    val mergedStyle = LocalTextStyle.current.merge(textStyle)
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor provides contentColor,
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalTextStyle provides mergedStyle,
+        LocalContentColor provides contentColor,
+        LocalTextStyle provides mergedStyle,
         content = content,
     )
 }
@@ -31,7 +31,7 @@ fun ProvideContentColor(
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalContentColor provides contentColor,
+        LocalContentColor provides contentColor,
         content = content,
     )
 }
@@ -44,9 +44,9 @@ fun ProvideTextStyle(
     textStyle: TextStyle,
     content: @Composable () -> Unit,
 ) {
-    val mergedStyle = _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalTextStyle.current.merge(textStyle)
+    val mergedStyle = LocalTextStyle.current.merge(textStyle)
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.foundation.LocalTextStyle provides mergedStyle,
+        LocalTextStyle provides mergedStyle,
         content = content,
     )
 }

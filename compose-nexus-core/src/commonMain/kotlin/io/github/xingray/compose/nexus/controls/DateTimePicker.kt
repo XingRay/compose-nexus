@@ -32,15 +32,15 @@ import io.github.xingray.compose.nexus.theme.NexusTheme
 import io.github.xingray.compose.nexus.theme.NexusType
 
 data class NexusDateTime(
-    val date: io.github.xingray.compose.nexus.controls.NexusDate,
-    val time: io.github.xingray.compose.nexus.controls.NexusTime,
+    val date: NexusDate,
+    val time: NexusTime,
 )
 
 @Stable
 class DateTimePickerState(
-    initialDateTime: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
-    initialRangeStart: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
-    initialRangeEnd: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
+    initialDateTime: NexusDateTime? = null,
+    initialRangeStart: NexusDateTime? = null,
+    initialRangeEnd: NexusDateTime? = null,
 ) {
     var selectedDateTime by mutableStateOf(initialDateTime)
         private set
@@ -51,13 +51,13 @@ class DateTimePickerState(
     var isOpen by mutableStateOf(false)
         internal set
 
-    val singleDateState = _root_ide_package_.io.github.xingray.compose.nexus.controls.DatePickerState(initialDateTime?.date)
-    val rangeStartDateState = _root_ide_package_.io.github.xingray.compose.nexus.controls.DatePickerState(initialRangeStart?.date)
-    val rangeEndDateState = _root_ide_package_.io.github.xingray.compose.nexus.controls.DatePickerState(initialRangeEnd?.date)
+    val singleDateState = DatePickerState(initialDateTime?.date)
+    val rangeStartDateState = DatePickerState(initialRangeStart?.date)
+    val rangeEndDateState = DatePickerState(initialRangeEnd?.date)
 
-    var singleTime by mutableStateOf(initialDateTime?.time ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0))
-    var rangeStartTime by mutableStateOf(initialRangeStart?.time ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0))
-    var rangeEndTime by mutableStateOf(initialRangeEnd?.time ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0))
+    var singleTime by mutableStateOf(initialDateTime?.time ?: NexusTime(0, 0, 0))
+    var rangeStartTime by mutableStateOf(initialRangeStart?.time ?: NexusTime(0, 0, 0))
+    var rangeEndTime by mutableStateOf(initialRangeEnd?.time ?: NexusTime(0, 0, 0))
 
     fun open() {
         isOpen = true
@@ -77,11 +77,11 @@ class DateTimePickerState(
     }
 
     fun syncDraftFromSelected(
-        type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType,
-        defaultStartTime: io.github.xingray.compose.nexus.controls.NexusTime = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0),
-        defaultEndTime: io.github.xingray.compose.nexus.controls.NexusTime = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0),
+        type: NexusDatePickerPanelType,
+        defaultStartTime: NexusTime = NexusTime(0, 0, 0),
+        defaultEndTime: NexusTime = NexusTime(0, 0, 0),
     ) {
-        if (_root_ide_package_.io.github.xingray.compose.nexus.controls.isRangeType(type)) {
+        if (isRangeType(type)) {
             resetDateState(rangeStartDateState, selectedRangeStart?.date)
             resetDateState(rangeEndDateState, selectedRangeEnd?.date)
             rangeStartTime = selectedRangeStart?.time ?: defaultStartTime
@@ -92,17 +92,17 @@ class DateTimePickerState(
         }
     }
 
-    fun commitSingle(): io.github.xingray.compose.nexus.controls.NexusDateTime? {
+    fun commitSingle(): NexusDateTime? {
         val date = singleDateState.selectedDate ?: return null
-        val committed = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDateTime(date = date, time = singleTime)
+        val committed = NexusDateTime(date = date, time = singleTime)
         selectedDateTime = committed
         return committed
     }
 
-    fun commitRange(): Pair<io.github.xingray.compose.nexus.controls.NexusDateTime?, io.github.xingray.compose.nexus.controls.NexusDateTime?> {
-        var start = rangeStartDateState.selectedDate?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDateTime(it, rangeStartTime) }
-        var end = rangeEndDateState.selectedDate?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDateTime(it, rangeEndTime) }
-        if (start != null && end != null && _root_ide_package_.io.github.xingray.compose.nexus.controls.compareDateTime(start, end) > 0) {
+    fun commitRange(): Pair<NexusDateTime?, NexusDateTime?> {
+        var start = rangeStartDateState.selectedDate?.let { NexusDateTime(it, rangeStartTime) }
+        var end = rangeEndDateState.selectedDate?.let { NexusDateTime(it, rangeEndTime) }
+        if (start != null && end != null && compareDateTime(start, end) > 0) {
             val tmp = start
             start = end
             end = tmp
@@ -112,7 +112,7 @@ class DateTimePickerState(
         return start to end
     }
 
-    private fun resetDateState(dateState: io.github.xingray.compose.nexus.controls.DatePickerState, date: io.github.xingray.compose.nexus.controls.NexusDate?) {
+    private fun resetDateState(dateState: DatePickerState, date: NexusDate?) {
         if (date != null) {
             dateState.selectWithoutClosing(date)
         } else {
@@ -123,11 +123,11 @@ class DateTimePickerState(
 
 @Composable
 fun rememberDateTimePickerState(
-    initialDateTime: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
-    initialRangeStart: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
-    initialRangeEnd: io.github.xingray.compose.nexus.controls.NexusDateTime? = null,
-): io.github.xingray.compose.nexus.controls.DateTimePickerState = remember {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimePickerState(
+    initialDateTime: NexusDateTime? = null,
+    initialRangeStart: NexusDateTime? = null,
+    initialRangeEnd: NexusDateTime? = null,
+): DateTimePickerState = remember {
+    DateTimePickerState(
         initialDateTime = initialDateTime,
         initialRangeStart = initialRangeStart,
         initialRangeEnd = initialRangeEnd,
@@ -136,14 +136,14 @@ fun rememberDateTimePickerState(
 
 @Composable
 fun NexusDateTimePicker(
-    state: io.github.xingray.compose.nexus.controls.DateTimePickerState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberDateTimePickerState(),
+    state: DateTimePickerState = rememberDateTimePickerState(),
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.DateTime,
+    type: NexusDatePickerPanelType = NexusDatePickerPanelType.DateTime,
     placeholder: String = "Select date and time",
     startPlaceholder: String = "Start date and time",
     endPlaceholder: String = "End date and time",
     rangeSeparator: String = " - ",
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     clearable: Boolean = true,
     showFooter: Boolean = true,
@@ -153,31 +153,31 @@ fun NexusDateTimePicker(
     format: String = "YYYY-MM-DD HH:mm:ss",
     dateFormat: String = "YYYY-MM-DD",
     timeFormat: String = "HH:mm:ss",
-    defaultTime: Pair<io.github.xingray.compose.nexus.controls.NexusTime, io.github.xingray.compose.nexus.controls.NexusTime>? = null,
+    defaultTime: Pair<NexusTime, NexusTime>? = null,
     onClear: (() -> Unit)? = null,
     onFocus: (() -> Unit)? = null,
     onBlur: (() -> Unit)? = null,
     onVisibleChange: ((Boolean) -> Unit)? = null,
-    onPanelChange: ((io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType) -> Unit)? = null,
-    onCalendarChange: ((io.github.xingray.compose.nexus.controls.NexusDate?, io.github.xingray.compose.nexus.controls.NexusDate?) -> Unit)? = null,
-    onChange: ((io.github.xingray.compose.nexus.controls.NexusDateTime?) -> Unit)? = null,
-    onRangeChange: ((io.github.xingray.compose.nexus.controls.NexusDateTime?, io.github.xingray.compose.nexus.controls.NexusDateTime?) -> Unit)? = null,
+    onPanelChange: ((NexusDate, NexusDatePickerPanelType) -> Unit)? = null,
+    onCalendarChange: ((NexusDate?, NexusDate?) -> Unit)? = null,
+    onChange: ((NexusDateTime?) -> Unit)? = null,
+    onRangeChange: ((NexusDateTime?, NexusDateTime?) -> Unit)? = null,
 ) {
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val isRange = _root_ide_package_.io.github.xingray.compose.nexus.controls.isRangeType(type)
-    val defaultStartTime = defaultTime?.first ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0)
-    val defaultEndTime = defaultTime?.second ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0)
+    val typography = NexusTheme.typography
+    val isRange = isRangeType(type)
+    val defaultStartTime = defaultTime?.first ?: NexusTime(0, 0, 0)
+    val defaultEndTime = defaultTime?.second ?: NexusTime(0, 0, 0)
 
     val displayText = if (isRange) {
-        val startText = state.selectedRangeStart?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.formatDateTime(it, format) }.orEmpty()
-        val endText = state.selectedRangeEnd?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.formatDateTime(it, format) }.orEmpty()
+        val startText = state.selectedRangeStart?.let { formatDateTime(it, format) }.orEmpty()
+        val endText = state.selectedRangeEnd?.let { formatDateTime(it, format) }.orEmpty()
         if (startText.isEmpty() && endText.isEmpty()) {
             ""
         } else {
             "$startText$rangeSeparator$endText"
         }
     } else {
-        state.selectedDateTime?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.formatDateTime(it, format) }.orEmpty()
+        state.selectedDateTime?.let { formatDateTime(it, format) }.orEmpty()
     }
 
     val effectivePlaceholder = if (isRange) {
@@ -187,7 +187,7 @@ fun NexusDateTimePicker(
     }
 
     Column(modifier = modifier) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+        NexusInput(
             value = displayText,
             onValueChange = { newValue ->
                 if (newValue.isEmpty() && displayText.isNotEmpty()) {
@@ -216,7 +216,7 @@ fun NexusDateTimePicker(
                 ),
             suffix = {
                 if (clearable && displayText.isNotEmpty() && !disabled) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "✕",
                         style = typography.extraSmall,
                         modifier = Modifier.clickable {
@@ -226,7 +226,7 @@ fun NexusDateTimePicker(
                         },
                     )
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "🗓", style = typography.extraSmall)
+                    NexusText(text = "🗓", style = typography.extraSmall)
                 }
             },
         )
@@ -247,7 +247,7 @@ fun NexusDateTimePicker(
                     }
                 },
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDateTimePickerPanel(
+                NexusDateTimePickerPanel(
                     state = state,
                     type = type,
                     showFooter = showFooter,
@@ -280,9 +280,9 @@ fun NexusDateTimePicker(
 
 @Composable
 fun NexusDateTimePickerPanel(
-    state: io.github.xingray.compose.nexus.controls.DateTimePickerState,
+    state: DateTimePickerState,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.DateTime,
+    type: NexusDatePickerPanelType = NexusDatePickerPanelType.DateTime,
     border: Boolean = true,
     disabled: Boolean = false,
     clearable: Boolean = true,
@@ -292,37 +292,37 @@ fun NexusDateTimePickerPanel(
     showNow: Boolean = true,
     dateFormat: String = "YYYY-MM-DD",
     timeFormat: String = "HH:mm:ss",
-    defaultStartTime: io.github.xingray.compose.nexus.controls.NexusTime = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0),
-    defaultEndTime: io.github.xingray.compose.nexus.controls.NexusTime = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(0, 0, 0),
-    onPanelChange: ((io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType) -> Unit)? = null,
-    onCalendarChange: ((io.github.xingray.compose.nexus.controls.NexusDate?, io.github.xingray.compose.nexus.controls.NexusDate?) -> Unit)? = null,
+    defaultStartTime: NexusTime = NexusTime(0, 0, 0),
+    defaultEndTime: NexusTime = NexusTime(0, 0, 0),
+    onPanelChange: ((NexusDate, NexusDatePickerPanelType) -> Unit)? = null,
+    onCalendarChange: ((NexusDate?, NexusDate?) -> Unit)? = null,
     onClear: (() -> Unit)? = null,
-    onChange: ((io.github.xingray.compose.nexus.controls.NexusDateTime?) -> Unit)? = null,
-    onRangeChange: ((io.github.xingray.compose.nexus.controls.NexusDateTime?, io.github.xingray.compose.nexus.controls.NexusDateTime?) -> Unit)? = null,
+    onChange: ((NexusDateTime?) -> Unit)? = null,
+    onRangeChange: ((NexusDateTime?, NexusDateTime?) -> Unit)? = null,
     onConfirm: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val isRange = _root_ide_package_.io.github.xingray.compose.nexus.controls.isRangeType(type)
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val isRange = isRangeType(type)
     val showSeconds = timeFormat.contains("ss")
 
     Column(
         modifier = modifier
-            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .clip(NexusTheme.shapes.base)
             .background(colorScheme.fill.blank)
-            .then(if (border) Modifier.border(1.dp, colorScheme.border.lighter, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base) else Modifier)
+            .then(if (border) Modifier.border(1.dp, colorScheme.border.lighter, NexusTheme.shapes.base) else Modifier)
             .padding(12.dp),
     ) {
         if (isRange) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Start", style = typography.small, color = colorScheme.text.secondary)
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanel(
+                    NexusText(text = "Start", style = typography.small, color = colorScheme.text.secondary)
+                    NexusDatePickerPanel(
                         state = state.rangeStartDateState,
                         border = false,
                         disabled = disabled,
                         clearable = false,
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Date,
+                        type = NexusDatePickerPanelType.Date,
                         showFooter = false,
                         showConfirm = false,
                         showWeekNumber = showWeekNumber,
@@ -337,7 +337,7 @@ fun NexusDateTimePickerPanel(
                             }
                         },
                     )
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimePanel(
+                    DateTimeTimePanel(
                         time = state.rangeStartTime,
                         showSeconds = showSeconds,
                         disabled = disabled,
@@ -352,13 +352,13 @@ fun NexusDateTimePickerPanel(
                     )
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "End", style = typography.small, color = colorScheme.text.secondary)
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanel(
+                    NexusText(text = "End", style = typography.small, color = colorScheme.text.secondary)
+                    NexusDatePickerPanel(
                         state = state.rangeEndDateState,
                         border = false,
                         disabled = disabled,
                         clearable = false,
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Date,
+                        type = NexusDatePickerPanelType.Date,
                         showFooter = false,
                         showConfirm = false,
                         showWeekNumber = showWeekNumber,
@@ -373,7 +373,7 @@ fun NexusDateTimePickerPanel(
                             }
                         },
                     )
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimePanel(
+                    DateTimeTimePanel(
                         time = state.rangeEndTime,
                         showSeconds = showSeconds,
                         disabled = disabled,
@@ -390,12 +390,12 @@ fun NexusDateTimePickerPanel(
             }
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanel(
+                NexusDatePickerPanel(
                     state = state.singleDateState,
                     border = false,
                     disabled = disabled,
                     clearable = false,
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.Date,
+                    type = NexusDatePickerPanelType.Date,
                     showFooter = false,
                     showConfirm = false,
                     showWeekNumber = showWeekNumber,
@@ -408,7 +408,7 @@ fun NexusDateTimePickerPanel(
                         }
                     },
                 )
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimePanel(
+                DateTimeTimePanel(
                     time = state.singleTime,
                     showSeconds = showSeconds,
                     disabled = disabled,
@@ -432,7 +432,7 @@ fun NexusDateTimePickerPanel(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (clearable) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "Clear",
                         style = typography.small,
                         color = if (disabled) colorScheme.text.disabled else colorScheme.text.secondary,
@@ -453,7 +453,7 @@ fun NexusDateTimePickerPanel(
                     )
                 }
                 if (showNow) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "Now",
                         style = typography.small,
                         color = if (disabled) colorScheme.text.disabled else colorScheme.primary.base,
@@ -463,14 +463,14 @@ fun NexusDateTimePickerPanel(
                                     Modifier
                                         .clickable {
                                             if (isRange) {
-                                                state.rangeStartDateState.selectWithoutClosing(_root_ide_package_.io.github.xingray.compose.nexus.controls.currentPanelDate(state.rangeStartDateState))
-                                                state.rangeEndDateState.selectWithoutClosing(_root_ide_package_.io.github.xingray.compose.nexus.controls.currentPanelDate(state.rangeEndDateState))
+                                                state.rangeStartDateState.selectWithoutClosing(currentPanelDate(state.rangeStartDateState))
+                                                state.rangeEndDateState.selectWithoutClosing(currentPanelDate(state.rangeEndDateState))
                                                 state.rangeStartTime = defaultStartTime
                                                 state.rangeEndTime = defaultEndTime
                                                 val committed = state.commitRange()
                                                 onRangeChange?.invoke(committed.first, committed.second)
                                             } else {
-                                                state.singleDateState.selectWithoutClosing(_root_ide_package_.io.github.xingray.compose.nexus.controls.currentPanelDate(state.singleDateState))
+                                                state.singleDateState.selectWithoutClosing(currentPanelDate(state.singleDateState))
                                                 onChange?.invoke(state.commitSingle())
                                             }
                                         }
@@ -483,7 +483,7 @@ fun NexusDateTimePickerPanel(
                     )
                 }
                 if (showConfirm) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                    NexusButton(
                         text = "Confirm",
                         onClick = {
                             if (isRange) {
@@ -494,8 +494,8 @@ fun NexusDateTimePickerPanel(
                             }
                             onConfirm?.invoke()
                         },
-                        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
-                        size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                        type = NexusType.Primary,
+                        size = ComponentSize.Small,
                         disabled = disabled,
                     )
                 }
@@ -506,14 +506,14 @@ fun NexusDateTimePickerPanel(
 
 @Composable
 private fun DateTimeTimePanel(
-    time: io.github.xingray.compose.nexus.controls.NexusTime,
+    time: NexusTime,
     showSeconds: Boolean,
     disabled: Boolean,
     title: String,
-    onTimeChange: (io.github.xingray.compose.nexus.controls.NexusTime) -> Unit,
+    onTimeChange: (NexusTime) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     var selectedHour by remember(time) { mutableStateOf(time.hour) }
     var selectedMinute by remember(time) { mutableStateOf(time.minute) }
@@ -523,38 +523,38 @@ private fun DateTimeTimePanel(
         modifier = Modifier.width(198.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = title,
             style = typography.small,
             color = colorScheme.text.secondary,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimeColumn(
+            DateTimeTimeColumn(
                 values = (0..23).toList(),
                 selected = selectedHour,
                 disabled = disabled,
                 onSelect = {
                     selectedHour = it
-                    onTimeChange(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(selectedHour, selectedMinute, selectedSecond))
+                    onTimeChange(NexusTime(selectedHour, selectedMinute, selectedSecond))
                 },
             )
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimeColumn(
+            DateTimeTimeColumn(
                 values = (0..59).toList(),
                 selected = selectedMinute,
                 disabled = disabled,
                 onSelect = {
                     selectedMinute = it
-                    onTimeChange(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(selectedHour, selectedMinute, selectedSecond))
+                    onTimeChange(NexusTime(selectedHour, selectedMinute, selectedSecond))
                 },
             )
             if (showSeconds) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DateTimeTimeColumn(
+                DateTimeTimeColumn(
                     values = (0..59).toList(),
                     selected = selectedSecond,
                     disabled = disabled,
                     onSelect = {
                         selectedSecond = it
-                        onTimeChange(_root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTime(selectedHour, selectedMinute, selectedSecond))
+                        onTimeChange(NexusTime(selectedHour, selectedMinute, selectedSecond))
                     },
                 )
             }
@@ -569,8 +569,8 @@ private fun DateTimeTimeColumn(
     disabled: Boolean,
     onSelect: (Int) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     Column(
         modifier = Modifier
@@ -603,7 +603,7 @@ private fun DateTimeTimeColumn(
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = value.toString().padStart(2, '0'),
                     style = typography.small,
                     color = textColor,
@@ -613,10 +613,10 @@ private fun DateTimeTimeColumn(
     }
 }
 
-private fun isRangeType(type: io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType): Boolean =
-    type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDatePickerPanelType.DateTimeRange
+private fun isRangeType(type: NexusDatePickerPanelType): Boolean =
+    type == NexusDatePickerPanelType.DateTimeRange
 
-private fun formatDateTime(value: io.github.xingray.compose.nexus.controls.NexusDateTime, pattern: String): String {
+private fun formatDateTime(value: NexusDateTime, pattern: String): String {
     return pattern
         .replace("YYYY", value.date.year.toString().padStart(4, '0'))
         .replace("MM", value.date.month.toString().padStart(2, '0'))
@@ -626,7 +626,7 @@ private fun formatDateTime(value: io.github.xingray.compose.nexus.controls.Nexus
         .replace("ss", value.time.second.toString().padStart(2, '0'))
 }
 
-private fun compareDateTime(left: io.github.xingray.compose.nexus.controls.NexusDateTime, right: io.github.xingray.compose.nexus.controls.NexusDateTime): Int {
+private fun compareDateTime(left: NexusDateTime, right: NexusDateTime): Int {
     if (left.date.year != right.date.year) return left.date.year - right.date.year
     if (left.date.month != right.date.month) return left.date.month - right.date.month
     if (left.date.day != right.date.day) return left.date.day - right.date.day
@@ -635,8 +635,8 @@ private fun compareDateTime(left: io.github.xingray.compose.nexus.controls.Nexus
     return left.time.second - right.time.second
 }
 
-private fun currentPanelDate(state: io.github.xingray.compose.nexus.controls.DatePickerState): io.github.xingray.compose.nexus.controls.NexusDate =
-    state.selectedDate ?: _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(
+private fun currentPanelDate(state: DatePickerState): NexusDate =
+    state.selectedDate ?: NexusDate(
         year = state.viewYear,
         month = state.viewMonth,
         day = 1,

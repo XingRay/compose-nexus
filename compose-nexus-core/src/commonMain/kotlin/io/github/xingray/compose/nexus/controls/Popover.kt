@@ -58,19 +58,19 @@ class PopoverState(initialVisible: Boolean = false) {
 }
 
 @Composable
-fun rememberPopoverState(initialVisible: Boolean = false): io.github.xingray.compose.nexus.controls.PopoverState =
-    remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverState(initialVisible) }
+fun rememberPopoverState(initialVisible: Boolean = false): PopoverState =
+    remember { PopoverState(initialVisible) }
 
 @Composable
 fun NexusPopover(
-    state: io.github.xingray.compose.nexus.controls.PopoverState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberPopoverState(),
+    state: PopoverState = rememberPopoverState(),
     modifier: Modifier = Modifier,
     title: String? = null,
     content: String = "",
     width: Dp = 150.dp,
-    placement: io.github.xingray.compose.nexus.controls.PopoverPlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Bottom,
-    trigger: io.github.xingray.compose.nexus.controls.PopoverTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.Hover,
-    effect: io.github.xingray.compose.nexus.controls.TooltipTheme = _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTheme.Light,
+    placement: PopoverPlacement = PopoverPlacement.Bottom,
+    trigger: PopoverTrigger = PopoverTrigger.Hover,
+    effect: TooltipTheme = TooltipTheme.Light,
     disabled: Boolean = false,
     visible: Boolean? = null,
     showArrow: Boolean = true,
@@ -82,7 +82,7 @@ fun NexusPopover(
     popoverContent: (@Composable () -> Unit)? = null,
     reference: @Composable () -> Unit,
 ) {
-    val tooltipState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberTooltipState(state.visible)
+    val tooltipState = rememberTooltipState(state.visible)
     val controlledVisible = visible ?: state.visible
 
     LaunchedEffect(state.visible, visible) {
@@ -91,7 +91,7 @@ fun NexusPopover(
         }
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTooltip(
+    NexusTooltip(
         text = "",
         modifier = modifier,
         placement = placement.toTooltipPlacement(),
@@ -119,17 +119,17 @@ fun NexusPopover(
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (!title.isNullOrBlank()) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = title,
-                                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
-                                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.primary,
+                                style = NexusTheme.typography.base,
+                                color = NexusTheme.colorScheme.text.primary,
                             )
                         }
                         if (content.isNotBlank()) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = content,
-                                style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small,
-                                color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.regular,
+                                style = NexusTheme.typography.small,
+                                color = NexusTheme.colorScheme.text.regular,
                             )
                         }
                     }
@@ -141,26 +141,26 @@ fun NexusPopover(
     }
 }
 
-internal fun io.github.xingray.compose.nexus.controls.PopoverPlacement.toTooltipPlacement(): io.github.xingray.compose.nexus.controls.TooltipPlacement =
+internal fun PopoverPlacement.toTooltipPlacement(): TooltipPlacement =
     when (this) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Top -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Top
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.TopStart -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopStart
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.TopEnd -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.TopEnd
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Bottom -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Bottom
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.BottomStart -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomStart
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.BottomEnd -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.BottomEnd
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Left -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Left
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.LeftStart -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftStart
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.LeftEnd -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.LeftEnd
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.Right -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.Right
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.RightStart -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightStart
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverPlacement.RightEnd -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipPlacement.RightEnd
+        PopoverPlacement.Top -> TooltipPlacement.Top
+        PopoverPlacement.TopStart -> TooltipPlacement.TopStart
+        PopoverPlacement.TopEnd -> TooltipPlacement.TopEnd
+        PopoverPlacement.Bottom -> TooltipPlacement.Bottom
+        PopoverPlacement.BottomStart -> TooltipPlacement.BottomStart
+        PopoverPlacement.BottomEnd -> TooltipPlacement.BottomEnd
+        PopoverPlacement.Left -> TooltipPlacement.Left
+        PopoverPlacement.LeftStart -> TooltipPlacement.LeftStart
+        PopoverPlacement.LeftEnd -> TooltipPlacement.LeftEnd
+        PopoverPlacement.Right -> TooltipPlacement.Right
+        PopoverPlacement.RightStart -> TooltipPlacement.RightStart
+        PopoverPlacement.RightEnd -> TooltipPlacement.RightEnd
     }
 
-internal fun io.github.xingray.compose.nexus.controls.PopoverTrigger.toTooltipTrigger(): io.github.xingray.compose.nexus.controls.TooltipTrigger =
+internal fun PopoverTrigger.toTooltipTrigger(): TooltipTrigger =
     when (this) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.Click -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Click
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.Focus -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Focus
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.Hover -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.Hover
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.PopoverTrigger.ContextMenu -> _root_ide_package_.io.github.xingray.compose.nexus.controls.TooltipTrigger.ContextMenu
+        PopoverTrigger.Click -> TooltipTrigger.Click
+        PopoverTrigger.Focus -> TooltipTrigger.Focus
+        PopoverTrigger.Hover -> TooltipTrigger.Hover
+        PopoverTrigger.ContextMenu -> TooltipTrigger.ContextMenu
     }

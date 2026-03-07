@@ -965,11 +965,7 @@ fun TabsDemo() {
                 items = items,
                 stretch = true,
                 beforeLeave = { newIndex, oldIndex ->
-                    if (oldIndex == 2 && !allowLeave && newIndex != oldIndex) {
-                        false
-                    } else {
-                        true
-                    }
+                    !(oldIndex == 2 && !allowLeave && newIndex != oldIndex)
                 },
             ) { index ->
                 NexusText(text = "Stretch tab content ${index + 1}")

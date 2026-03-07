@@ -44,15 +44,15 @@ class AffixState internal constructor() {
 }
 
 @Composable
-fun rememberAffixState(): io.github.xingray.compose.nexus.controls.AffixState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.AffixState() }
+fun rememberAffixState(): AffixState = remember { AffixState() }
 
 @Composable
 fun NexusAffix(
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.AffixState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberAffixState(),
+    state: AffixState = rememberAffixState(),
     scrollState: ScrollState? = null,
     offset: Dp = 0.dp,
-    position: io.github.xingray.compose.nexus.controls.AffixPosition = _root_ide_package_.io.github.xingray.compose.nexus.controls.AffixPosition.Top,
+    position: AffixPosition = AffixPosition.Top,
     zIndex: Int = 100,
     onChange: ((fixed: Boolean) -> Unit)? = null,
     onScroll: ((scrollTop: Int, fixed: Boolean) -> Unit)? = null,
@@ -67,7 +67,7 @@ fun NexusAffix(
     val scrollTop = scrollState?.value ?: 0
     val fixedNow = when {
         scrollState == null -> false
-        position == _root_ide_package_.io.github.xingray.compose.nexus.controls.AffixPosition.Top -> scrollTop > offsetPx
+        position == AffixPosition.Top -> scrollTop > offsetPx
         else -> (scrollState.maxValue - scrollTop) > offsetPx
     }
 
@@ -101,8 +101,8 @@ fun NexusAffix(
                     .height(with(density) { anchorSize.height.toDp() }),
             )
             Popup(
-                alignment = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.AffixPosition.Top) Alignment.TopStart else Alignment.BottomStart,
-                offset = if (position == _root_ide_package_.io.github.xingray.compose.nexus.controls.AffixPosition.Top) {
+                alignment = if (position == AffixPosition.Top) Alignment.TopStart else Alignment.BottomStart,
+                offset = if (position == AffixPosition.Top) {
                     IntOffset(anchorPosition.x, offsetPx)
                 } else {
                     IntOffset(anchorPosition.x, -offsetPx)

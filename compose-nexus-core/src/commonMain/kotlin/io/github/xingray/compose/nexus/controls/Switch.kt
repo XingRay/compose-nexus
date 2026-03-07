@@ -40,13 +40,13 @@ fun NexusSwitch(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     loading: Boolean = false,
     width: Dp? = null,
     inlinePrompt: Boolean = false,
-    activeColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base,
-    inactiveColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.border.base,
+    activeColor: Color = NexusTheme.colorScheme.primary.base,
+    inactiveColor: Color = NexusTheme.colorScheme.border.base,
     activeText: String = "",
     inactiveText: String = "",
     activeIcon: (@Composable () -> Unit)? = null,
@@ -62,7 +62,7 @@ fun NexusSwitch(
     beforeChange: (suspend (Boolean) -> Boolean)? = null,
     onChange: ((Boolean) -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSwitch(
+    NexusSwitch(
         value = checked,
         onValueChange = onCheckedChange,
         modifier = modifier,
@@ -99,13 +99,13 @@ fun <T> NexusSwitch(
     modifier: Modifier = Modifier,
     activeValue: T,
     inactiveValue: T,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     loading: Boolean = false,
     width: Dp? = null,
     inlinePrompt: Boolean = false,
-    activeColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base,
-    inactiveColor: Color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.border.base,
+    activeColor: Color = NexusTheme.colorScheme.primary.base,
+    inactiveColor: Color = NexusTheme.colorScheme.border.base,
     activeText: String = "",
     inactiveText: String = "",
     activeIcon: (@Composable () -> Unit)? = null,
@@ -152,7 +152,7 @@ fun <T> NexusSwitch(
         }
     }
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.SwitchTrack(
+    SwitchTrack(
         checked = checked,
         onToggle = { requestToggle() },
         modifier = modifier,
@@ -182,7 +182,7 @@ private fun SwitchTrack(
     checked: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize,
+    size: ComponentSize,
     disabled: Boolean,
     loading: Boolean,
     width: Dp?,
@@ -201,26 +201,26 @@ private fun SwitchTrack(
     inactive: (@Composable () -> Unit)?,
     label: (@Composable () -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val isDisabled = disabled || loading
 
     val defaultTrackWidth = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 56.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 32.dp
+        ComponentSize.Large -> 56.dp
+        ComponentSize.Default -> 40.dp
+        ComponentSize.Small -> 32.dp
     }
     val trackWidth = width ?: defaultTrackWidth
     val trackHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 24.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 20.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 16.dp
+        ComponentSize.Large -> 24.dp
+        ComponentSize.Default -> 20.dp
+        ComponentSize.Small -> 16.dp
     }
     val thumbSize = trackHeight - 4.dp
     val thumbTravel = (trackWidth - trackHeight).coerceAtLeast(0.dp)
 
     val thumbOffset by animateDpAsState(
         targetValue = if (checked) thumbTravel else 0.dp,
-        animationSpec = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.motion.tweenFast(),
+        animationSpec = NexusTheme.motion.tweenFast(),
         label = "switch-thumb",
     )
 
@@ -235,9 +235,9 @@ private fun SwitchTrack(
     val sideInactive = inactive ?: inactiveIcon?.let { { it() } } ?: run {
         if (inactiveText.isNotEmpty()) {
             {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = inactiveText,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall
+                    style = NexusTheme.typography.extraSmall
                 )
             }
         } else {
@@ -247,9 +247,9 @@ private fun SwitchTrack(
     val sideActive = active ?: activeIcon?.let { { it() } } ?: run {
         if (activeText.isNotEmpty()) {
             {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = activeText,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall
+                    style = NexusTheme.typography.extraSmall
                 )
             }
         } else {
@@ -262,19 +262,19 @@ private fun SwitchTrack(
         !checked && inactiveIcon != null -> inactiveIcon
         checked && activeText.isNotEmpty() -> {
             {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = activeText.take(1),
                     color = colorScheme.primary.base,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall
+                    style = NexusTheme.typography.extraSmall
                 )
             }
         }
         !checked && inactiveText.isNotEmpty() -> {
             {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = inactiveText.take(1),
                     color = colorScheme.text.placeholder,
-                    style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall
+                    style = NexusTheme.typography.extraSmall
                 )
             }
         }
@@ -283,7 +283,7 @@ private fun SwitchTrack(
 
     val actionContent: (@Composable () -> Unit)? = when {
         loading -> {
-            { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusLoading(loading = true, spinnerSize = (thumbSize - 8.dp).coerceAtLeast(8.dp)) }
+            { NexusLoading(loading = true, spinnerSize = (thumbSize - 8.dp).coerceAtLeast(8.dp)) }
         }
         checked && activeAction != null -> activeAction
         !checked && inactiveAction != null -> inactiveAction

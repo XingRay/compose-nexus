@@ -33,8 +33,8 @@ fun NexusEmpty(
     descriptionSlot: (@Composable () -> Unit)? = null,
     actions: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val resolvedImageSize = (imageSize ?: 96).dp
 
     Column(
@@ -53,18 +53,18 @@ fun NexusEmpty(
             Box(
                 modifier = Modifier
                     .size(resolvedImageSize)
-                    .background(colorScheme.fill.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+                    .background(colorScheme.fill.light, NexusTheme.shapes.base)
                     .padding(8.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = imageUrl,
                     color = colorScheme.text.placeholder,
                     style = typography.extraSmall,
                 )
             }
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = "□",
                 color = colorScheme.text.placeholder,
                 style = typography.extraLarge,
@@ -77,7 +77,7 @@ fun NexusEmpty(
         if (descriptionSlot != null) {
             descriptionSlot()
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = description,
                 color = colorScheme.text.secondary,
                 style = typography.base,

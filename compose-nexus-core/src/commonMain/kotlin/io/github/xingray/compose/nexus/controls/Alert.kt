@@ -52,39 +52,39 @@ enum class AlertEffect {
 fun NexusAlert(
     title: String,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+    type: NexusType = NexusType.Info,
     description: String? = null,
     closable: Boolean = true,
     center: Boolean = false,
     closeText: String? = null,
     showIcon: Boolean = false,
-    effect: io.github.xingray.compose.nexus.controls.AlertEffect = _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light,
+    effect: AlertEffect = AlertEffect.Light,
     onClose: (() -> Unit)? = null,
     titleContent: (@Composable () -> Unit)? = null,
     descriptionContent: (@Composable () -> Unit)? = null,
     icon: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     var visible by remember { mutableStateOf(true) }
 
     val tc = colorScheme.typeColor(type) ?: colorScheme.info
     val hasDescription = description != null || descriptionContent != null
-    val bgColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light) tc.light9 else tc.base
-    val borderColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light) tc.light8 else tc.base
-    val titleColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light) tc.base else colorScheme.white
-    val descriptionColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light) tc.light1 else colorScheme.white.copy(alpha = 0.86f)
-    val closeColor = if (effect == _root_ide_package_.io.github.xingray.compose.nexus.controls.AlertEffect.Light) tc.base else colorScheme.white
+    val bgColor = if (effect == AlertEffect.Light) tc.light9 else tc.base
+    val borderColor = if (effect == AlertEffect.Light) tc.light8 else tc.base
+    val titleColor = if (effect == AlertEffect.Light) tc.base else colorScheme.white
+    val descriptionColor = if (effect == AlertEffect.Light) tc.light1 else colorScheme.white.copy(alpha = 0.86f)
+    val closeColor = if (effect == AlertEffect.Light) tc.base else colorScheme.white
 
     val iconText = when (type) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary -> "i"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success -> "✓"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning -> "!"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger -> "✕"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info -> "i"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> "i"
+        NexusType.Primary -> "i"
+        NexusType.Success -> "✓"
+        NexusType.Warning -> "!"
+        NexusType.Danger -> "✕"
+        NexusType.Info -> "i"
+        NexusType.Default -> "i"
     }
 
     AnimatedVisibility(
@@ -106,7 +106,7 @@ fun NexusAlert(
                     if (icon != null) {
                         icon()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = iconText,
                             color = titleColor,
                             style = if (hasDescription) typography.large else typography.base,
@@ -122,7 +122,7 @@ fun NexusAlert(
                 if (titleContent != null) {
                     titleContent()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = title,
                         color = titleColor,
                         style = if (hasDescription) typography.small else typography.extraSmall,
@@ -133,7 +133,7 @@ fun NexusAlert(
                         if (descriptionContent != null) {
                             descriptionContent()
                         } else {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = description.orEmpty(),
                                 color = descriptionColor,
                                 style = typography.extraSmall,
@@ -145,7 +145,7 @@ fun NexusAlert(
 
             if (closable) {
                 Spacer(modifier = Modifier.width(8.dp))
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = closeText ?: "✕",
                     color = closeColor,
                     style = typography.extraSmall,

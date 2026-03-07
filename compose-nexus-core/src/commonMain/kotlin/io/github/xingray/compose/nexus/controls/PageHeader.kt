@@ -29,8 +29,8 @@ fun NexusPageHeader(
     extra: (@Composable () -> Unit)? = null,
     main: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -63,7 +63,7 @@ fun NexusPageHeader(
                     if (iconSlot != null) {
                         iconSlot()
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = icon ?: "",
                             color = colorScheme.primary.base,
                             style = typography.base,
@@ -75,7 +75,7 @@ fun NexusPageHeader(
             if (titleSlot != null) {
                 titleSlot()
             } else if (title.isNotBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = title,
                     color = colorScheme.text.primary,
                     style = typography.base,
@@ -85,7 +85,7 @@ fun NexusPageHeader(
             if (contentSlot != null) {
                 contentSlot()
             } else if (content.isNotBlank()) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = content,
                     color = colorScheme.text.secondary,
                     style = typography.base,

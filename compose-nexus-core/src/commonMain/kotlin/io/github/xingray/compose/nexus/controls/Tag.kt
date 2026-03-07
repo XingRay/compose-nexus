@@ -44,9 +44,9 @@ enum class TagEffect {
 fun NexusTag(
     text: String,
     modifier: Modifier = Modifier,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
-    effect: io.github.xingray.compose.nexus.controls.TagEffect = _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Light,
+    type: NexusType = NexusType.Default,
+    size: ComponentSize = ComponentSize.Default,
+    effect: TagEffect = TagEffect.Light,
     closable: Boolean = false,
     disableTransitions: Boolean = false,
     hit: Boolean = false,
@@ -57,9 +57,9 @@ fun NexusTag(
 ) {
     @Suppress("UNUSED_VARIABLE")
     val _disableTransitions = disableTransitions
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     val tc = colorScheme.typeColor(type)
     val shape = if (round) shapes.round else shapes.small
@@ -70,17 +70,17 @@ fun NexusTag(
 
     if (color != null) {
         when (effect) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Plain -> {
+            TagEffect.Plain -> {
                 bgColor = Color.Transparent
                 textColor = color
                 borderColor = color
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Dark -> {
+            TagEffect.Dark -> {
                 bgColor = color
                 textColor = if (color.luminance() > 0.55f) colorScheme.text.primary else colorScheme.white
                 borderColor = color
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Light -> {
+            TagEffect.Light -> {
                 bgColor = color
                 textColor = if (color.luminance() > 0.55f) colorScheme.text.primary else colorScheme.white
                 borderColor = color
@@ -88,17 +88,17 @@ fun NexusTag(
         }
     } else {
         when (effect) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Dark -> {
+            TagEffect.Dark -> {
                 bgColor = tc?.base ?: colorScheme.info.base
                 textColor = colorScheme.white
                 borderColor = tc?.base ?: colorScheme.info.base
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Plain -> {
+            TagEffect.Plain -> {
                 bgColor = Color.Transparent
                 textColor = tc?.base ?: colorScheme.text.regular
                 borderColor = tc?.light5 ?: colorScheme.border.base
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Light -> {
+            TagEffect.Light -> {
                 bgColor = tc?.light9 ?: colorScheme.fill.base
                 textColor = tc?.base ?: colorScheme.text.regular
                 borderColor = tc?.light8 ?: colorScheme.border.lighter
@@ -110,14 +110,14 @@ fun NexusTag(
     }
 
     val tagHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 24.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 20.dp
+        ComponentSize.Large -> 32.dp
+        ComponentSize.Default -> 24.dp
+        ComponentSize.Small -> 20.dp
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.small
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.extraSmall
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.extraSmall
+        ComponentSize.Large -> typography.small
+        ComponentSize.Default -> typography.extraSmall
+        ComponentSize.Small -> typography.extraSmall
     }
 
     Row(
@@ -137,13 +137,13 @@ fun NexusTag(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = text,
             color = textColor,
             style = textStyle,
         )
         if (closable) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = "✕",
                 color = textColor.copy(alpha = 0.7f),
                 style = textStyle,
@@ -160,13 +160,13 @@ fun NexusCheckTag(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     disabled: Boolean = false,
-    type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+    type: NexusType = NexusType.Primary,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val tc = colorScheme.typeColor(type)
     val bg = if (checked) (tc?.base ?: colorScheme.primary.base) else colorScheme.fill.light
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+    NexusTag(
         text = text,
         modifier = modifier.then(
             if (!disabled) {
@@ -176,7 +176,7 @@ fun NexusCheckTag(
             }
         ),
         type = type,
-        effect = if (checked) _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Dark else _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Light,
+        effect = if (checked) TagEffect.Dark else TagEffect.Light,
         color = bg,
         hit = true,
         onClick = null,

@@ -59,7 +59,7 @@ fun NexusSkeleton(
     rows: Int = 3,
     avatar: Boolean = false,
     throttle: Int = 0,
-    throttleConfig: io.github.xingray.compose.nexus.controls.SkeletonThrottle? = null,
+    throttleConfig: SkeletonThrottle? = null,
     template: (@Composable (key: Int) -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
@@ -87,7 +87,7 @@ fun NexusSkeleton(
         return
     }
 
-    val baseColor = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.fill.base
+    val baseColor = NexusTheme.colorScheme.fill.base
     val shimmerAlpha = if (animated) {
         val transition = rememberInfiniteTransition(label = "skeleton")
         val alpha by transition.animateFloat(
@@ -113,7 +113,7 @@ fun NexusSkeleton(
             if (template != null) {
                 template(index)
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.DefaultSkeletonTemplate(
+                DefaultSkeletonTemplate(
                     rows = rows,
                     avatar = avatar,
                     color = color,
@@ -125,22 +125,22 @@ fun NexusSkeleton(
 
 @Composable
 fun NexusSkeletonItem(
-    variant: io.github.xingray.compose.nexus.controls.SkeletonVariant = _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Text,
+    variant: SkeletonVariant = SkeletonVariant.Text,
     modifier: Modifier = Modifier,
     color: Color? = null,
 ) {
-    val resolvedColor = color ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.fill.base
+    val resolvedColor = color ?: NexusTheme.colorScheme.fill.base
     val (w, h, circle) = when (variant) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.P, _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Text -> Triple(1f, 14.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.H1 -> Triple(0.5f, 26.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.H3 -> Triple(0.35f, 20.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Caption -> Triple(0.24f, 12.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Button -> Triple(0.22f, 32.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Image -> Triple(1f, 120.dp, false)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Circle -> Triple(0f, 40.dp, true)
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Rect -> Triple(1f, 56.dp, false)
+        SkeletonVariant.P, SkeletonVariant.Text -> Triple(1f, 14.dp, false)
+        SkeletonVariant.H1 -> Triple(0.5f, 26.dp, false)
+        SkeletonVariant.H3 -> Triple(0.35f, 20.dp, false)
+        SkeletonVariant.Caption -> Triple(0.24f, 12.dp, false)
+        SkeletonVariant.Button -> Triple(0.22f, 32.dp, false)
+        SkeletonVariant.Image -> Triple(1f, 120.dp, false)
+        SkeletonVariant.Circle -> Triple(0f, 40.dp, true)
+        SkeletonVariant.Rect -> Triple(1f, 56.dp, false)
     }
-    val shape = if (circle) CircleShape else _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base
+    val shape = if (circle) CircleShape else NexusTheme.shapes.base
 
     Box(
         modifier = modifier
@@ -166,8 +166,8 @@ private fun DefaultSkeletonTemplate(
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
         if (avatar) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSkeletonItem(
-                variant = _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Circle,
+            NexusSkeletonItem(
+                variant = SkeletonVariant.Circle,
                 color = color,
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -178,15 +178,15 @@ private fun DefaultSkeletonTemplate(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Title row, always rendered; rows define the additional rows.
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSkeletonItem(
-                variant = _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.H3,
+            NexusSkeletonItem(
+                variant = SkeletonVariant.H3,
                 modifier = Modifier.fillMaxWidth(0.35f),
                 color = color,
             )
             repeat(rows.coerceAtLeast(0)) { index ->
                 val width = if (index == rows - 1) 0.6f else 1f
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSkeletonItem(
-                    variant = _root_ide_package_.io.github.xingray.compose.nexus.controls.SkeletonVariant.Text,
+                NexusSkeletonItem(
+                    variant = SkeletonVariant.Text,
                     modifier = Modifier.fillMaxWidth(width),
                     color = color,
                 )

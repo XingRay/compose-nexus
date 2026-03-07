@@ -52,14 +52,14 @@ sealed interface NexusSplitterPanelSize {
     data class DpSize(val value: Dp) : NexusSplitterPanelSize
 }
 
-fun splitterPercent(value: Number): io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.Percent(value.toFloat())
-fun splitterPx(value: Number): io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.Pixels(value.toFloat())
-fun splitterDp(value: Dp): io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.DpSize(value)
+fun splitterPercent(value: Number): NexusSplitterPanelSize = NexusSplitterPanelSize.Percent(value.toFloat())
+fun splitterPx(value: Number): NexusSplitterPanelSize = NexusSplitterPanelSize.Pixels(value.toFloat())
+fun splitterDp(value: Dp): NexusSplitterPanelSize = NexusSplitterPanelSize.DpSize(value)
 
 internal data class NexusSplitterPanelData(
-    val size: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize?,
-    val min: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize?,
-    val max: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize?,
+    val size: NexusSplitterPanelSize?,
+    val min: NexusSplitterPanelSize?,
+    val max: NexusSplitterPanelSize?,
     val resizable: Boolean,
     val collapsible: Boolean,
     val onSizeChange: ((Float) -> Unit)?,
@@ -69,18 +69,18 @@ internal data class NexusSplitterPanelData(
 )
 
 class NexusSplitterScope internal constructor() {
-    private val panels: MutableList<io.github.xingray.compose.nexus.controls.NexusSplitterPanelData> = mutableListOf()
+    private val panels: MutableList<NexusSplitterPanelData> = mutableListOf()
 
     internal fun clear() {
         panels.clear()
     }
 
-    internal fun snapshot(): List<io.github.xingray.compose.nexus.controls.NexusSplitterPanelData> = panels.toList()
+    internal fun snapshot(): List<NexusSplitterPanelData> = panels.toList()
 
     fun panel(
-        size: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize? = null,
-        min: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize? = null,
-        max: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize? = null,
+        size: NexusSplitterPanelSize? = null,
+        min: NexusSplitterPanelSize? = null,
+        max: NexusSplitterPanelSize? = null,
         resizable: Boolean = true,
         collapsible: Boolean = false,
         onSizeChange: ((Float) -> Unit)? = null,
@@ -88,7 +88,7 @@ class NexusSplitterScope internal constructor() {
         endCollapsible: (@Composable () -> Unit)? = null,
         content: @Composable BoxScope.() -> Unit,
     ) {
-        panels += _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterPanelData(
+        panels += NexusSplitterPanelData(
             size = size,
             min = min,
             max = max,
@@ -105,17 +105,17 @@ class NexusSplitterScope internal constructor() {
 @Composable
 fun NexusSplitter(
     modifier: Modifier = Modifier,
-    layout: io.github.xingray.compose.nexus.controls.NexusSplitterLayout = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterLayout.Horizontal,
+    layout: NexusSplitterLayout = NexusSplitterLayout.Horizontal,
     lazy: Boolean = false,
     barSize: Dp = 16.dp,
     onResizeStart: ((index: Int, sizes: List<Float>) -> Unit)? = null,
     onResize: ((index: Int, sizes: List<Float>) -> Unit)? = null,
     onResizeEnd: ((index: Int, sizes: List<Float>) -> Unit)? = null,
-    onCollapse: ((index: Int, type: io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType, sizes: List<Float>) -> Unit)? = null,
-    content: io.github.xingray.compose.nexus.controls.NexusSplitterScope.() -> Unit,
+    onCollapse: ((index: Int, type: NexusSplitterCollapseType, sizes: List<Float>) -> Unit)? = null,
+    content: NexusSplitterScope.() -> Unit,
 ) {
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val scope = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterScope() }
+    val colors = NexusTheme.colorScheme
+    val scope = remember { NexusSplitterScope() }
     scope.clear()
     scope.content()
     val panels = scope.snapshot()
@@ -144,14 +144,14 @@ fun NexusSplitter(
 
     BoxWithConstraints(
         modifier = modifier
-            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
-            .border(1.dp, colors.border.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .clip(NexusTheme.shapes.base)
+            .border(1.dp, colors.border.light, NexusTheme.shapes.base)
             .background(colors.fill.blank),
     ) {
-        val mainSizeDp = if (layout == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterLayout.Horizontal) maxWidth else maxHeight
+        val mainSizeDp = if (layout == NexusSplitterLayout.Horizontal) maxWidth else maxHeight
         if (!mainSizeDp.value.isFinite() || mainSizeDp <= 0.dp) {
             // Without a bounded size we cannot provide reliable drag behavior.
-            if (layout == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterLayout.Horizontal) {
+            if (layout == NexusSplitterLayout.Horizontal) {
                 Row(modifier = Modifier.fillMaxSize()) {
                     panels.forEach { panel ->
                         Box(modifier = Modifier.weight(1f).fillMaxHeight(), content = panel.content)
@@ -174,12 +174,12 @@ fun NexusSplitter(
         val panelAreaDp = with(density) { panelAreaPx.toDp() }
 
         var ratios by remember(panelConfigKey, panels.size, panelAreaPx) {
-            mutableStateOf(_root_ide_package_.io.github.xingray.compose.nexus.controls.computeInitialRatios(panels, panelAreaPx, density))
+            mutableStateOf(computeInitialRatios(panels, panelAreaPx, density))
         }
         var activeBarIndex by remember { mutableStateOf<Int?>(null) }
         var lazyOffsetPx by remember { mutableStateOf(0f) }
         var pendingRatios by remember { mutableStateOf<List<Float>?>(null) }
-        val collapseCache = remember { mutableStateMapOf<Pair<Int, io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType>, Float>() }
+        val collapseCache = remember { mutableStateMapOf<Pair<Int, NexusSplitterCollapseType>, Float>() }
 
         fun currentSizesPx(targetRatios: List<Float>): List<Float> {
             return targetRatios.map { it * panelAreaPx }
@@ -192,9 +192,9 @@ fun NexusSplitter(
             }
         }
 
-        fun collapse(index: Int, type: io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType) {
-            val panelIndex = if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.Start) index else index + 1
-            val neighborIndex = if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.Start) index + 1 else index
+        fun collapse(index: Int, type: NexusSplitterCollapseType) {
+            val panelIndex = if (type == NexusSplitterCollapseType.Start) index else index + 1
+            val neighborIndex = if (type == NexusSplitterCollapseType.Start) index + 1 else index
             if (panelIndex !in panels.indices || neighborIndex !in panels.indices) {
                 return
             }
@@ -208,14 +208,14 @@ fun NexusSplitter(
                 mutable[neighborIndex] += current
             } else {
                 val restore = collapseCache[key] ?: 0.2f
-                val neighborMin = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(panels[neighborIndex].min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
+                val neighborMin = resolveRatio(panels[neighborIndex].min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
                 val available = (mutable[neighborIndex] - neighborMin).coerceAtLeast(0f)
                 val restored = restore.coerceAtMost(available)
                 mutable[panelIndex] += restored
                 mutable[neighborIndex] -= restored
             }
 
-            ratios = _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRatios(mutable)
+            ratios = normalizeRatios(mutable)
             val sizes = currentSizesPx(ratios)
             notifyPanelSizeChange(ratios)
             onCollapse?.invoke(index, type, sizes)
@@ -236,10 +236,10 @@ fun NexusSplitter(
             val oldEnd = baseRatios[index + 1]
             val pairTotal = oldStart + oldEnd
 
-            val startMin = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(startPanel.min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
-            val endMin = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(endPanel.min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
-            val startMax = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(startPanel.max, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 1f
-            val endMax = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(endPanel.max, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 1f
+            val startMin = resolveRatio(startPanel.min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
+            val endMin = resolveRatio(endPanel.min, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 0f
+            val startMax = resolveRatio(startPanel.max, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 1f
+            val endMax = resolveRatio(endPanel.max, panelAreaPx, density)?.coerceIn(0f, 1f) ?: 1f
 
             val minStart = max(startMin, pairTotal - endMax)
             val maxStart = min(startMax, pairTotal - endMin)
@@ -249,7 +249,7 @@ fun NexusSplitter(
             val updated = baseRatios.toMutableList()
             updated[index] = nextStart
             updated[index + 1] = nextEnd
-            return _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRatios(updated)
+            return normalizeRatios(updated)
         }
 
         LaunchedEffect(ratios, panelAreaPx) {
@@ -258,7 +258,7 @@ fun NexusSplitter(
 
         val renderRatios = pendingRatios?.takeIf { lazy } ?: ratios
 
-        if (layout == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterLayout.Horizontal) {
+        if (layout == NexusSplitterLayout.Horizontal) {
             Row(modifier = Modifier.fillMaxSize()) {
                 panels.forEachIndexed { index, panel ->
                     Box(
@@ -285,7 +285,7 @@ fun NexusSplitter(
                             onResize?.invoke(index, currentSizesPx(next))
                         }
 
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterBar(
+                        NexusSplitterBar(
                             modifier = Modifier
                                 .width(barSize)
                                 .fillMaxHeight(),
@@ -297,8 +297,8 @@ fun NexusSplitter(
                             lazyOffset = with(density) { (if (activeBarIndex == index) lazyOffsetPx else 0f).toDp() },
                             startCollapsible = panel.startCollapsible,
                             endCollapsible = panels[index + 1].endCollapsible,
-                            onCollapseStart = { collapse(index, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.Start) },
-                            onCollapseEnd = { collapse(index, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.End) },
+                            onCollapseStart = { collapse(index, NexusSplitterCollapseType.Start) },
+                            onCollapseEnd = { collapse(index, NexusSplitterCollapseType.End) },
                             draggableModifier = Modifier.draggable(
                                 state = dragState,
                                 orientation = Orientation.Horizontal,
@@ -352,7 +352,7 @@ fun NexusSplitter(
                             onResize?.invoke(index, currentSizesPx(next))
                         }
 
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterBar(
+                        NexusSplitterBar(
                             modifier = Modifier
                                 .height(barSize)
                                 .fillMaxWidth(),
@@ -364,8 +364,8 @@ fun NexusSplitter(
                             lazyOffset = with(density) { (if (activeBarIndex == index) lazyOffsetPx else 0f).toDp() },
                             startCollapsible = panel.startCollapsible,
                             endCollapsible = panels[index + 1].endCollapsible,
-                            onCollapseStart = { collapse(index, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.Start) },
-                            onCollapseEnd = { collapse(index, _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterCollapseType.End) },
+                            onCollapseStart = { collapse(index, NexusSplitterCollapseType.Start) },
+                            onCollapseEnd = { collapse(index, NexusSplitterCollapseType.End) },
                             draggableModifier = Modifier.draggable(
                                 state = dragState,
                                 orientation = Orientation.Vertical,
@@ -399,7 +399,7 @@ fun NexusSplitter(
 @Composable
 private fun NexusSplitterBar(
     modifier: Modifier,
-    layout: io.github.xingray.compose.nexus.controls.NexusSplitterLayout,
+    layout: NexusSplitterLayout,
     lazy: Boolean,
     resizable: Boolean,
     showStartCollapse: Boolean,
@@ -411,8 +411,8 @@ private fun NexusSplitterBar(
     onCollapseEnd: () -> Unit,
     draggableModifier: Modifier,
 ) {
-    val colors = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val isHorizontal = layout == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSplitterLayout.Horizontal
+    val colors = NexusTheme.colorScheme
+    val isHorizontal = layout == NexusSplitterLayout.Horizontal
     Box(
         modifier = modifier
             .background(colors.fill.blank)
@@ -451,14 +451,14 @@ private fun NexusSplitterBar(
                         .width(24.dp)
                         .height(14.dp)
                 }
-                    .background(colors.border.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+                    .background(colors.border.light, NexusTheme.shapes.small)
                     .clickable { onCollapseStart() },
                 contentAlignment = Alignment.Center,
             ) {
                 if (startCollapsible != null) {
                     startCollapsible()
                 } else {
-                    BasicText(if (isHorizontal) "<" else "^", style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small.copy(color = colors.text.regular))
+                    BasicText(if (isHorizontal) "<" else "^", style = NexusTheme.typography.small.copy(color = colors.text.regular))
                 }
             }
         }
@@ -478,14 +478,14 @@ private fun NexusSplitterBar(
                         .width(24.dp)
                         .height(14.dp)
                 }
-                    .background(colors.border.light, _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.small)
+                    .background(colors.border.light, NexusTheme.shapes.small)
                     .clickable { onCollapseEnd() },
                 contentAlignment = Alignment.Center,
             ) {
                 if (endCollapsible != null) {
                     endCollapsible()
                 } else {
-                    BasicText(if (isHorizontal) ">" else "v", style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small.copy(color = colors.text.regular))
+                    BasicText(if (isHorizontal) ">" else "v", style = NexusTheme.typography.small.copy(color = colors.text.regular))
                 }
             }
         }
@@ -493,7 +493,7 @@ private fun NexusSplitterBar(
 }
 
 private fun computeInitialRatios(
-    panels: List<io.github.xingray.compose.nexus.controls.NexusSplitterPanelData>,
+    panels: List<NexusSplitterPanelData>,
     panelAreaPx: Float,
     density: Density,
 ): List<Float> {
@@ -506,7 +506,7 @@ private fun computeInitialRatios(
     var emptyCount = 0
 
     panels.forEachIndexed { index, panel ->
-        val ratio = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(panel.size, panelAreaPx, density)
+        val ratio = resolveRatio(panel.size, panelAreaPx, density)
         if (ratio == null) {
             emptyCount += 1
         } else {
@@ -524,15 +524,15 @@ private fun computeInitialRatios(
     }
 
     val constrained = filled.mapIndexed { index, ratio ->
-        val minRatio = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(panels[index].min, panelAreaPx, density) ?: 0f
-        val maxRatio = _root_ide_package_.io.github.xingray.compose.nexus.controls.resolveRatio(panels[index].max, panelAreaPx, density) ?: 1f
+        val minRatio = resolveRatio(panels[index].min, panelAreaPx, density) ?: 0f
+        val maxRatio = resolveRatio(panels[index].max, panelAreaPx, density) ?: 1f
         ratio.coerceIn(min(minRatio, maxRatio), max(minRatio, maxRatio))
     }
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.normalizeRatios(constrained)
+    return normalizeRatios(constrained)
 }
 
 private fun resolveRatio(
-    size: io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize?,
+    size: NexusSplitterPanelSize?,
     panelAreaPx: Float,
     density: Density,
 ): Float? {
@@ -540,9 +540,9 @@ private fun resolveRatio(
         return null
     }
     return when (size) {
-        is io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.Percent -> size.value / 100f
-        is io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.Pixels -> size.value / panelAreaPx
-        is io.github.xingray.compose.nexus.controls.NexusSplitterPanelSize.DpSize -> with(density) { size.value.toPx() / panelAreaPx }
+        is NexusSplitterPanelSize.Percent -> size.value / 100f
+        is NexusSplitterPanelSize.Pixels -> size.value / panelAreaPx
+        is NexusSplitterPanelSize.DpSize -> with(density) { size.value.toPx() / panelAreaPx }
     }
 }
 

@@ -43,7 +43,7 @@ class LoginPageState {
 }
 
 @Composable
-fun rememberLoginPageState(): io.github.xingray.compose.nexus.templates.LoginPageState = remember { _root_ide_package_.io.github.xingray.compose.nexus.templates.LoginPageState() }
+fun rememberLoginPageState(): LoginPageState = remember { LoginPageState() }
 
 /**
  * LoginPage — a centered login form template.
@@ -61,7 +61,7 @@ fun rememberLoginPageState(): io.github.xingray.compose.nexus.templates.LoginPag
  */
 @Composable
 fun NexusLoginPage(
-    state: io.github.xingray.compose.nexus.templates.LoginPageState = _root_ide_package_.io.github.xingray.compose.nexus.templates.rememberLoginPageState(),
+    state: LoginPageState = rememberLoginPageState(),
     modifier: Modifier = Modifier,
     title: String = "Login",
     subtitle: String? = null,
@@ -70,10 +70,10 @@ fun NexusLoginPage(
     logo: (@Composable () -> Unit)? = null,
     extraActions: (@Composable () -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
 
     Box(
         modifier = modifier
@@ -97,14 +97,14 @@ fun NexusLoginPage(
             }
 
             // Title
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = title,
                 color = colorScheme.text.primary,
                 style = typography.extraLarge,
             )
             if (subtitle != null) {
                 Spacer(modifier = Modifier.height(4.dp))
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = subtitle,
                     color = colorScheme.text.secondary,
                     style = typography.base,
@@ -114,7 +114,7 @@ fun NexusLoginPage(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Username
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = state.username,
                 onValueChange = { state.username = it },
                 placeholder = "Username",
@@ -124,7 +124,7 @@ fun NexusLoginPage(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Password
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInput(
+            NexusInput(
                 value = state.password,
                 onValueChange = { state.password = it },
                 placeholder = "Password",
@@ -139,11 +139,11 @@ fun NexusLoginPage(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+                NexusCheckbox(
                     checked = state.rememberMe,
                     onCheckedChange = { state.rememberMe = it },
                 )
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "Remember me",
                     color = colorScheme.text.regular,
                     style = typography.small,
@@ -154,19 +154,19 @@ fun NexusLoginPage(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Login button
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+            NexusButton(
                 onClick = { onLogin?.invoke(state.username, state.password) },
-                type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary,
+                type = NexusType.Primary,
                 loading = state.isLoading,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = "Login")
+                NexusText(text = "Login")
             }
 
             // Extra actions
             if (extraActions != null) {
                 Spacer(modifier = Modifier.height(16.dp))
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+                NexusDivider()
                 Spacer(modifier = Modifier.height(12.dp))
                 extraActions()
             }

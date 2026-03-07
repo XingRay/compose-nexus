@@ -138,34 +138,34 @@ class CarouselState(
 fun rememberCarouselState(
     initialIndex: Int = 0,
     itemCount: Int,
-): io.github.xingray.compose.nexus.containers.CarouselState = remember(itemCount) {
-    _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselState(initialIndex, itemCount)
+): CarouselState = remember(itemCount) {
+    CarouselState(initialIndex, itemCount)
 }
 
 @Composable
 fun NexusCarousel(
-    state: io.github.xingray.compose.nexus.containers.CarouselState,
+    state: CarouselState,
     modifier: Modifier = Modifier,
     height: Dp? = 300.dp,
     autoplay: Boolean = true,
     interval: Long = 3000L,
     showIndicators: Boolean = true,
     showArrows: Boolean = true,
-    trigger: io.github.xingray.compose.nexus.containers.CarouselTrigger = _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselTrigger.Hover,
-    indicatorPosition: io.github.xingray.compose.nexus.containers.CarouselIndicatorPosition = _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselIndicatorPosition.Inside,
-    arrow: io.github.xingray.compose.nexus.containers.CarouselArrow = _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselArrow.Hover,
-    type: io.github.xingray.compose.nexus.containers.CarouselType = _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselType.Default,
+    trigger: CarouselTrigger = CarouselTrigger.Hover,
+    indicatorPosition: CarouselIndicatorPosition = CarouselIndicatorPosition.Inside,
+    arrow: CarouselArrow = CarouselArrow.Hover,
+    type: CarouselType = CarouselType.Default,
     cardScale: Float = 0.83f,
     loop: Boolean = true,
-    direction: io.github.xingray.compose.nexus.containers.CarouselDirection = _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Horizontal,
+    direction: CarouselDirection = CarouselDirection.Horizontal,
     pauseOnHover: Boolean = true,
     motionBlur: Boolean = false,
     onChange: ((current: Int, prev: Int) -> Unit)? = null,
     content: @Composable (index: Int) -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -201,13 +201,13 @@ fun NexusCarousel(
     }
 
     val showArrowByMode = when (arrow) {
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselArrow.Always -> true
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselArrow.Hover -> isHovered
-        _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselArrow.Never -> false
+        CarouselArrow.Always -> true
+        CarouselArrow.Hover -> isHovered
+        CarouselArrow.Never -> false
     }
     val shouldShowArrows = showArrows && showArrowByMode && state.itemCount > 1
     val shouldShowIndicators = showIndicators &&
-        indicatorPosition != _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselIndicatorPosition.None &&
+        indicatorPosition != CarouselIndicatorPosition.None &&
         state.itemCount > 1
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -219,16 +219,16 @@ fun NexusCarousel(
                 .background(colorScheme.fill.base)
                 .hoverable(interactionSource),
         ) {
-            if (type == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselType.Card && direction == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Horizontal && state.itemCount > 1) {
-                val prevIndex = _root_ide_package_.io.github.xingray.compose.nexus.containers.previousCardIndex(state.currentIndex, state.itemCount, loop)
-                val nextIndex = _root_ide_package_.io.github.xingray.compose.nexus.containers.nextCardIndex(state.currentIndex, state.itemCount, loop)
+            if (type == CarouselType.Card && direction == CarouselDirection.Horizontal && state.itemCount > 1) {
+                val prevIndex = previousCardIndex(state.currentIndex, state.itemCount, loop)
+                val nextIndex = nextCardIndex(state.currentIndex, state.itemCount, loop)
 
                 Row(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselCard(
+                    CarouselCard(
                         modifier = Modifier.weight(1f),
                         scale = cardScale,
                         alpha = 0.66f,
@@ -237,7 +237,7 @@ fun NexusCarousel(
                     ) {
                         content(prevIndex)
                     }
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselCard(
+                    CarouselCard(
                         modifier = Modifier.weight(1.2f),
                         scale = 1f,
                         alpha = 1f,
@@ -246,7 +246,7 @@ fun NexusCarousel(
                     ) {
                         content(state.currentIndex)
                     }
-                    _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselCard(
+                    CarouselCard(
                         modifier = Modifier.weight(1f),
                         scale = cardScale,
                         alpha = 0.66f,
@@ -264,7 +264,7 @@ fun NexusCarousel(
                     targetState = state.currentIndex,
                     transitionSpec = {
                         when (direction) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Horizontal -> {
+                            CarouselDirection.Horizontal -> {
                                 if (directionSign > 0) {
                                     (slideInHorizontally { it } + fadeIn())
                                         .togetherWith(slideOutHorizontally { -it } + fadeOut())
@@ -274,7 +274,7 @@ fun NexusCarousel(
                                 }
                             }
 
-                            _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Vertical -> {
+                            CarouselDirection.Vertical -> {
                                 if (directionSign > 0) {
                                     (slideInVertically { it } + fadeIn())
                                         .togetherWith(slideOutVertically { -it } + fadeOut())
@@ -306,8 +306,8 @@ fun NexusCarousel(
                         .pointerHoverIcon(PointerIcon.Hand),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                        text = if (direction == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Horizontal) "‹" else "˄",
+                    NexusText(
+                        text = if (direction == CarouselDirection.Horizontal) "‹" else "˄",
                         color = colorScheme.white,
                         style = typography.large,
                     )
@@ -323,16 +323,16 @@ fun NexusCarousel(
                         .pointerHoverIcon(PointerIcon.Hand),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                        text = if (direction == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselDirection.Horizontal) "›" else "˅",
+                    NexusText(
+                        text = if (direction == CarouselDirection.Horizontal) "›" else "˅",
                         color = colorScheme.white,
                         style = typography.large,
                     )
                 }
             }
 
-            if (shouldShowIndicators && indicatorPosition == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselIndicatorPosition.Inside) {
-                _root_ide_package_.io.github.xingray.compose.nexus.containers.IndicatorRow(
+            if (shouldShowIndicators && indicatorPosition == CarouselIndicatorPosition.Inside) {
+                IndicatorRow(
                     state = state,
                     trigger = trigger,
                     modifier = Modifier
@@ -343,8 +343,8 @@ fun NexusCarousel(
             }
         }
 
-        if (shouldShowIndicators && indicatorPosition == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselIndicatorPosition.Outside) {
-            _root_ide_package_.io.github.xingray.compose.nexus.containers.IndicatorRow(
+        if (shouldShowIndicators && indicatorPosition == CarouselIndicatorPosition.Outside) {
+            IndicatorRow(
                 state = state,
                 trigger = trigger,
                 modifier = Modifier
@@ -389,8 +389,8 @@ private fun CarouselCard(
 
 @Composable
 private fun IndicatorRow(
-    state: io.github.xingray.compose.nexus.containers.CarouselState,
-    trigger: io.github.xingray.compose.nexus.containers.CarouselTrigger,
+    state: CarouselState,
+    trigger: CarouselTrigger,
     modifier: Modifier = Modifier,
     onSelect: (Int) -> Unit,
 ) {
@@ -403,7 +403,7 @@ private fun IndicatorRow(
             val interactionSource = remember(index) { MutableInteractionSource() }
             val isHovered by interactionSource.collectIsHoveredAsState()
 
-            if (trigger == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselTrigger.Hover) {
+            if (trigger == CarouselTrigger.Hover) {
                 LaunchedEffect(isHovered) {
                     if (isHovered) onSelect(index)
                 }
@@ -415,11 +415,11 @@ private fun IndicatorRow(
                     .height(8.dp)
                     .clip(CircleShape)
                     .background(
-                        if (isActive) _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.primary.base
-                        else _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.text.placeholder.copy(alpha = 0.6f),
+                        if (isActive) NexusTheme.colorScheme.primary.base
+                        else NexusTheme.colorScheme.text.placeholder.copy(alpha = 0.6f),
                     )
                     .then(
-                        if (trigger == _root_ide_package_.io.github.xingray.compose.nexus.containers.CarouselTrigger.Click) {
+                        if (trigger == CarouselTrigger.Click) {
                             Modifier
                                 .clickable { onSelect(index) }
                                 .pointerHoverIcon(PointerIcon.Hand)

@@ -69,30 +69,30 @@ class CheckboxGroupState<T>(
 @Composable
 fun <T> rememberCheckboxGroupState(
     initialSelected: Set<T> = emptySet(),
-): io.github.xingray.compose.nexus.controls.CheckboxGroupState<T> = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupState(initialSelected) }
+): CheckboxGroupState<T> = remember { CheckboxGroupState(initialSelected) }
 
 private data class CheckboxGroupConfig(
-    val state: io.github.xingray.compose.nexus.controls.CheckboxGroupState<Any>,
-    val size: io.github.xingray.compose.nexus.theme.ComponentSize?,
+    val state: CheckboxGroupState<Any>,
+    val size: ComponentSize?,
     val disabled: Boolean,
     val min: Int?,
     val max: Int?,
-    val type: io.github.xingray.compose.nexus.controls.CheckboxGroupType,
+    val type: CheckboxGroupType,
     val onChange: ((Set<Any>) -> Unit)?,
 )
 
-private val LocalCheckboxGroupConfig = compositionLocalOf<io.github.xingray.compose.nexus.controls.CheckboxGroupConfig?> { null }
+private val LocalCheckboxGroupConfig = compositionLocalOf<CheckboxGroupConfig?> { null }
 
 @Composable
 fun <T> NexusCheckboxGroup(
-    state: io.github.xingray.compose.nexus.controls.CheckboxGroupState<T>,
+    state: CheckboxGroupState<T>,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     min: Int? = null,
     max: Int? = null,
-    type: io.github.xingray.compose.nexus.controls.CheckboxGroupType = _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupType.Checkbox,
-    options: List<io.github.xingray.compose.nexus.controls.CheckboxOption<T>> = emptyList(),
+    type: CheckboxGroupType = CheckboxGroupType.Checkbox,
+    options: List<CheckboxOption<T>> = emptyList(),
     onChange: ((Set<T>) -> Unit)? = null,
     content: @Composable () -> Unit = {},
 ) {
@@ -104,8 +104,8 @@ fun <T> NexusCheckboxGroup(
 
     @Suppress("UNCHECKED_CAST")
     CompositionLocalProvider(
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalCheckboxGroupConfig provides _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupConfig(
-            state = state as io.github.xingray.compose.nexus.controls.CheckboxGroupState<Any>,
+        LocalCheckboxGroupConfig provides CheckboxGroupConfig(
+            state = state as CheckboxGroupState<Any>,
             size = size,
             disabled = disabled,
             min = min,
@@ -122,20 +122,20 @@ fun <T> NexusCheckboxGroup(
             if (options.isNotEmpty()) {
                 options.forEach { option ->
                     when (type) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupType.Checkbox -> {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+                        CheckboxGroupType.Checkbox -> {
+                            NexusCheckbox(
                                 value = option.value,
                                 disabled = option.disabled,
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = option.label)
+                                NexusText(text = option.label)
                             }
                         }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupType.Button -> {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckboxButton(
+                        CheckboxGroupType.Button -> {
+                            NexusCheckboxButton(
                                 value = option.value,
                                 disabled = option.disabled,
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = option.label)
+                                NexusText(text = option.label)
                             }
                         }
                     }
@@ -151,13 +151,13 @@ fun NexusCheckbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     indeterminate: Boolean = false,
     border: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckboxCore(
+    NexusCheckboxCore(
         checked = checked,
         onToggle = { onCheckedChange(!checked) },
         modifier = modifier,
@@ -174,21 +174,21 @@ fun NexusCheckbox(
 fun <T> NexusCheckbox(
     value: T,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     border: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    val group = _root_ide_package_.io.github.xingray.compose.nexus.controls.LocalCheckboxGroupConfig.current ?: return
+    val group = LocalCheckboxGroupConfig.current ?: return
     @Suppress("UNCHECKED_CAST")
     val typedValue = value as Any
     val checked = group.state.isChecked(typedValue)
-    val resolvedSize = size ?: group.size ?: _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default
+    val resolvedSize = size ?: group.size ?: ComponentSize.Default
     val disabledByLimit = !checked && group.max != null && group.state.selected.size >= group.max
     val mergedDisabled = disabled || group.disabled || disabledByLimit
 
-    if (group.type == _root_ide_package_.io.github.xingray.compose.nexus.controls.CheckboxGroupType.Button) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckboxButton(
+    if (group.type == CheckboxGroupType.Button) {
+        NexusCheckboxButton(
             checked = checked,
             onCheckedChange = {
                 if (!mergedDisabled) {
@@ -204,7 +204,7 @@ fun <T> NexusCheckbox(
             label = label,
         )
     } else {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckboxCore(
+        NexusCheckboxCore(
             checked = checked,
             onToggle = {
                 if (!mergedDisabled) {
@@ -230,11 +230,11 @@ fun NexusCheckboxButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     disabled: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckboxCore(
+    NexusCheckboxCore(
         checked = checked,
         onToggle = { onCheckedChange(!checked) },
         modifier = modifier,
@@ -251,11 +251,11 @@ fun NexusCheckboxButton(
 fun <T> NexusCheckboxButton(
     value: T,
     modifier: Modifier = Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize? = null,
+    size: ComponentSize? = null,
     disabled: Boolean = false,
     label: (@Composable () -> Unit)? = null,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusCheckbox(
+    NexusCheckbox(
         value = value,
         modifier = modifier,
         size = size,
@@ -269,27 +269,27 @@ private fun NexusCheckboxCore(
     checked: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier,
-    size: io.github.xingray.compose.nexus.theme.ComponentSize,
+    size: ComponentSize,
     disabled: Boolean,
     indeterminate: Boolean,
     border: Boolean,
     buttonStyle: Boolean,
     label: (@Composable () -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val colorScheme = NexusTheme.colorScheme
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val shape = RoundedCornerShape(4.dp)
 
     val boxSize = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 16.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 14.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 12.dp
+        ComponentSize.Large -> 16.dp
+        ComponentSize.Default -> 14.dp
+        ComponentSize.Small -> 12.dp
     }
     val textStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.small
+        ComponentSize.Large -> NexusTheme.typography.base
+        ComponentSize.Default -> NexusTheme.typography.base
+        ComponentSize.Small -> NexusTheme.typography.small
     }
 
     val isActive = checked || indeterminate
@@ -330,9 +330,9 @@ private fun NexusCheckboxCore(
     val rowModifier = if (buttonStyle) {
         Modifier
             .defaultMinSize(minHeight = when (size) {
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-                _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+                ComponentSize.Large -> 40.dp
+                ComponentSize.Default -> 32.dp
+                ComponentSize.Small -> 24.dp
             })
             .clip(shape)
             .background(bgColor)
@@ -368,10 +368,10 @@ private fun NexusCheckboxCore(
                             .background(colorScheme.white),
                     )
                 } else if (checked) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "✓",
                         color = colorScheme.white,
-                        style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.extraSmall,
+                        style = NexusTheme.typography.extraSmall,
                     )
                 }
             }

@@ -56,11 +56,11 @@ class MessageHandle internal constructor(private val onClose: () -> Unit) {
 @Stable
 class MessageEntry(
     val text: String,
-    val type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+    val type: NexusType = NexusType.Info,
     val plain: Boolean = false,
     val duration: Long = 3000L,
     val showClose: Boolean = false,
-    val placement: io.github.xingray.compose.nexus.controls.MessagePlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Top,
+    val placement: MessagePlacement = MessagePlacement.Top,
     val offset: Dp = 16.dp,
     val onClose: (() -> Unit)? = null,
     val icon: (@Composable () -> Unit)? = null,
@@ -81,32 +81,32 @@ class MessageEntry(
 
 @Stable
 class MessageState {
-    internal val messages = mutableStateListOf<io.github.xingray.compose.nexus.controls.MessageEntry>()
+    internal val messages = mutableStateListOf<MessageEntry>()
 
     fun show(
         text: String,
-        type: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+        type: NexusType = NexusType.Info,
         plain: Boolean = false,
         duration: Long = 3000L,
         showClose: Boolean = false,
-        placement: io.github.xingray.compose.nexus.controls.MessagePlacement = _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Top,
+        placement: MessagePlacement = MessagePlacement.Top,
         offset: Dp = 16.dp,
         grouping: Boolean = false,
         repeatNum: Int = 1,
         onClose: (() -> Unit)? = null,
         icon: (@Composable () -> Unit)? = null,
-    ): io.github.xingray.compose.nexus.controls.MessageHandle {
+    ): MessageHandle {
         if (grouping) {
             val existing = messages.lastOrNull { it.text == text && it.placement == placement && it.visible }
             if (existing != null) {
                 existing.repeatNum += repeatNum
                 existing.restartKey += 1
                 existing.visible = true
-                return _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageHandle { close(existing) }
+                return MessageHandle { close(existing) }
             }
         }
 
-        val entry = _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageEntry(
+        val entry = MessageEntry(
             text = text,
             type = type,
             plain = plain,
@@ -119,21 +119,21 @@ class MessageState {
             repeatNum = repeatNum,
         )
         messages.add(entry)
-        return _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageHandle { close(entry) }
+        return MessageHandle { close(entry) }
     }
 
-    fun primary(text: String, duration: Long = 3000L) = show(text, type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary, duration = duration)
-    fun success(text: String, duration: Long = 3000L) = show(text, type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success, duration = duration)
-    fun warning(text: String, duration: Long = 3000L) = show(text, type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning, duration = duration)
-    fun error(text: String, duration: Long = 3000L) = show(text, type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger, duration = duration)
-    fun info(text: String, duration: Long = 3000L) = show(text, type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info, duration = duration)
+    fun primary(text: String, duration: Long = 3000L) = show(text, type = NexusType.Primary, duration = duration)
+    fun success(text: String, duration: Long = 3000L) = show(text, type = NexusType.Success, duration = duration)
+    fun warning(text: String, duration: Long = 3000L) = show(text, type = NexusType.Warning, duration = duration)
+    fun error(text: String, duration: Long = 3000L) = show(text, type = NexusType.Danger, duration = duration)
+    fun info(text: String, duration: Long = 3000L) = show(text, type = NexusType.Info, duration = duration)
 
     fun closeAll() {
         val snapshot = messages.toList()
         snapshot.forEach { close(it) }
     }
 
-    fun close(entry: io.github.xingray.compose.nexus.controls.MessageEntry) {
+    fun close(entry: MessageEntry) {
         if (!entry.visible) {
             remove(entry)
             return
@@ -141,7 +141,7 @@ class MessageState {
         entry.visible = false
     }
 
-    internal fun remove(entry: io.github.xingray.compose.nexus.controls.MessageEntry) {
+    internal fun remove(entry: MessageEntry) {
         if (messages.remove(entry)) {
             entry.onClose?.invoke()
         }
@@ -149,27 +149,27 @@ class MessageState {
 }
 
 @Composable
-fun rememberMessageState(): io.github.xingray.compose.nexus.controls.MessageState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageState() }
+fun rememberMessageState(): MessageState = remember { MessageState() }
 
 @Composable
 fun NexusMessageHost(
-    state: io.github.xingray.compose.nexus.controls.MessageState,
+    state: MessageState,
     modifier: Modifier = Modifier,
 ) {
     if (state.messages.isEmpty()) return
 
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.entries.forEach { placement ->
+    MessagePlacement.entries.forEach { placement ->
         val entries = state.messages.filter { it.placement == placement }
         if (entries.isEmpty()) return@forEach
 
         Popup(
             alignment = when (placement) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Top -> Alignment.TopCenter
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopLeft -> Alignment.TopStart
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopRight -> Alignment.TopEnd
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Bottom -> Alignment.BottomCenter
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomLeft -> Alignment.BottomStart
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomRight -> Alignment.BottomEnd
+                MessagePlacement.Top -> Alignment.TopCenter
+                MessagePlacement.TopLeft -> Alignment.TopStart
+                MessagePlacement.TopRight -> Alignment.TopEnd
+                MessagePlacement.Bottom -> Alignment.BottomCenter
+                MessagePlacement.BottomLeft -> Alignment.BottomStart
+                MessagePlacement.BottomRight -> Alignment.BottomEnd
             },
             properties = PopupProperties(focusable = false),
         ) {
@@ -177,29 +177,29 @@ fun NexusMessageHost(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(
-                        top = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Top || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopLeft || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopRight) {
+                        top = if (placement == MessagePlacement.Top || placement == MessagePlacement.TopLeft || placement == MessagePlacement.TopRight) {
                             entries.first().offset
                         } else {
                             0.dp
                         },
-                        bottom = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Bottom || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomLeft || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomRight) {
+                        bottom = if (placement == MessagePlacement.Bottom || placement == MessagePlacement.BottomLeft || placement == MessagePlacement.BottomRight) {
                             entries.first().offset
                         } else {
                             0.dp
                         },
-                        start = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopLeft || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomLeft) 16.dp else 0.dp,
-                        end = if (placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopRight || placement == _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomRight) 16.dp else 0.dp,
+                        start = if (placement == MessagePlacement.TopLeft || placement == MessagePlacement.BottomLeft) 16.dp else 0.dp,
+                        end = if (placement == MessagePlacement.TopRight || placement == MessagePlacement.BottomRight) 16.dp else 0.dp,
                     ),
                 horizontalAlignment = when (placement) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Top, _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.Bottom -> Alignment.CenterHorizontally
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopLeft, _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomLeft -> Alignment.Start
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.TopRight, _root_ide_package_.io.github.xingray.compose.nexus.controls.MessagePlacement.BottomRight -> Alignment.End
+                    MessagePlacement.Top, MessagePlacement.Bottom -> Alignment.CenterHorizontally
+                    MessagePlacement.TopLeft, MessagePlacement.BottomLeft -> Alignment.Start
+                    MessagePlacement.TopRight, MessagePlacement.BottomRight -> Alignment.End
                 },
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 entries.forEach { entry ->
                     key(entry.id) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.MessageItem(entry = entry, onDismiss = { state.remove(entry) })
+                        MessageItem(entry = entry, onDismiss = { state.remove(entry) })
                     }
                 }
             }
@@ -209,22 +209,22 @@ fun NexusMessageHost(
 
 @Composable
 private fun MessageItem(
-    entry: io.github.xingray.compose.nexus.controls.MessageEntry,
+    entry: MessageEntry,
     onDismiss: () -> Unit,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
-    val shadows = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shadows
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
+    val shadows = NexusTheme.shadows
     val tc = colorScheme.typeColor(entry.type) ?: colorScheme.info
 
     val iconText = when (entry.type) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Primary -> "P"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Success -> "✓"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Warning -> "!"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Danger -> "✕"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info -> "i"
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Default -> "i"
+        NexusType.Primary -> "P"
+        NexusType.Success -> "✓"
+        NexusType.Warning -> "!"
+        NexusType.Danger -> "✕"
+        NexusType.Info -> "i"
+        NexusType.Default -> "i"
     }
 
     LaunchedEffect(entry.id, entry.restartKey) {
@@ -254,15 +254,15 @@ private fun MessageItem(
             if (entry.icon != null) {
                 entry.icon.invoke()
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(text = iconText, color = tc.base, style = typography.base)
+                NexusText(text = iconText, color = tc.base, style = typography.base)
             }
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+            NexusText(
                 text = entry.text,
                 color = if (entry.plain) tc.base else colorScheme.text.regular,
                 style = typography.base,
             )
             if (entry.repeatNum > 1) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "x${entry.repeatNum}",
                     color = colorScheme.text.secondary,
                     style = typography.extraSmall,
@@ -273,7 +273,7 @@ private fun MessageItem(
                 )
             }
             if (entry.showClose) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = "✕",
                     color = colorScheme.text.placeholder,
                     style = typography.small,

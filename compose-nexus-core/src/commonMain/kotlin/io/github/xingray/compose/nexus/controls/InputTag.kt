@@ -93,19 +93,19 @@ class InputTagState(
 @Composable
 fun rememberInputTagState(
     initialTags: List<String> = emptyList(),
-): io.github.xingray.compose.nexus.controls.InputTagState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.InputTagState(initialTags) }
+): InputTagState = remember { InputTagState(initialTags) }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NexusInputTag(
-    state: io.github.xingray.compose.nexus.controls.InputTagState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberInputTagState(),
+    state: InputTagState = rememberInputTagState(),
     modifier: Modifier = Modifier,
     placeholder: String = "Enter tags",
-    size: io.github.xingray.compose.nexus.theme.ComponentSize = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default,
+    size: ComponentSize = ComponentSize.Default,
     maxTags: Int = 0,
-    tagType: io.github.xingray.compose.nexus.theme.NexusType = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
-    tagEffect: io.github.xingray.compose.nexus.controls.TagEffect = _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Light,
-    trigger: io.github.xingray.compose.nexus.controls.NexusInputTagTrigger = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputTagTrigger.Enter,
+    tagType: NexusType = NexusType.Info,
+    tagEffect: TagEffect = TagEffect.Light,
+    trigger: NexusInputTagTrigger = NexusInputTagTrigger.Enter,
     delimiter: String? = null,
     collapseTags: Boolean = false,
     collapseTagsTooltip: Boolean = false,
@@ -131,19 +131,19 @@ fun NexusInputTag(
     onBlur: (() -> Unit)? = null,
     onClear: (() -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     val minHeight = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> 40.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> 32.dp
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> 24.dp
+        ComponentSize.Large -> 40.dp
+        ComponentSize.Default -> 32.dp
+        ComponentSize.Small -> 24.dp
     }
     val inputTextStyle = when (size) {
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Large -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Default -> typography.base
-        _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small -> typography.small
+        ComponentSize.Large -> typography.base
+        ComponentSize.Default -> typography.base
+        ComponentSize.Small -> typography.small
     }
 
     val canAddMore = maxTags <= 0 || state.tags.size < maxTags
@@ -211,12 +211,12 @@ fun NexusInputTag(
                     if (tagContent != null) {
                         tagContent(tag, actualIndex)
                     } else {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+                        NexusTag(
                             text = tag,
                             type = tagType,
                             effect = tagEffect,
                             closable = !readonly && !disabled,
-                            size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                            size = ComponentSize.Small,
                             onClose = {
                                 val removed = state.removeTag(actualIndex)
                                 if (removed != null) {
@@ -237,11 +237,11 @@ fun NexusInputTag(
                 } else {
                     "+$hiddenCount"
                 }
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusTag(
+                NexusTag(
                     text = collapseText,
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
-                    effect = _root_ide_package_.io.github.xingray.compose.nexus.controls.TagEffect.Plain,
-                    size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                    type = NexusType.Info,
+                    effect = TagEffect.Plain,
+                    size = ComponentSize.Small,
                 )
             }
 
@@ -275,7 +275,7 @@ fun NexusInputTag(
                         .onKeyEvent { event ->
                             when (event.key) {
                                 Key.Enter -> {
-                                    if (trigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputTagTrigger.Enter) {
+                                    if (trigger == NexusInputTagTrigger.Enter) {
                                         tryAddTagFromText(state.inputText)
                                         true
                                     } else {
@@ -283,7 +283,7 @@ fun NexusInputTag(
                                     }
                                 }
                                 Key.Spacebar -> {
-                                    if (trigger == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusInputTagTrigger.Space) {
+                                    if (trigger == NexusInputTagTrigger.Space) {
                                         tryAddTagFromText(state.inputText)
                                         true
                                     } else {
@@ -312,7 +312,7 @@ fun NexusInputTag(
                     decorationBox = { innerTextField ->
                         Box(contentAlignment = Alignment.CenterStart) {
                             if (state.inputText.isEmpty() && state.tags.isEmpty()) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = placeholder,
                                     color = colorScheme.text.placeholder,
                                     style = inputTextStyle,
@@ -343,7 +343,7 @@ fun NexusInputTag(
                 if (clearIcon != null) {
                     clearIcon()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "✕",
                         color = colorScheme.text.placeholder,
                         style = typography.extraSmall,

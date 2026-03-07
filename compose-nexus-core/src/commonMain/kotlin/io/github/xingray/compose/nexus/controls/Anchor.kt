@@ -36,7 +36,7 @@ enum class AnchorDirection {
 data class AnchorLink(
     val title: String,
     val href: String,
-    val subLinks: List<io.github.xingray.compose.nexus.controls.AnchorLink> = emptyList(),
+    val subLinks: List<AnchorLink> = emptyList(),
 )
 
 @Stable
@@ -61,24 +61,24 @@ class AnchorState internal constructor(
 @Composable
 fun rememberAnchorState(
     initialHref: String? = null,
-): io.github.xingray.compose.nexus.controls.AnchorState = remember(initialHref) { _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorState(initialHref) }
+): AnchorState = remember(initialHref) { AnchorState(initialHref) }
 
 @Composable
 fun NexusAnchor(
-    links: List<io.github.xingray.compose.nexus.controls.AnchorLink>,
+    links: List<AnchorLink>,
     modifier: Modifier = Modifier,
-    state: io.github.xingray.compose.nexus.controls.AnchorState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberAnchorState(),
+    state: AnchorState = rememberAnchorState(),
     offset: Int = 0,
     bound: Int = 15,
     duration: Int = 300,
     marker: Boolean = true,
-    type: io.github.xingray.compose.nexus.controls.AnchorType = _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorType.Default,
-    direction: io.github.xingray.compose.nexus.controls.AnchorDirection = _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorDirection.Vertical,
+    type: AnchorType = AnchorType.Default,
+    direction: AnchorDirection = AnchorDirection.Vertical,
     selectScrollTop: Boolean = false,
     onChange: ((href: String) -> Unit)? = null,
     onClick: ((href: String) -> Unit)? = null,
     onRequestScroll: ((href: String) -> Unit)? = null,
-    linkContent: (@Composable (link: io.github.xingray.compose.nexus.controls.AnchorLink, selected: Boolean) -> Unit)? = null,
+    linkContent: (@Composable (link: AnchorLink, selected: Boolean) -> Unit)? = null,
 ) {
     // Keep API parity with Element attrs in current simplified implementation.
     @Suppress("UNUSED_VARIABLE")
@@ -88,7 +88,7 @@ fun NexusAnchor(
 
     state.bindScrollAction(onRequestScroll)
 
-    if (direction == _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorDirection.Horizontal) {
+    if (direction == AnchorDirection.Horizontal) {
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -96,7 +96,7 @@ fun NexusAnchor(
         ) {
             links.forEach { link ->
                 val selected = state.currentHref == link.href
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorLinkItem(
+                AnchorLinkItem(
                     link = link,
                     selected = selected,
                     level = 0,
@@ -118,7 +118,7 @@ fun NexusAnchor(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             links.forEach { link ->
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorLinkTree(
+                AnchorLinkTree(
                     link = link,
                     state = state,
                     level = 0,
@@ -135,17 +135,17 @@ fun NexusAnchor(
 
 @Composable
 private fun AnchorLinkTree(
-    link: io.github.xingray.compose.nexus.controls.AnchorLink,
-    state: io.github.xingray.compose.nexus.controls.AnchorState,
+    link: AnchorLink,
+    state: AnchorState,
     level: Int,
     marker: Boolean,
-    type: io.github.xingray.compose.nexus.controls.AnchorType,
+    type: AnchorType,
     onChange: ((String) -> Unit)?,
     onClick: ((String) -> Unit)?,
-    linkContent: (@Composable (link: io.github.xingray.compose.nexus.controls.AnchorLink, selected: Boolean) -> Unit)?,
+    linkContent: (@Composable (link: AnchorLink, selected: Boolean) -> Unit)?,
 ) {
     val selected = state.currentHref == link.href
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorLinkItem(
+    AnchorLinkItem(
         link = link,
         selected = selected,
         level = level,
@@ -160,7 +160,7 @@ private fun AnchorLinkTree(
         linkContent = linkContent,
     )
     link.subLinks.forEach { child ->
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorLinkTree(
+        AnchorLinkTree(
             link = child,
             state = state,
             level = level + 1,
@@ -175,27 +175,27 @@ private fun AnchorLinkTree(
 
 @Composable
 private fun AnchorLinkItem(
-    link: io.github.xingray.compose.nexus.controls.AnchorLink,
+    link: AnchorLink,
     selected: Boolean,
     level: Int,
     marker: Boolean,
-    type: io.github.xingray.compose.nexus.controls.AnchorType,
+    type: AnchorType,
     onClick: () -> Unit,
-    linkContent: (@Composable (link: io.github.xingray.compose.nexus.controls.AnchorLink, selected: Boolean) -> Unit)?,
+    linkContent: (@Composable (link: AnchorLink, selected: Boolean) -> Unit)?,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
 
     val textColor = if (selected) colorScheme.primary.base else colorScheme.text.regular
     val rowModifier = Modifier
         .fillMaxWidth()
-        .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+        .clip(NexusTheme.shapes.base)
         .clickable { onClick() }
         .pointerHoverIcon(PointerIcon.Hand)
         .padding(start = (level * 12 + 4).dp, top = 6.dp, bottom = 6.dp, end = 8.dp)
 
     Box(modifier = rowModifier) {
-        if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorType.Default && marker && selected) {
+        if (type == AnchorType.Default && marker && selected) {
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
@@ -208,13 +208,13 @@ private fun AnchorLinkItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorType.Default && marker) 8.dp else 0.dp),
+                .padding(start = if (type == AnchorType.Default && marker) 8.dp else 0.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (linkContent != null) {
                 linkContent(link, selected)
             } else {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                NexusText(
                     text = link.title,
                     color = textColor,
                     style = typography.base,
@@ -222,7 +222,7 @@ private fun AnchorLinkItem(
             }
         }
 
-        if (type == _root_ide_package_.io.github.xingray.compose.nexus.controls.AnchorType.Underline && selected) {
+        if (type == AnchorType.Underline && selected) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomStart)

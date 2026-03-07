@@ -53,17 +53,17 @@ enum class CalendarCellType(val value: String) {
 }
 
 data class CalendarDateCellData(
-    val type: io.github.xingray.compose.nexus.controls.CalendarCellType,
+    val type: CalendarCellType,
     val isSelected: Boolean,
     val day: String,
-    val date: io.github.xingray.compose.nexus.controls.NexusDate,
+    val date: NexusDate,
 )
 
 @Stable
 class CalendarState(
     initialYear: Int = 2026,
     initialMonth: Int = 1,
-    initialDate: io.github.xingray.compose.nexus.controls.NexusDate? = null,
+    initialDate: NexusDate? = null,
 ) {
     var viewYear by mutableIntStateOf(initialYear)
         private set
@@ -103,43 +103,43 @@ class CalendarState(
         viewYear++
     }
 
-    fun select(date: io.github.xingray.compose.nexus.controls.NexusDate) {
+    fun select(date: NexusDate) {
         selectedDate = date
         viewYear = date.year
         viewMonth = date.month
     }
 
-    fun pickDay(day: io.github.xingray.compose.nexus.controls.NexusDate) {
+    fun pickDay(day: NexusDate) {
         select(day)
     }
 
-    fun selectDate(type: io.github.xingray.compose.nexus.controls.CalendarDateType) {
+    fun selectDate(type: CalendarDateType) {
         when (type) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateType.PrevMonth -> prevMonth()
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateType.NextMonth -> nextMonth()
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateType.PrevYear -> prevYear()
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateType.NextYear -> nextYear()
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateType.Today -> today()
+            CalendarDateType.PrevMonth -> prevMonth()
+            CalendarDateType.NextMonth -> nextMonth()
+            CalendarDateType.PrevYear -> prevYear()
+            CalendarDateType.NextYear -> nextYear()
+            CalendarDateType.Today -> today()
         }
     }
 
     fun today() {
-        val today = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TODAY_YEAR,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TODAY_MONTH,
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.TODAY_DAY
+        val today = NexusDate(
+            TODAY_YEAR,
+            TODAY_MONTH,
+            TODAY_DAY
         )
         select(today)
     }
 
-    fun calculateValidatedDateRange(start: io.github.xingray.compose.nexus.controls.NexusDate, end: io.github.xingray.compose.nexus.controls.NexusDate): List<Pair<io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDate>> {
-        val valid = _root_ide_package_.io.github.xingray.compose.nexus.controls.validateRange(start, end) ?: return emptyList()
-        val result = mutableListOf<Pair<io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDate>>()
+    fun calculateValidatedDateRange(start: NexusDate, end: NexusDate): List<Pair<NexusDate, NexusDate>> {
+        val valid = validateRange(start, end) ?: return emptyList()
+        val result = mutableListOf<Pair<NexusDate, NexusDate>>()
         var cursor = valid.first
-        while (_root_ide_package_.io.github.xingray.compose.nexus.controls.compareDate(cursor, valid.second) <= 0) {
-            val weekEnd = _root_ide_package_.io.github.xingray.compose.nexus.controls.addDays(cursor, 6)
+        while (compareDate(cursor, valid.second) <= 0) {
+            val weekEnd = addDays(cursor, 6)
             result += cursor to weekEnd
-            cursor = _root_ide_package_.io.github.xingray.compose.nexus.controls.addDays(cursor, 7)
+            cursor = addDays(cursor, 7)
         }
         return result
     }
@@ -149,29 +149,29 @@ class CalendarState(
 fun rememberCalendarState(
     initialYear: Int = 2026,
     initialMonth: Int = 1,
-    initialDate: io.github.xingray.compose.nexus.controls.NexusDate? = null,
-): io.github.xingray.compose.nexus.controls.CalendarState = remember { _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarState(initialYear, initialMonth, initialDate) }
+    initialDate: NexusDate? = null,
+): CalendarState = remember { CalendarState(initialYear, initialMonth, initialDate) }
 
 @Composable
 fun NexusCalendar(
-    state: io.github.xingray.compose.nexus.controls.CalendarState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberCalendarState(),
+    state: CalendarState = rememberCalendarState(),
     modifier: Modifier = Modifier,
-    modelValue: io.github.xingray.compose.nexus.controls.NexusDate? = state.selectedDate,
-    range: Pair<io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDate>? = null,
-    controllerType: io.github.xingray.compose.nexus.controls.CalendarControllerType = _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerType.Button,
-    formatter: ((value: Int, type: io.github.xingray.compose.nexus.controls.CalendarFormatterType) -> Any)? = null,
-    onDateSelect: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)? = null,
-    onModelValueChange: ((io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)? = null,
+    modelValue: NexusDate? = state.selectedDate,
+    range: Pair<NexusDate, NexusDate>? = null,
+    controllerType: CalendarControllerType = CalendarControllerType.Button,
+    formatter: ((value: Int, type: CalendarFormatterType) -> Any)? = null,
+    onDateSelect: ((NexusDate) -> Unit)? = null,
+    onModelValueChange: ((NexusDate) -> Unit)? = null,
     header: (@Composable (date: String) -> Unit)? = null,
-    dateCellSlot: (@Composable (data: io.github.xingray.compose.nexus.controls.CalendarDateCellData) -> Unit)? = null,
-    dateCell: (@Composable (io.github.xingray.compose.nexus.controls.NexusDate) -> Unit)? = null,
+    dateCellSlot: (@Composable (data: CalendarDateCellData) -> Unit)? = null,
+    dateCell: (@Composable (NexusDate) -> Unit)? = null,
 ) {
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val shapes = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val shapes = NexusTheme.shapes
 
     val validRange = remember(range) {
-        range?.let { _root_ide_package_.io.github.xingray.compose.nexus.controls.validateRange(it.first, it.second) }
+        range?.let { validateRange(it.first, it.second) }
     }
 
     LaunchedEffect(modelValue) {
@@ -188,14 +188,14 @@ fun NexusCalendar(
 
     val cells = remember(state.viewYear, state.viewMonth, validRange) {
         if (validRange != null) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.buildRangeCells(validRange.first, validRange.second, state.viewYear, state.viewMonth)
+            buildRangeCells(validRange.first, validRange.second, state.viewYear, state.viewMonth)
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.buildMonthCells(state.viewYear, state.viewMonth)
+            buildMonthCells(state.viewYear, state.viewMonth)
         }
     }
 
     val headerDate = if (validRange != null) {
-        "${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatDay(validRange.first)} ~ ${_root_ide_package_.io.github.xingray.compose.nexus.controls.formatDay(validRange.second)}"
+        "${formatDay(validRange.first)} ~ ${formatDay(validRange.second)}"
     } else {
         "${state.viewYear}-${state.viewMonth.toString().padStart(2, '0')}"
     }
@@ -215,7 +215,7 @@ fun NexusCalendar(
                 header(headerDate)
             }
         } else {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarHeader(
+            CalendarHeader(
                 state = state,
                 headerDate = headerDate,
                 hasFixedRange = validRange != null,
@@ -224,7 +224,7 @@ fun NexusCalendar(
             )
         }
 
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDivider()
+        NexusDivider()
 
         Row(
             modifier = Modifier
@@ -232,12 +232,12 @@ fun NexusCalendar(
                 .padding(vertical = 8.dp, horizontal = 6.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            _root_ide_package_.io.github.xingray.compose.nexus.controls.WEEKDAY_LABELS.forEach { label ->
+            WEEKDAY_LABELS.forEach { label ->
                 Box(
                     modifier = Modifier.weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = label,
                         color = colorScheme.text.regular,
                         style = typography.small,
@@ -250,10 +250,10 @@ fun NexusCalendar(
             Row(modifier = Modifier.fillMaxWidth()) {
                 rowCells.forEach { cell ->
                     val isSelected = state.selectedDate == cell.date
-                    val slotData = _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarDateCellData(
+                    val slotData = CalendarDateCellData(
                         type = cell.type,
                         isSelected = isSelected,
-                        day = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatDay(cell.date),
+                        day = formatDay(cell.date),
                         date = cell.date,
                     )
 
@@ -274,11 +274,11 @@ fun NexusCalendar(
                             dateCellSlot != null -> dateCellSlot(slotData)
                             dateCell != null -> dateCell(cell.date)
                             else -> {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = cell.date.day.toString(),
                                     color = when {
                                         isSelected -> colorScheme.primary.base
-                                        cell.type == _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.CurrentMonth -> colorScheme.text.primary
+                                        cell.type == CalendarCellType.CurrentMonth -> colorScheme.text.primary
                                         else -> colorScheme.text.placeholder
                                     },
                                     style = typography.small,
@@ -294,14 +294,14 @@ fun NexusCalendar(
 
 @Composable
 private fun CalendarHeader(
-    state: io.github.xingray.compose.nexus.controls.CalendarState,
+    state: CalendarState,
     headerDate: String,
     hasFixedRange: Boolean,
-    controllerType: io.github.xingray.compose.nexus.controls.CalendarControllerType,
-    formatter: ((value: Int, type: io.github.xingray.compose.nexus.controls.CalendarFormatterType) -> Any)?,
+    controllerType: CalendarControllerType,
+    formatter: ((value: Int, type: CalendarFormatterType) -> Any)?,
 ) {
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
+    val typography = NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
 
     Row(
         modifier = Modifier
@@ -310,7 +310,7 @@ private fun CalendarHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = headerDate,
             color = colorScheme.text.primary,
             style = typography.base,
@@ -318,22 +318,22 @@ private fun CalendarHeader(
 
         if (!hasFixedRange) {
             when (controllerType) {
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerType.Button -> {
+                CalendarControllerType.Button -> {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Prev Year") { state.prevYear() }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Prev Month") { state.prevMonth() }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Today") { state.today() }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Next Month") { state.nextMonth() }
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Next Year") { state.nextYear() }
+                        CalendarControllerButton("Prev Year") { state.prevYear() }
+                        CalendarControllerButton("Prev Month") { state.prevMonth() }
+                        CalendarControllerButton("Today") { state.today() }
+                        CalendarControllerButton("Next Month") { state.nextMonth() }
+                        CalendarControllerButton("Next Year") { state.nextYear() }
                     }
                 }
 
-                _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerType.Select -> {
-                    val yearState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSelectState(initialSelected = state.viewYear)
-                    val monthState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberSelectState(initialSelected = state.viewMonth)
+                CalendarControllerType.Select -> {
+                    val yearState = rememberSelectState(initialSelected = state.viewYear)
+                    val monthState = rememberSelectState(initialSelected = state.viewMonth)
 
                     LaunchedEffect(state.viewYear) {
                         yearState.selected = state.viewYear
@@ -344,11 +344,11 @@ private fun CalendarHeader(
 
                     val yearOptions = remember(state.viewYear, formatter) {
                         ((state.viewYear - 10)..(state.viewYear + 10)).map { year ->
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOption(
+                            SelectOption(
                                 value = year,
-                                label = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatControllerLabel(
+                                label = formatControllerLabel(
                                     year,
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarFormatterType.Year,
+                                    CalendarFormatterType.Year,
                                     formatter
                                 ),
                             )
@@ -356,11 +356,11 @@ private fun CalendarHeader(
                     }
                     val monthOptions = remember(formatter) {
                         (1..12).map { month ->
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.SelectOption(
+                            SelectOption(
                                 value = month,
-                                label = _root_ide_package_.io.github.xingray.compose.nexus.controls.formatControllerLabel(
+                                label = formatControllerLabel(
                                     month,
-                                    _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarFormatterType.Month,
+                                    CalendarFormatterType.Month,
                                     formatter
                                 ),
                             )
@@ -371,23 +371,23 @@ private fun CalendarHeader(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSelect(
+                        NexusSelect(
                             state = yearState,
                             options = yearOptions,
                             onSelect = { state.setView(it, state.viewMonth) },
                             modifier = Modifier.width(120.dp),
-                            size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                            size = ComponentSize.Small,
                             fitInputWidth = true,
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusSelect(
+                        NexusSelect(
                             state = monthState,
                             options = monthOptions,
                             onSelect = { state.setView(state.viewYear, it) },
                             modifier = Modifier.width(108.dp),
-                            size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                            size = ComponentSize.Small,
                             fitInputWidth = true,
                         )
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarControllerButton("Today") { state.today() }
+                        CalendarControllerButton("Today") { state.today() }
                     }
                 }
             }
@@ -400,63 +400,63 @@ private fun CalendarControllerButton(
     text: String,
     onClick: () -> Unit,
 ) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+    NexusButton(
         text = text,
         onClick = onClick,
-        size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
-        type = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusType.Info,
+        size = ComponentSize.Small,
+        type = NexusType.Info,
         plain = true,
     )
 }
 
 private fun formatControllerLabel(
     value: Int,
-    type: io.github.xingray.compose.nexus.controls.CalendarFormatterType,
-    formatter: ((value: Int, type: io.github.xingray.compose.nexus.controls.CalendarFormatterType) -> Any)?,
+    type: CalendarFormatterType,
+    formatter: ((value: Int, type: CalendarFormatterType) -> Any)?,
 ): String = formatter?.invoke(value, type)?.toString() ?: when (type) {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarFormatterType.Year -> "$value"
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarFormatterType.Month -> value.toString().padStart(2, '0')
+    CalendarFormatterType.Year -> "$value"
+    CalendarFormatterType.Month -> value.toString().padStart(2, '0')
 }
 
 private data class CalendarCell(
-    val date: io.github.xingray.compose.nexus.controls.NexusDate,
-    val type: io.github.xingray.compose.nexus.controls.CalendarCellType,
+    val date: NexusDate,
+    val type: CalendarCellType,
 )
 
 private fun buildMonthCells(
     year: Int,
     month: Int,
-): List<io.github.xingray.compose.nexus.controls.CalendarCell> {
-    val firstWeekDay = _root_ide_package_.io.github.xingray.compose.nexus.controls.dayOfWeek(year, month, 1)
-    val currentMonthDays = _root_ide_package_.io.github.xingray.compose.nexus.controls.daysInMonth(year, month)
+): List<CalendarCell> {
+    val firstWeekDay = dayOfWeek(year, month, 1)
+    val currentMonthDays = daysInMonth(year, month)
     val prevMonth = if (month == 1) 12 else month - 1
     val prevYear = if (month == 1) year - 1 else year
-    val prevMonthDays = _root_ide_package_.io.github.xingray.compose.nexus.controls.daysInMonth(prevYear, prevMonth)
+    val prevMonthDays = daysInMonth(prevYear, prevMonth)
     val nextMonth = if (month == 12) 1 else month + 1
     val nextYear = if (month == 12) year + 1 else year
 
-    val cells = mutableListOf<io.github.xingray.compose.nexus.controls.CalendarCell>()
+    val cells = mutableListOf<CalendarCell>()
     for (index in 0 until 42) {
         val day = index - firstWeekDay + 1
         when {
             day <= 0 -> {
-                cells += _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCell(
-                    date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(prevYear, prevMonth, prevMonthDays + day),
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.PrevMonth,
+                cells += CalendarCell(
+                    date = NexusDate(prevYear, prevMonth, prevMonthDays + day),
+                    type = CalendarCellType.PrevMonth,
                 )
             }
 
             day > currentMonthDays -> {
-                cells += _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCell(
-                    date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(nextYear, nextMonth, day - currentMonthDays),
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.NextMonth,
+                cells += CalendarCell(
+                    date = NexusDate(nextYear, nextMonth, day - currentMonthDays),
+                    type = CalendarCellType.NextMonth,
                 )
             }
 
             else -> {
-                cells += _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCell(
-                    date = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(year, month, day),
-                    type = _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.CurrentMonth,
+                cells += CalendarCell(
+                    date = NexusDate(year, month, day),
+                    type = CalendarCellType.CurrentMonth,
                 )
             }
         }
@@ -465,40 +465,40 @@ private fun buildMonthCells(
 }
 
 private fun buildRangeCells(
-    start: io.github.xingray.compose.nexus.controls.NexusDate,
-    end: io.github.xingray.compose.nexus.controls.NexusDate,
+    start: NexusDate,
+    end: NexusDate,
     viewYear: Int,
     viewMonth: Int,
-): List<io.github.xingray.compose.nexus.controls.CalendarCell> {
-    val result = mutableListOf<io.github.xingray.compose.nexus.controls.CalendarCell>()
+): List<CalendarCell> {
+    val result = mutableListOf<CalendarCell>()
     var cursor = start
-    while (_root_ide_package_.io.github.xingray.compose.nexus.controls.compareDate(cursor, end) <= 0) {
-        result += _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCell(
+    while (compareDate(cursor, end) <= 0) {
+        result += CalendarCell(
             date = cursor,
             type = when {
-                cursor.year == viewYear && cursor.month == viewMonth -> _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.CurrentMonth
-                cursor.year * 12 + cursor.month < viewYear * 12 + viewMonth -> _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.PrevMonth
-                else -> _root_ide_package_.io.github.xingray.compose.nexus.controls.CalendarCellType.NextMonth
+                cursor.year == viewYear && cursor.month == viewMonth -> CalendarCellType.CurrentMonth
+                cursor.year * 12 + cursor.month < viewYear * 12 + viewMonth -> CalendarCellType.PrevMonth
+                else -> CalendarCellType.NextMonth
             },
         )
-        cursor = _root_ide_package_.io.github.xingray.compose.nexus.controls.addDays(cursor, 1)
+        cursor = addDays(cursor, 1)
     }
     return result
 }
 
 private fun validateRange(
-    start: io.github.xingray.compose.nexus.controls.NexusDate,
-    end: io.github.xingray.compose.nexus.controls.NexusDate,
-): Pair<io.github.xingray.compose.nexus.controls.NexusDate, io.github.xingray.compose.nexus.controls.NexusDate>? {
-    if (_root_ide_package_.io.github.xingray.compose.nexus.controls.compareDate(start, end) > 0) return null
-    if (_root_ide_package_.io.github.xingray.compose.nexus.controls.dayOfWeek(start.year, start.month, start.day) != 0) return null
-    if (_root_ide_package_.io.github.xingray.compose.nexus.controls.dayOfWeek(end.year, end.month, end.day) != 6) return null
+    start: NexusDate,
+    end: NexusDate,
+): Pair<NexusDate, NexusDate>? {
+    if (compareDate(start, end) > 0) return null
+    if (dayOfWeek(start.year, start.month, start.day) != 0) return null
+    if (dayOfWeek(end.year, end.month, end.day) != 6) return null
     val monthSpan = (end.year - start.year) * 12 + (end.month - start.month)
     if (monthSpan > 1) return null
     return start to end
 }
 
-private fun compareDate(left: io.github.xingray.compose.nexus.controls.NexusDate, right: io.github.xingray.compose.nexus.controls.NexusDate): Int {
+private fun compareDate(left: NexusDate, right: NexusDate): Int {
     return when {
         left.year != right.year -> left.year.compareTo(right.year)
         left.month != right.month -> left.month.compareTo(right.month)
@@ -506,7 +506,7 @@ private fun compareDate(left: io.github.xingray.compose.nexus.controls.NexusDate
     }
 }
 
-private fun addDays(date: io.github.xingray.compose.nexus.controls.NexusDate, days: Int): io.github.xingray.compose.nexus.controls.NexusDate {
+private fun addDays(date: NexusDate, days: Int): NexusDate {
     if (days == 0) return date
     var year = date.year
     var month = date.month
@@ -515,7 +515,7 @@ private fun addDays(date: io.github.xingray.compose.nexus.controls.NexusDate, da
 
     if (remaining > 0) {
         while (remaining > 0) {
-            val currentMonthDays = _root_ide_package_.io.github.xingray.compose.nexus.controls.daysInMonth(year, month)
+            val currentMonthDays = daysInMonth(year, month)
             if (day + remaining <= currentMonthDays) {
                 day += remaining
                 remaining = 0
@@ -543,22 +543,22 @@ private fun addDays(date: io.github.xingray.compose.nexus.controls.NexusDate, da
                 } else {
                     month--
                 }
-                day = _root_ide_package_.io.github.xingray.compose.nexus.controls.daysInMonth(year, month)
+                day = daysInMonth(year, month)
             }
         }
     }
 
-    return _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusDate(year, month, day)
+    return NexusDate(year, month, day)
 }
 
-private fun formatDay(date: io.github.xingray.compose.nexus.controls.NexusDate): String {
+private fun formatDay(date: NexusDate): String {
     return "${date.year}-${date.month.toString().padStart(2, '0')}-${date.day.toString().padStart(2, '0')}"
 }
 
 private fun daysInMonth(year: Int, month: Int): Int = when (month) {
     1, 3, 5, 7, 8, 10, 12 -> 31
     4, 6, 9, 11 -> 30
-    2 -> if (_root_ide_package_.io.github.xingray.compose.nexus.controls.isLeapYear(year)) 29 else 28
+    2 -> if (isLeapYear(year)) 29 else 28
     else -> 30
 }
 

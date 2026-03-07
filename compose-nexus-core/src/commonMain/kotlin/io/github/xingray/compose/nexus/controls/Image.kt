@@ -115,17 +115,17 @@ class NexusImageState(
 @Composable
 fun rememberNexusImageState(
     initialIndex: Int = 0,
-): io.github.xingray.compose.nexus.controls.NexusImageState = remember {
-    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusImageState(initialIndex = initialIndex)
+): NexusImageState = remember {
+    NexusImageState(initialIndex = initialIndex)
 }
 
 @Composable
 fun NexusImage(
     src: String,
     modifier: Modifier = Modifier,
-    fit: io.github.xingray.compose.nexus.controls.NexusImageFit = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusImageFit.Cover,
+    fit: NexusImageFit = NexusImageFit.Cover,
     hideOnClickModal: Boolean = false,
-    loading: io.github.xingray.compose.nexus.controls.NexusImageLoading = _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusImageLoading.Eager,
+    loading: NexusImageLoading = NexusImageLoading.Eager,
     lazy: Boolean = false,
     scrollContainer: Any? = null,
     alt: String = "",
@@ -142,7 +142,7 @@ fun NexusImage(
     minScale: Float = 0.2f,
     maxScale: Float = 7f,
     showProgress: Boolean = false,
-    state: io.github.xingray.compose.nexus.controls.NexusImageState = _root_ide_package_.io.github.xingray.compose.nexus.controls.rememberNexusImageState(initialIndex = initialIndex),
+    state: NexusImageState = rememberNexusImageState(initialIndex = initialIndex),
     placeholder: (@Composable () -> Unit)? = null,
     error: (@Composable () -> Unit)? = null,
     viewerError: (@Composable (activeIndex: Int, src: String) -> Unit)? = null,
@@ -165,13 +165,13 @@ fun NexusImage(
 ) {
     @Suppress("UNUSED_VARIABLE")
     val _unusedNative = listOf(scrollContainer, referrerPolicy, crossorigin, zIndex, previewTeleported)
-    val colorScheme = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme
-    val typography = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography
+    val colorScheme = NexusTheme.colorScheme
+    val typography = NexusTheme.typography
     val previewList = if (previewSrcList.isNotEmpty()) previewSrcList else if (src.isNotBlank()) listOf(src) else emptyList()
     val total = previewList.size
 
     var requestedLoad by remember(src, lazy, loading) {
-        mutableStateOf(!(lazy || loading == _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusImageLoading.Lazy))
+        mutableStateOf(!(lazy || loading == NexusImageLoading.Lazy))
     }
     var loadNotified by remember(src) { mutableStateOf(false) }
     var errorNotified by remember(src) { mutableStateOf(false) }
@@ -213,7 +213,7 @@ fun NexusImage(
 
     Box(
         modifier = modifier
-            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+            .clip(NexusTheme.shapes.base)
             .background(colorScheme.fill.light)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -233,7 +233,7 @@ fun NexusImage(
                 if (placeholder != null) {
                     placeholder()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "Loading...",
                         color = colorScheme.text.placeholder,
                         style = typography.small,
@@ -245,7 +245,7 @@ fun NexusImage(
                 if (error != null) {
                     error()
                 } else {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = if (alt.isBlank()) "Load Failed" else alt,
                         color = colorScheme.danger.base,
                         style = typography.small,
@@ -258,18 +258,18 @@ fun NexusImage(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "IMG",
                         color = colorScheme.primary.base,
                         style = typography.large,
                     )
-                    _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                    NexusText(
                         text = "fit=${fit.name.lowercase()}",
                         color = colorScheme.text.placeholder,
                         style = typography.extraSmall,
                     )
                     if (alt.isNotBlank()) {
-                        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                        NexusText(
                             text = alt,
                             color = colorScheme.text.secondary,
                             style = typography.extraSmall,
@@ -361,10 +361,10 @@ fun NexusImage(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusButton(
+                            NexusButton(
                                 text = "Close",
                                 onClick = { closePreview() },
-                                size = _root_ide_package_.io.github.xingray.compose.nexus.theme.ComponentSize.Small,
+                                size = ComponentSize.Small,
                             )
                         }
                     }
@@ -373,7 +373,7 @@ fun NexusImage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(380.dp)
-                            .clip(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.shapes.base)
+                            .clip(NexusTheme.shapes.base)
                             .background(colorScheme.fill.blank),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -383,7 +383,7 @@ fun NexusImage(
                             } else if (error != null) {
                                 error()
                             } else {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "Viewer Error",
                                     color = colorScheme.danger.base,
                                 )
@@ -393,18 +393,18 @@ fun NexusImage(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = "Preview ${safeIndex + 1}",
                                     color = colorScheme.primary.base,
                                     style = typography.large,
                                 )
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                                NexusText(
                                     text = activeSrc,
                                     color = colorScheme.text.secondary,
                                     style = typography.extraSmall,
                                 )
-                                _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
-                                    text = "scale=${_root_ide_package_.io.github.xingray.compose.nexus.controls.toShortScale(state.scale)}",
+                                NexusText(
+                                    text = "scale=${toShortScale(state.scale)}",
                                     color = colorScheme.text.placeholder,
                                     style = typography.extraSmall,
                                 )
@@ -418,13 +418,13 @@ fun NexusImage(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.ControlDot(text = "‹", onClick = { prevImage() })
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.ControlDot(text = "›", onClick = { nextImage() })
+                            ControlDot(text = "‹", onClick = { prevImage() })
+                            ControlDot(text = "›", onClick = { nextImage() })
                         }
                         if (progress != null) {
                             progress(safeIndex, previewList.size)
                         } else if (showProgress) {
-                            _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+                            NexusText(
                                 text = "${safeIndex + 1}/${previewList.size}",
                                 color = colorScheme.white,
                                 style = typography.small,
@@ -452,15 +452,15 @@ private fun ControlDot(
         modifier = Modifier
             .size(30.dp)
             .clip(CircleShape)
-            .background(_root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.overlay.lighter)
+            .background(NexusTheme.colorScheme.overlay.lighter)
             .clickable(onClick = onClick)
             .pointerHoverIcon(PointerIcon.Hand),
         contentAlignment = Alignment.Center,
     ) {
-        _root_ide_package_.io.github.xingray.compose.nexus.controls.NexusText(
+        NexusText(
             text = text,
-            color = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.colorScheme.white,
-            style = _root_ide_package_.io.github.xingray.compose.nexus.theme.NexusTheme.typography.base,
+            color = NexusTheme.colorScheme.white,
+            style = NexusTheme.typography.base,
         )
     }
 }
